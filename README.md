@@ -1,5 +1,5 @@
 # ProbSyllabifier
-Probabilistic syllabifier of English language using HMM
+Probabilistic syllabifier of English language using HMM.
 Word sets generated using Brown Corpus with custom tokenization
  
 ---
@@ -41,7 +41,6 @@ freq_words.txt
 ```
 Most frequently used words in the brown corpus
 
--
 ```
 randomWords.txt
 ```
