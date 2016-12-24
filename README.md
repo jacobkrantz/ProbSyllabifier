@@ -2,32 +2,50 @@
 Probabilistic syllabifier of English language using HMM
 Word sets generated using Brown Corpus with custom tokenization
  
----------------------------------
-Tokenization
+---
+###Tokenization
 
-Program Order:
-1. brownTokenizer.py
-    tokenizes a corpus
-2. freqLst.py
-    generates a file containing the 1000 most frequent words given a tokenized corpus
-3. randomWords.py
-    generates a random subset of words given a tokenized grouping of words
+####Program Order:
 
-Corpus Files:
--raw_words.txt
-    every untokenized word in the Brown corpus
+```
+brownTokenizer.py
+```
+tokenizes a corpus
 
--brown_words.txt
-    All tokenized words in the Brown corpus
+```
+freqLst.py
+```
+generates a file containing the 1000 most frequent words given a tokenized corpus
 
--unique_words.txt
-    All tokenized, unique words in the Brown corpus
+```
+randomWords.py
+``` 
+generates a random subset of words given a tokenized grouping of words
 
--freq_words.txt
-    Most frequently used words in the brown corpus
+####Corpus Files:
+```
+raw_words.txt
+```
+every untokenized word in the Brown corpus
 
--randomWords.txt
-    random selection of words from freq_words.txt
+```
+brown_words.txt
+```
+All tokenized words in the Brown corpus
+```
+unique_words.txt
+```
+All tokenized, unique words in the Brown corpus
+```
+freq_words.txt
+```
+Most frequently used words in the brown corpus
 
----------------------------------
+-
+```
+randomWords.txt
+```
+random selection of words from freq_words.txt
+
+---
 
