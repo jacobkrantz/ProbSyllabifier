@@ -29,7 +29,7 @@ def getWords():
     else:
         name = 'r'
         selection = raw
-        fileName = 'raw_words.txt'
+        fileName = 'brown_words.txt'
 
     fileName = './corpusFiles/' + fileName
     mid = open(fileName,'w')
