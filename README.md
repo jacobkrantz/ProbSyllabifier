@@ -11,8 +11,10 @@ Word sets generated using Brown Corpus with custom tokenization
 tokenizes a corpus  
 *freqLst.py*  
 generates a file containing the 1000 most frequent words given a tokenized corpus  
+*NISTSyllab.py*  
+generates a file containing a dictionary of word:syllab. Multiple syllabifications will be in tuple format within the dictionary value. Utilizes the NIST syllabifier and pulls word set from freqEditWords.txt  
 *randomWords.py*  
-generates a random subset of words given a tokenized grouping of words  
+follows FreqLst.py. generates a random subset of words given a tokenized grouping of words  
 
 ####Corpus Files:
 
@@ -26,6 +28,8 @@ every untokenized word in the Editorials category of the Brown corpus
 1000 most frequently used words in the brown corpus  
 *randomWords.txt*  
 random selection of 20 words from freq_words.txt  
+*topSyllabDict.txt*  
+holds dictionary created in NISTSyllab.py  
 
 ---
 
