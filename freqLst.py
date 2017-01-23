@@ -2,8 +2,10 @@
 Takes in a file of all tokenized words
 Adds word and # of occurrances to a dictionary
 outputs top 1000 words and their probability 
+Note: all top 1000 words must exist in CMU pronouncing dictionary
 '''
 import sys
+from nltk.corpus import cmudict
 
 def getWords():
     if(len(sys.argv) == 2 and sys.argv[1] == '-e'):
@@ -12,10 +14,12 @@ def getWords():
         fileName = './corpusFiles/raw_words.txt'
 
     wordFile = open(fileName,'r')
-    print(fileName)
+    print("Extracting from: " + fileName)
     words = ""
+
     for line in wordFile:
         words = words + ' ' + line
+
     words = words.split()
 
     return words, fileName
@@ -38,15 +42,27 @@ def createWordDict(words):
 
 
 def createFreqDict(wordDict, count):
+    CMUDict = cmudict.dict()
     freqLst = []
     wordLst = []
+    freqCount = 0
 
-    for i in range(1000):
-        maxKey = max(wordDict, key=wordDict.get)
-        wordLst.append(maxKey)
-        freqLst.append(wordDict[maxKey])
+    while(freqCount < 1000):
 
-        del wordDict[maxKey]
+        maxWord = max(wordDict, key=wordDict.get)
+        unicodeWord = unicode(maxWord)
+
+        try:
+
+            CMUDict[unicodeWord]
+            wordLst.append(maxWord)
+            freqLst.append(wordDict[maxWord])
+            del wordDict[maxWord]
+            freqCount = freqCount + 1
+
+        except:
+
+            del wordDict[maxWord]            
 
     return wordLst, freqLst
 
@@ -70,10 +86,17 @@ def printLst(w,fileName):
 
 def main():
     words,fileName = getWords()
+
     count = getWordCount(words)
+
     wordDict = createWordDict(words)
+
     wordLst, freqLst = createFreqDict(wordDict,count)
+
     viewMost(wordLst, freqLst)
+
+    print('\n' + "Number of words: " + str(len(wordLst)))
+
     printLst(wordLst,fileName)
 
 main()
