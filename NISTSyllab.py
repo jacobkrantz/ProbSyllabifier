@@ -46,10 +46,10 @@ def getArpabet(wordLst):
             pronounceDict[word] = CMUDict[unicodeWord]
 
         except:
-            ## common: names not in CMU. how to handle this?
+
             print(unicodeWord + " not found in CMUDict")
             sys.exit()
-    
+
     return pronounceDict
 
 
@@ -59,7 +59,27 @@ def getSyllabDict(ArpabetLst):
     return syllabDict
 
 
+## dictionary format: word: [[syllab1],[syllab2]...]
+## this function not passing. Need actual dictionary format to proceed.
 def printDictToFile(Dict):
+    outFile = open("./corpusFiles/topSyllabDict.txt",'w')
+
+    for entry in Dict:
+
+        #print(Dict[entry])
+        outFile.write(str(entry))
+        outFile.write(" ")
+        NumOfSyllabs = len(Dict[entry])
+
+        for i in range(0,NumOfSyllabs):
+
+            print(str(Dict[entry][i]))
+            outFile.write(" ")
+            outFile.write(str(Dict[entry][i]))
+
+        outFile.write("\n")
+
+    outFile.close()
     return
 
 
@@ -68,13 +88,11 @@ def main():
 
     wordLst = getWords(wordLst)
     
-    ArpabetLst = getArpabet(wordLst)
+    ArpabetDict = getArpabet(wordLst)
 
-    syllabDict = getSyllabDict(ArpabetLst)
+    syllabDict = getSyllabDict(ArpabetDict)
 
-    printDictToFile(syllabDict)
-
-
+    # printDictToFile(syllabDict)
 
 
 main()

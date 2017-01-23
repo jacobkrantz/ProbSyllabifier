@@ -1,0 +1,23 @@
+all  AO1
+evidence  EH1
+consider  K
+chinese  CH
+lack  L
+dollar  D AA1
+month  M
+four  F
+welfare  W
+go  G
+bomb  B AA1
+children  CH
+causes  K AA1
+whose  HH
+certainly  S
+corps  K AO1
+aug  AO1
+tv  T IY1
+concerned  K
+father  F
+young  Y
+spirit  S P
+to  T UW1
