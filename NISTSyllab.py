@@ -6,7 +6,11 @@
 ##   entry per line
 
 import sys
+import re
 from nltk.corpus import cmudict
+from subprocess import Popen, PIPE, STDOUT
+import subprocess 
+import shlex
 
 
 ## needs textfile of words to exist in specified directory
@@ -53,11 +57,51 @@ def getArpabet(wordLst):
     return pronounceDict
 
 
-def getSyllabDict(ArpabetLst):
+def getSyllabDict(ArpabetDict):
     syllabDict = {}
 
+    for key in ArpabetDict:
+
+        syllabDict[key] = []
+
+        for pronounciation in ArpabetDict[key]:
+
+            syllabification = getSyllabification(pronounciation)
+            syllabDict[key].append(syllabification)
+            
+        #print(syllabDict[key])
     return syllabDict
 
+
+def getSyllabification(pronounciation):
+    ArpString = ""
+
+    for phone in pronounciation:
+        aPhone = phone.encode('ascii','ignore')
+
+        if(len(aPhone) == 2):
+            if(aPhone[1].isdigit()):
+                aPhone = aPhone[:1]
+                
+        else:
+            if(len(aPhone) == 3):
+                if(aPhone[2].isdigit()):
+                    aPhone = aPhone[:2]
+
+        ArpString = ArpString + aPhone.lower() + " "
+
+    ## ArpString ready for NIST
+
+    return ArpString
+
+
+def runNIST(ArpString):
+    p = subprocess.Popen("cd ~/NIST/tsylb2-1.1/ && ./tsylb2 -n phon1ax.pcd", shell = True,stdin = PIPE,stdout = PIPE,stderr = PIPE, bufsize = 1) 
+
+    data = p.communicate(input = ArpString + "\n")[0]
+    #data is the output of the machine
+    print(data)
+    stringData = str(data)
 
 ## dictionary format: word: [[syllab1],[syllab2]...]
 ## this function not passing. Need actual dictionary format to proceed.
@@ -91,6 +135,8 @@ def main():
     ArpabetDict = getArpabet(wordLst)
 
     syllabDict = getSyllabDict(ArpabetDict)
+
+    runNIST("s t ey")
 
     # printDictToFile(syllabDict)
 
