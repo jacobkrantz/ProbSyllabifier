@@ -1,0 +1,122 @@
+; (first token in this line defines the comment flag)
+; File phon1ax.pcd
+; (Version of phon1a.pcd expanded to cover the usages
+;  of several sites's pronunciation dictionaries.)
+;
+; Candidate for Arpa Common Lexicon phonemic set.
+; Approximately classical phonemic.
+; Auxiliary info key-word lines, marked with "*":
+* NAME "phon1ax.pcd"
+* DESC "General English Phonemes - Expanded Set v. 1.0"
+* DATE "7/26/94"
+* FORMAT "NIST2"
+* This pcode is separated; separator characters are " /[]".
+* order for searching should be "alphabetic"
+* The element type is "phone"
+* compositional
+* lower code = "feats4.pcd"
+; NOTES:
+; 1. I don't yet know how to distinguish /aa/ from /aax/.
+; 2. The relative proximity of place of articulation is not represented
+;    well in this feature set.
+; 3. "stressed" and "boundary" are handled as scales, where a unit may
+;    be marked more and more.
+;
+; 5. Complex phonemes are not handled here in a way that expresses
+;    phonetic distance very well.  The relative time order of the
+;    sub-parts is not expressed, and the minor element of a diphthong
+;    is not represented fully, but just as a feature on the vowel.
+; 6. SPE and Halle & Clements 1983 say /h/ is -cons; Wolfram
+;    and Johnson 1982 say it's +cons.
+; 7. Halle & Clements 1983 say /y/ is +cor; SPE and Wolfram
+;    and Johnson 1982 say it's -cor.
+; 8. SPE and Wolfram & Johnson use "str" or "strident", but
+;    Halle & Clements 1983 apparently don't.
+; 9. I'm using "stop" for what others like W & J use "-d.r." for.
+; 10. At least one dictionary uses /ts/ for foreign loans like "tsunumi"
+;     We are allowing this as a phoneme.
+; 11. We use /ix/ to mean "barred eye".
+;      BUT some dictionaries use it for just the unstressed /ih/.
+; 12. At least one dictionary uses /ux/, apparently for the high front rounded vowel.
+;
+; segments:
+;CODE  Features:
+iy     syllabic sonorant voiced tense high                                 ; "bEAt"
+; rare - TI has it:
+ux     syllabic sonorant voiced tense high rounded                         ; "blUE" variant 
+ih     syllabic sonorant voiced       high                                 ; "bIt"
+ey     syllabic sonorant voiced tense                                      ; "bAIt"
+eh     syllabic sonorant voiced                                            ; "bEt"
+ae     syllabic sonorant voiced        low                                 ; "bAEt"
+aa     syllabic sonorant voiced tense  low back                            ; "bOb"
+aax    syllabic sonorant voiced tense  low back                            ; "cAlm", "adOpt" variants
+ao     syllabic sonorant voiced tense  low back rounded                    ; "bOUGHt"
+ow     syllabic sonorant voiced tense      back rounded                    ; "bOAt"
+uh     syllabic sonorant voiced       high back rounded                    ; "bOOk"
+uw     syllabic sonorant voiced tense high back rounded                    ; "bOOt"
+ay     syllabic sonorant voiced tense  low                                 ; "bIte"
+oy     syllabic sonorant voiced tense      back rounded                    ; "bOY"
+aw     syllabic sonorant voiced tense  low      rounded                    ; "bOUt"
+er     syllabic sonorant voiced            back rounded retroflex          ; "pERt"
+; /axr/ not distinct from /'0 er/:
+axr    syllabic sonorant voiced            back rounded retroflex          ; "buttER"
+ax     syllabic sonorant voiced            back                            ; "Abut"
+; /ah/ not distinct from /'1 ax/:
+ah     syllabic sonorant voiced            back                            ; "abUt"
+; NOTE: the symbol /ix/ has been used in at least 2 ways:
+; Note: this is the "barred eye", a high central unrounded vowel:
+; (see Halle & Clements p. 33)
+ix     syllabic sonorant voiced tense high back                            ; "rosE's"
+; Note: this is the version of /ih/ that occurs only under zero stress:
+; ix     syllabic sonorant voiced       high                                 ; "bIt"
+wh  consonantal sonorant              high back       continuent           ; "WHich"
+w               sonorant voiced       high back       continuent           ; "Witch"
+y               sonorant voiced       high            continuent           ; "Yet"
+r   consonantal sonorant voiced anterior coronal      continuent retroflex ; "Right"
+l   consonantal sonorant voiced          coronal      continuent lateral   ; "Light"
+; /el/ not distinct from tautosyllabic /'0 ax l/:
+el  syllabic consonantal sonorant voiced          coronal      continuent lateral   ; "bottLE"
+m   consonantal sonorant voiced anterior                           nasal   ; "Might"
+; /em/ not distinct from tautosyllabic /'0 ax m/:
+em   syllabic consonantal sonorant voiced anterior                 nasal   ; "bottOM" variant
+n   consonantal sonorant voiced anterior coronal                   nasal   ; "Night"
+; /en/ not distinct from tautosyllabic /'0 ax n/:
+en  syllabic consonantal sonorant voiced anterior coronal                  nasal   ; "buttON" variant
+nx  consonantal sonorant voiced       high back                    nasal   ; "kiNG"
+; /enx/ not distinct from tautosyllabic /'0 ax nx/:
+enx syllabic consonantal sonorant voiced high back                 nasal   ; "WashINGton" variant
+p   consonantal                 anterior              stop                 ; "Pet"
+b   consonantal          voiced anterior              stop                 ; "Bet"
+t   consonantal                 anterior coronal      stop                 ; "Tot"
+d   consonantal          voiced anterior coronal      stop                 ; "Dot"
+;; /dx/, a flap, not distinct from /t/ or /d/:
+dx   consonantal                 anterior coronal      stop                ; "baTTer" variant
+k   consonantal                       high back       stop                 ; "Kite"
+g   consonantal          voiced       high back       stop                 ; "Got"
+;; glottal stop:
+q   consonantal                       high back back       stop            ; "_ever","boTTle" variants
+ch  consonantal                          coronal high            strident  ; "CHeck"
+;; used in foreign (mainly Japanese) words only:
+;; feature composition is only a wag.
+ts  consonantal                          coronal                 strident  ; "tsunumi", "tse-tse"
+jh  consonantal          voiced          coronal high            strident  ; "Jet"
+f   consonantal                 anterior              continuent strident  ; "Fed"
+v   consonantal          voiced anterior              continuent strident  ; "Vote"
+th  consonantal                 anterior coronal      continuent           ; "THigh"
+dh  consonantal          voiced anterior coronal      continuent           ; "THy"
+s   consonantal                 anterior coronal      continuent strident  ; "Sigh"
+z   consonantal          voiced anterior coronal      continuent strident  ; "Zoo"
+sh  consonantal                          coronal high continuent strident  ; "SHed"
+zh  consonantal          voiced          coronal high continuent strident  ; "meaSure"
+hh  consonantal                                  low  continuent           ; "Hot"
+; non-segmental units:
+'1  nonsegmental stressed stressed stressed                                ; "decommISSion" (primary)
+'2  nonsegmental stressed stressed                                         ; "DEcommission" (secondary)
+'3  nonsegmental stressed                                                  ; ???
+'0  nonsegmental                                                           ; "decommissiON" (no stress)
+$## nonsegmental boundary boundary boundary                                ; UTTERANCE BEGINNING
+##$ nonsegmental boundary boundary boundary                                ; UTTERANCE ENDING
+#   nonsegmental boundary boundary ; WORD BOUNDARY                         ; "night#rate"
++   nonsegmental boundary ; MORPHEME BOUNDARY                              ; ???
+[   nonsegmental boundary ; BEGINNING SYLLABLE BOUNDARY                    ; /['0 ax][b '1 eh t]/ "abet"
+]   nonsegmental boundary ; ENDING SYLLABLE BOUNDARY
