@@ -6,6 +6,7 @@
 ##   entry per line
 
 import sys
+import re
 from nltk.corpus import cmudict
 
 
@@ -53,10 +54,43 @@ def getArpabet(wordLst):
     return pronounceDict
 
 
-def getSyllabDict(ArpabetLst):
+def getSyllabDict(ArpabetDict):
     syllabDict = {}
 
+    for key in ArpabetDict:
+
+        syllabDict[key] = []
+
+        for pronounciation in ArpabetDict[key]:
+
+            syllabification = getSyllabification(pronounciation)
+            syllabDict[key].append(syllabification)
+            
+        #print(syllabDict[key])
     return syllabDict
+
+
+def getSyllabification(pronounciation):
+    ArpString = ""
+
+    for phone in pronounciation:
+        aPhone = phone.encode('ascii','ignore')
+
+        if(len(aPhone) == 2):
+            if(aPhone[1].isdigit()):
+                aPhone = aPhone[:1]
+                
+        else:
+            if(len(aPhone) == 3):
+                if(aPhone[2].isdigit()):
+                    aPhone = aPhone[:2]
+
+        ArpString = ArpString + aPhone.lower() + " "
+
+    ## ArpString ready for NIST
+
+    return ArpString
+
 
 
 ## dictionary format: word: [[syllab1],[syllab2]...]
