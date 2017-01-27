@@ -35,6 +35,7 @@ def getWords(wordLst):
 
     return wordLst
 
+
 ## looks up each word in cmudict and adds the word and pronounciation
 ## to a dictionary. Values are in list format to allow for 
 ## Multiple pronounciations.
@@ -91,17 +92,43 @@ def getSyllabification(pronounciation):
         ArpString = ArpString + aPhone.lower() + " "
 
     ## ArpString ready for NIST
+    finalSyllab = runNIST(ArpString)
 
-    return ArpString
+    return finalSyllab
 
 
+## takes in a phonetic pronounciation and runs them through NIST
+## returns the proper syllabification(s) in a list  
 def runNIST(ArpString):
+    sylbLst = []
+
     p = subprocess.Popen("cd ~/NIST/tsylb2-1.1/ && ./tsylb2 -n phon1ax.pcd", shell = True,stdin = PIPE,stdout = PIPE,stderr = PIPE, bufsize = 1) 
 
-    data = p.communicate(input = ArpString + "\n")[0]
-    #data is the output of the machine
-    print(data)
-    stringData = str(data)
+    data = p.communicate(input = ArpString + "\n")[0] # data = output
+    
+    sylbLst = parseNIST(data)
+
+    return sylbLst
+
+
+## takes in the raw output of NIST 
+## parses for pronounciations and returns all in a list
+def parseNIST(data):
+    pattern   = '\/.*?\/'
+    returnLst = []
+    proLst    = []
+
+    proLst = re.findall(pattern, str(data))
+    proLst = proLst[1:]
+
+    for item in proLst:
+
+        tmp = item.strip('/# ')
+        tmp = tmp.strip('#')
+        returnLst.append(tmp)
+
+    return returnLst
+
 
 ## dictionary format: word: [[syllab1],[syllab2]...]
 ## this function not passing. Need actual dictionary format to proceed.
@@ -136,7 +163,7 @@ def main():
 
     syllabDict = getSyllabDict(ArpabetDict)
 
-    runNIST("s t ey")
+    runNIST("ah d ah l t")
 
     # printDictToFile(syllabDict)
 
