@@ -44,7 +44,7 @@ def getArpabet(wordLst):
         unicodeWord = unicode(word) 
 
         try:
-            print CMUDict[unicodeWord]
+            # print CMUDict[unicodeWord]
             pronounceDict[word] = CMUDict[unicodeWord]
 
         except:
@@ -67,7 +67,7 @@ def getSyllabDict(ArpabetDict):
             syllabification = getSyllabification(pronunciation)
             syllabDict[key].append(syllabification)
             
-        #print(syllabDict[key])
+        # print(syllabDict[key])
     return syllabDict
 
 
@@ -128,9 +128,9 @@ def main():
 
     syllabDict = getSyllabDict(ArpabetDict)
     
-    # print NIST.syllabify("hh ae v ih ng")
+    print NIST.syllabify("hh ae v")
 
-    # printDictToFile(syllabDict)
+    printDictToFile(syllabDict)
 
 
 main()
