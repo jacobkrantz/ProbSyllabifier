@@ -30,6 +30,6 @@ every untokenized word in the Editorials category of the Brown corpus
 random selection of 20 words from freq_words.txt  
 *topSyllabDict.txt*  
 holds dictionary created in NISTSyllab.py  
-
+tst  
 ---
 
