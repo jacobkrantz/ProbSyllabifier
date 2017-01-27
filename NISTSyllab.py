@@ -128,7 +128,7 @@ def main():
 
     syllabDict = getSyllabDict(ArpabetDict)
     
-    print NIST.syllabify("hh ae v")
+    # print NIST.syllabify("hh ae v ih ng")
 
     printDictToFile(syllabDict)
 
