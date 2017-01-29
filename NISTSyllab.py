@@ -34,8 +34,8 @@ def getWords(wordLst):
 
 
 ## looks up each word in cmudict and adds the word and pronunciation
-## to a dictionary. Values are in list format to allow for 
-## Multiple pronunciations.
+## to a dictionary. Values are in list format with unicode phonemes
+## only takes the first pronounciation for CMU when multiple exist
 def getArpabet(wordLst):
     pronounceDict = {}
     CMUDict = cmudict.dict()
@@ -44,8 +44,8 @@ def getArpabet(wordLst):
         unicodeWord = unicode(word) 
 
         try:
-            # print CMUDict[unicodeWord]
-            pronounceDict[word] = CMUDict[unicodeWord]
+            pronounceDict[word] = CMUDict[unicodeWord][0]
+            # print pronounceDict[word]
 
         except:
 
@@ -60,33 +60,29 @@ def getSyllabDict(ArpabetDict):
 
     for key in ArpabetDict:
 
-        syllabDict[key] = []
-
-        for pronunciation in ArpabetDict[key]:
-
-            syllabification = getSyllabification(pronunciation)
-            syllabDict[key].append(syllabification)
-            
+        syllabification = getSyllabification(ArpabetDict[key])
+        syllabDict[key] = syllabification
         # print(syllabDict[key])
+
     return syllabDict
 
 
 def getSyllabification(pronunciation):
     ArpString = ""
 
-    for phone in pronunciation:
-        aPhone = phone.encode('ascii','ignore')
+    for phoneme in pronunciation:
+        aPhoneme = phoneme.encode('ascii','ignore')
 
-        if(len(aPhone) == 2):
-            if(aPhone[1].isdigit()):
-                aPhone = aPhone[:1]
+        if(len(aPhoneme) == 2):
+            if(aPhoneme[1].isdigit()):
+                aPhoneme = aPhoneme[:1]
                 
         else:
-            if(len(aPhone) == 3):
-                if(aPhone[2].isdigit()):
-                    aPhone = aPhone[:2]
+            if(len(aPhoneme) == 3):
+                if(aPhoneme[2].isdigit()):
+                    aPhoneme = aPhoneme[:2]
 
-        ArpString = ArpString + aPhone + " "
+        ArpString = ArpString + aPhoneme + " "
 
     ## ArpString ready for NIST
     finalSyllab = NIST.syllabify(ArpString)
@@ -128,9 +124,9 @@ def main():
 
     syllabDict = getSyllabDict(ArpabetDict)
     
-    # print NIST.syllabify("hh ae v ih ng")
+    # print NIST.syllabify("s p eh sh ah l")
 
-    printDictToFile(syllabDict)
+    # printDictToFile(syllabDict)
 
 
 main()
