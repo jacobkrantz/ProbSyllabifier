@@ -1,5 +1,5 @@
 ## module for running the NIST Syllabifier
-
+## assumes tsylb2 file exists in directory '~/NIST/tsylb2-1.1/'
 
 from subprocess import Popen, PIPE, STDOUT
 import subprocess 

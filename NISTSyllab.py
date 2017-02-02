@@ -3,7 +3,8 @@
 ## Program takes in file of words to be syllabified separated
 ##   by spaces. Creates dictionary of word:syllabification.
 ##   This is outputted as a text file with one dictionary
-##   entry per line
+##   entry per line. 
+## Output file: './corpusFiles/topSyllabDict.txt'
 
 import sys
 from nltk.corpus import cmudict
@@ -45,7 +46,6 @@ def getArpabet(wordLst):
 
         try:
             pronounceDict[word] = CMUDict[unicodeWord][0]
-            # print pronounceDict[word]
 
         except:
 
@@ -62,7 +62,6 @@ def getSyllabDict(ArpabetDict):
 
         syllabification = getSyllabification(ArpabetDict[key])
         syllabDict[key] = syllabification
-        # print(syllabDict[key])
 
     return syllabDict
 
@@ -97,17 +96,9 @@ def printDictToFile(Dict):
 
     for entry in Dict:
 
-        #print(Dict[entry])
         outFile.write(str(entry))
         outFile.write(" ")
-        NumOfSyllabs = len(Dict[entry])
-
-        for i in range(0,NumOfSyllabs):
-
-            print(str(Dict[entry][i]))
-            outFile.write(" ")
-            outFile.write(str(Dict[entry][i]))
-
+        outFile.write(str(Dict[entry][0]))
         outFile.write("\n")
 
     outFile.close()
