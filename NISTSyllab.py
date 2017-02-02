@@ -123,10 +123,8 @@ def main():
     ArpabetDict = getArpabet(wordLst)
 
     syllabDict = getSyllabDict(ArpabetDict)
-    
-    # print NIST.syllabify("s p eh sh ah l")
 
-    # printDictToFile(syllabDict)
+    printDictToFile(syllabDict)
 
 
 main()
