@@ -49,9 +49,11 @@ def __runNIST(ArpString):
 ## parses for pronounciations and returns all in a list
 def __parseNISTData(data, ArpString):
     pattern   = '\/.*?\/'
+    pattern2 = '[^0-9]'
     error     = 'ERR'
     returnLst = []
     proLst    = []
+    
     data = str(data)
 
     if(len(re.findall(error, data))):
@@ -59,11 +61,15 @@ def __parseNISTData(data, ArpString):
 
     proLst = re.findall(pattern, data)
     proLst = proLst[1:]
-
+   
     for item in proLst:
-
         tmp = item.strip('/# ')
         tmp = tmp.strip('#')
-        returnLst.append(tmp)
+        newString = ""
+        for i in range(len(tmp)):
+            if(tmp[i] !='0' and tmp[i] != '1' and tmp[i] != '2' and tmp[i] !="'"):
+                newString += tmp[i]   
+        returnLst.append(newString)
 
     return returnLst
+
