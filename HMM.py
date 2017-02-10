@@ -34,12 +34,15 @@ class HMM:
     #     syllible to another.
     # Loads files necessary, builds matrix probabilities,
     #     outputs final matrix to a file "./HMM/MatrixA.txt"
-    #     using numpy.
+    #     using numpy. Also returns MatrixA.
     def buildMatrixA(self):
         self.__loadFiles__('A')
 
+        MatrixA = self.__insertProbA__()
+
         self.utils.outputMatrix(MatrixA, "./HMM/MatrixA.txt")
-        return
+
+        return MatrixA
 
 
     # goes through process of creating MatrixB for an HMM.
@@ -47,12 +50,16 @@ class HMM:
     # 
     # Loads files necessary, builds matrix probabilities,
     #     outputs final matrix to a file "./HMM/MatrixB.txt"
-    #     using numpy.
+    #     using numpy. Also returns MatrixB. 
     def buildMatrixB(self):
+
         self.__loadFiles__('B')
 
+        MatrixB = 0 # placeholder
+
         self.utils.outputMatrix(MatrixB, "./HMM/MatrixB.txt")
-        return 
+
+        return MatrixB
 
 
 
@@ -75,9 +82,9 @@ class HMM:
             self.syllabDict = utils.importSyllabDict("HMMFiles/SyllabDict.txt")
 
             self.syllabLst = utils.makeSylLst(self.syllabDict)
-            self.sylBigramLst = []
-            self.sylBigramFreqDict = {}
-            self.syllabCount = 0
+            self.sylBigramLst = utils.makeBigramLst(self.syllabDict)
+            self.sylBigramFreqDict = utils.makesylFreqDict(self.sylBigramLst)
+            self.syllabCount = len(syllabLst)
 
         elif(mode == 'B'):
             return
@@ -87,4 +94,10 @@ class HMM:
             sys.exit()
 
         print("Success: loaded files for " + mode + " matrix.")
+        return
+
+
+    # computes probabilities of a tag given the previous tag
+    # populates matrixB with these values as floating point decimals
+    def __insertProbA__(self):
         return

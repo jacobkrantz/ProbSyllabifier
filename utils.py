@@ -109,7 +109,33 @@ class Utils:
         return uniques
 
 
+    # builds the bigram list with bigrams inserted as tuples.
+    # bigrams derived from each entry of the syllabDict.
+    # no order specified in this list.
+    def makeBigramLst(self, Dict):
+        bigramLst = []
+        
+        for word in Dict:
+            singleLst = self.__BigramLstHelper__(Dict[word])
+            bigramLst = bigramLst + singleLst
 
+        return 
+
+
+    # creates a dictionary of [syllable]:frequency. 
+    # needs a list of all bigrams in the training set.
+    def makesylFreqDict(self,bigramLst):
+        freqDict = {}
+
+        for bigram in bigramLst:
+
+            if bigram in freqDict:
+                freqDict[bigram] = freqDict[bigram] + 1
+            else:
+                freqDict[bigram] = 1
+
+        return freqDict
+        
 
     # ------------------------------------------------------
     # helper functions below
@@ -137,3 +163,11 @@ class Utils:
 
         return fullSyllab
 
+
+    # helper function for makeBigramLst
+    def __BigramLstHelper__(self, lst):
+        bigramLst = []
+        for i in range(0,len(lst) - 1):
+            tup = (lst[i][1],lst[i+1][1]);
+            bigramLst.append(tup)
+        return bigramLst
