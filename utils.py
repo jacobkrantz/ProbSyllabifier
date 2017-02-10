@@ -2,6 +2,10 @@ import sys
 import numpy as np
 
 '''
+fileName:       utils.py
+Authors:        Jacob Krantz
+Date Modified:  2/9/17
+
 Common utilies needed for building matrices with a HMM
 - outputMatrix
 - importMatrix
@@ -88,6 +92,21 @@ class Utils:
             print (fileName+" does not exist or is not in proper form.")
 
         return syllabDict
+
+
+    # input: dictionary of word: syllabification
+    # output: list of unique syllables 
+    def makeSylLst(self,syllabDict):
+        uniques = []
+
+        for word in syllabDict:
+
+            for syllable in word[1]:
+
+                if syllabe not in uniques:
+                    uniques.append(syllable)
+
+        return uniques
 
 
 
