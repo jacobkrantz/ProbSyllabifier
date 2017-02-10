@@ -92,7 +92,7 @@ def getSyllabification(pronunciation):
 ## dictionary format: word: [[syllab1],[syllab2]...]
 ## this function not passing. Need actual dictionary format to proceed.
 def printDictToFile(Dict):
-    outFile = open("./corpusFiles/topSyllabDict.txt",'w')
+    outFile = open("./HMMFiles/SyllabDict.txt",'w')
 
     for entry in Dict:
 

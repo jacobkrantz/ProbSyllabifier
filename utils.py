@@ -10,10 +10,6 @@ Common utilies needed for building matrices with a HMM
 - makeSyllabDict
 - importSyllabDict
 
-#file i o
-#structure analysis
-#syllab?
-#parse syllab dict
 '''
 
 
@@ -69,6 +65,7 @@ class Utils:
             del tagDict[largest]
         return tagLst
 
+
     # given a file name, imports as a dictionary.
     # input expected as:  word [syl][syl]...[syl]
     def importSyllabDict(self, fileName):
@@ -93,9 +90,13 @@ class Utils:
         return syllabDict
 
 
-    # -------------------------------------------------
+
+
+    # ------------------------------------------------------
     # helper functions below
-    # -------------------------------------------------
+    # ------------------------------------------------------
+
+
 
     # helper for importSyllabDict.
     # parses the dict value beginning as a continuous string
@@ -105,6 +106,7 @@ class Utils:
     def __parseSyllabsIn__(self, syllabString):
         fullSyllab = ["<s>"]
 
+        syllabString = ' '.join(syllabString.split())
         splitLst = syllabString.split(']')
 
         for syllable in splitLst:
