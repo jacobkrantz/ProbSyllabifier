@@ -19,6 +19,12 @@ Common utilies needed for building matrices with a HMM
 
 class Utils:
 
+    # intialize a matrix using numpy with provided size
+    # returns matrix
+    def initMatrix(self,size):
+        return np.zeros((size,size), dtype=np.float)
+
+
     # Given a matrix created with numpy, outputMatrix sends the matrix
     # to a txt file under the provided name.
     def outputMatrix(self, matrix, fileName):
@@ -130,12 +136,28 @@ class Utils:
         for bigram in bigramLst:
 
             if bigram in freqDict:
-                freqDict[bigram] = freqDict[bigram] + 1
+                freqDict[bigram] += 1
             else:
                 freqDict[bigram] = 1
 
         return freqDict
         
+
+    #returns number of tags used in training set given syllabDict.
+    #tagDict= {[tag,#occurances],...}
+    def getSyllableFreq(syllabDict):
+        hiddenDict = {}
+
+        for syllabification in syllabDict:
+
+            for syllable in syllabification:
+                
+                if syllable in hiddenDict:
+                    hiddenDict[syllable] += 1
+                else:
+                    hiddenDict[syllable] = 1
+
+        return hiddenDict
 
     # ------------------------------------------------------
     # helper functions below

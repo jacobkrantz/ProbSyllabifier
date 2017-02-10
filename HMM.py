@@ -1,5 +1,7 @@
 from utils import Utils
+import numpy as np
 import sys
+
 
 '''
 fileName:       HMM.py
@@ -23,6 +25,7 @@ class HMM:
         self.syllabLst = []
         self.sylBigramLst = []
         self.sylBigramFreqDict = {}
+        self.sylFreqDict = {}
         self.syllabCount = 0
         self.matrixA
 
@@ -38,11 +41,13 @@ class HMM:
     def buildMatrixA(self):
         self.__loadFiles__('A')
 
-        MatrixA = self.__insertProbA__()
+        matrixA = utils.intiMatrix(self.syllabCount)
 
-        self.utils.outputMatrix(MatrixA, "./HMM/MatrixA.txt")
+        matrixA = self.__insertProbA__(matrixA)
 
-        return MatrixA
+        self.utils.outputMatrix(matrixA, "./HMM/MatrixA.txt")
+
+        return matrixA
 
 
     # goes through process of creating MatrixB for an HMM.
@@ -84,6 +89,7 @@ class HMM:
             self.syllabLst = utils.makeSylLst(self.syllabDict)
             self.sylBigramLst = utils.makeBigramLst(self.syllabDict)
             self.sylBigramFreqDict = utils.makesylFreqDict(self.sylBigramLst)
+            self.sylFreqDict = utils.getSyllableFreq(self.syllableDict)
             self.syllabCount = len(syllabLst)
 
         elif(mode == 'B'):
@@ -100,4 +106,17 @@ class HMM:
     # computes probabilities of a tag given the previous tag
     # populates matrixB with these values as floating point decimals
     def __insertProbA__(self):
-        return
+        for entry in self.sylBigramFreqDict:
+            iTag = entry[0]
+            jTag = entry[1]
+
+            count  = self.sylBigramFreqDict[entry]
+            divisor = self.sylFreqDict[iTag]
+            probability = count / float(divisor)
+
+            iIndex = self.syllabLst.index(iTag) #finds index in matrix with tagLst
+            jIndex = self.syllabLst.index(jTag)
+
+            matrixA[iIndex,jIndex] = probability
+
+        return matrixA
