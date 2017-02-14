@@ -1,12 +1,11 @@
 from utils import Utils
-import numpy as np
 import sys
 
 
 '''
 fileName:       HMM.py
 Authors:        Jacob Krantz
-Date Modified:  2/9/17
+Date Modified:  2/14/17
 
 - Builds A and B matrices of an HMM
 - Necessary files:
@@ -27,9 +26,6 @@ class HMM:
         self.sylBigramFreqDict = {}
         self.sylFreqDict = {}
         self.syllabCount = 0
-        self.matrixA
-
-
 
 
     # goes through process of creating MatrixA for an HMM.
@@ -38,10 +34,10 @@ class HMM:
     # Loads files necessary, builds matrix probabilities,
     #     outputs final matrix to a file "./HMM/MatrixA.txt"
     #     using numpy. Also returns MatrixA.
-    def buildMatrixA(self):
+    def buildMatrixA(self, outFile):
         self.__loadFiles__('A')
 
-        matrixA = utils.intiMatrix(self.syllabCount)
+        matrixA = self.utils.initMatrix(self.syllabCount)
 
         matrixA = self.__insertProbA__(matrixA)
 
@@ -79,18 +75,19 @@ class HMM:
     #       - syllabLst
     #       - sylBigramLst
     #       - bigramFreqDict
+    #       - syllabFreqDict
     #       - syllabCount
     # if mode == 'B', loads data necessary for B matrix
     def __loadFiles__(self,mode):
         if(mode == 'A'):
 
-            self.syllabDict = utils.importSyllabDict("HMMFiles/SyllabDict.txt")
+            self.syllabDict = self.utils.importSyllabDict("HMMFiles/SyllabDict.txt")
 
-            self.syllabLst = utils.makeSylLst(self.syllabDict)
-            self.sylBigramLst = utils.makeBigramLst(self.syllabDict)
-            self.sylBigramFreqDict = utils.makesylFreqDict(self.sylBigramLst)
-            self.sylFreqDict = utils.getSyllableFreq(self.syllableDict)
-            self.syllabCount = len(syllabLst)
+            self.syllabLst = self.utils.makeSylLst(self.syllabDict)
+            self.sylBigramLst = self.utils.makeBigramLst(self.syllabDict)
+            self.sylBigramFreqDict = self.utils.makesylFreqDict(self.sylBigramLst)
+            self.sylFreqDict = self.utils.getSyllableFreq(self.syllabDict)
+            self.syllabCount = len(self.syllabLst)
 
         elif(mode == 'B'):
             return
@@ -105,7 +102,7 @@ class HMM:
 
     # computes probabilities of a tag given the previous tag
     # populates matrixB with these values as floating point decimals
-    def __insertProbA__(self):
+    def __insertProbA__(self, matrixA):
         for entry in self.sylBigramFreqDict:
             iTag = entry[0]
             jTag = entry[1]

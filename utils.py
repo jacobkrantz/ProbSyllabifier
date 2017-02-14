@@ -4,7 +4,7 @@ import numpy as np
 '''
 fileName:       utils.py
 Authors:        Jacob Krantz
-Date Modified:  2/9/17
+Date Modified:  2/14/17
 
 Common utilies needed for building matrices with a HMM
 - outputMatrix
@@ -106,12 +106,12 @@ class Utils:
         uniques = []
 
         for word in syllabDict:
+            
+            for syllable in syllabDict[word]:
 
-            for syllable in word[1]:
-
-                if syllabe not in uniques:
+                if syllable not in uniques:
                     uniques.append(syllable)
-
+        print len(uniques)
         return uniques
 
 
@@ -125,7 +125,7 @@ class Utils:
             singleLst = self.__BigramLstHelper__(Dict[word])
             bigramLst = bigramLst + singleLst
 
-        return 
+        return bigramLst
 
 
     # creates a dictionary of [syllable]:frequency. 
@@ -145,7 +145,7 @@ class Utils:
 
     #returns number of tags used in training set given syllabDict.
     #tagDict= {[tag,#occurances],...}
-    def getSyllableFreq(syllabDict):
+    def getSyllableFreq(self, syllabDict):
         hiddenDict = {}
 
         for syllabification in syllabDict:
@@ -159,10 +159,10 @@ class Utils:
 
         return hiddenDict
 
+
     # ------------------------------------------------------
     # helper functions below
     # ------------------------------------------------------
-
 
 
     # helper for importSyllabDict.

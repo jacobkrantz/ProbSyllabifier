@@ -1,121 +1,134 @@
-## Mass syllabifier using CMU Pronouncing Dictionary and 
-##   NIST Sylabifier. 
-## Program takes in file of words to be syllabified separated
-##   by spaces. Creates dictionary of word:syllabification.
-##   This is outputted as a text file with one dictionary
-##   entry per line. 
-## Output file: './corpusFiles/topSyllabDict.txt'
+'''
+fileName:       NISTSyllab.py
+Authors:        Jacob Krantz
+Date Modified:  2/14/17
 
+- Mass syllabifier using CMU Pronouncing Dictionary and 
+    NIST Sylabifier. 
+- Program takes in file of words to be syllabified separated
+    by spaces. Creates dictionary of word:syllabification.
+    This is outputted as a text file with one dictionary
+    entry per line. 
+- Output file: './corpusFiles/topSyllabDict.txt'
+'''
 import sys
 from nltk.corpus import cmudict
-import NIST
+from NIST import NIST
+
+class NISTSyllab:
+
+    def __init__(self):
+        self.NIST = NIST()
+        self.CMUDict = cmudict.dict()
+        self.wordLst = []
+        self.ArpabetDict = {}
+        self.outFile = ""
+        self.inFile = ""
+
+    # given an input file, will syllabify all the words within.
+    # Outputs as a syllabification dictionary to specified 
+    # output file. Parsing of this file shown in 'utils.py'.
+    def syllabifyFile(self, inputFile, outputFile):
+        self.inFile = inputFile
+        self.outFile = outputFile
+
+        self.__readWords__()
+        
+        self.__buildArpabet__()
+
+        syllabDict = self.__getSyllabDict__()
+
+        self.__printDictToFile__(syllabDict)
+
+        print "File successfully syllabified."
 
 
-## needs textfile of words to exist in specified directory
-## imports words from file as list of words
-def getWords(wordLst):
-
-    if(len(sys.argv) == 2):
-        fileName = sys.argv[1]
-    else:
-        print("Error. No word file provided.")
-        sys.exit()
-
-    wordFile = open(fileName,'r') 
-
-    words = ""
-    for line in wordFile:
-        words = words + ' ' + line
-    words = words.split()
-
-    for i in words:
-        wordLst.append(i)
-
-    return wordLst
+    # ------------------------------------------------------
+    # private functions below
+    # ------------------------------------------------------
 
 
-## looks up each word in cmudict and adds the word and pronunciation
-## to a dictionary. Values are in list format with unicode phonemes
-## only takes the first pronounciation for CMU when multiple exist
-def getArpabet(wordLst):
-    pronounceDict = {}
-    CMUDict = cmudict.dict()
-
-    for word in wordLst:
-        unicodeWord = unicode(word) 
-
+    ## needs textfile of words to exist in specified directory
+    ## imports words from file as list of words.
+    ## populates self.wordLst with file contents
+    def __readWords__(self):
         try:
-            pronounceDict[word] = CMUDict[unicodeWord][0]
+            wordFile = open(self.inFile,'r') 
+
+            words = ""
+            for line in wordFile:
+                words = words + ' ' + line
+            words = words.split()
+
+            for i in words:
+                self.wordLst.append(i)
 
         except:
-
-            print(unicodeWord + " not found in CMUDict")
-            sys.exit()
-
-    return pronounceDict
+            print("Error reading file " + self.inFile)
 
 
-def getSyllabDict(ArpabetDict):
-    syllabDict = {}
+    ## looks up each word in cmudict and adds the word and pronunciation
+    ## to a dictionary. Values are in list format with unicode phonemes.
+    ## Only takes the first pronounciation for CMU when multiple exist.
+    def __buildArpabet__(self):
 
-    for key in ArpabetDict:
+        for word in self.wordLst:
+            unicodeWord = unicode(word) 
 
-        syllabification = getSyllabification(ArpabetDict[key])
-        syllabDict[key] = syllabification
+            try:
+                self.ArpabetDict[word] = self.CMUDict[unicodeWord][0]
 
-    return syllabDict
+            except:
 
-
-def getSyllabification(pronunciation):
-    ArpString = ""
-
-    for phoneme in pronunciation:
-        aPhoneme = phoneme.encode('ascii','ignore')
-
-        if(len(aPhoneme) == 2):
-            if(aPhoneme[1].isdigit()):
-                aPhoneme = aPhoneme[:1]
-                
-        else:
-            if(len(aPhoneme) == 3):
-                if(aPhoneme[2].isdigit()):
-                    aPhoneme = aPhoneme[:2]
-
-        ArpString = ArpString + aPhoneme + " "
-
-    ## ArpString ready for NIST
-    finalSyllab = NIST.syllabify(ArpString)
-
-    return finalSyllab
+                print(unicodeWord + " not found in CMUDict")
+                sys.exit()
 
 
-## dictionary format: word: [[syllab1],[syllab2]...]
-## this function not passing. Need actual dictionary format to proceed.
-def printDictToFile(Dict):
-    outFile = open("./HMMFiles/SyllabDict.txt",'w')
+    def __getSyllabDict__(self):
+        syllabDict = {}
 
-    for entry in Dict:
+        for key in self.ArpabetDict:
 
-        outFile.write(str(entry))
-        outFile.write(" ")
-        outFile.write(str(Dict[entry][0]))
-        outFile.write("\n")
+            syllabif = self.__getSyllabification__(self.ArpabetDict[key])
+            syllabDict[key] = syllabif
 
-    outFile.close()
-    return
+        return syllabDict
 
 
-def main():
-    
-    wordLst = []
+    def __getSyllabification__(self, pronunciation):
+        ArpString = ""
 
-    wordLst = getWords(wordLst)
-    
-    ArpabetDict = getArpabet(wordLst)
+        for phoneme in pronunciation:
+            aPhoneme = phoneme.encode('ascii','ignore')
 
-    syllabDict = getSyllabDict(ArpabetDict)
+            if(len(aPhoneme) == 2):
+                if(aPhoneme[1].isdigit()):
+                    aPhoneme = aPhoneme[:1]
+                    
+            else:
+                if(len(aPhoneme) == 3):
+                    if(aPhoneme[2].isdigit()):
+                        aPhoneme = aPhoneme[:2]
 
-    printDictToFile(syllabDict)
+            ArpString = ArpString + aPhoneme + " "
+
+        ## ArpString ready for NIST
+        finalSyllab = self.NIST.syllabify(ArpString)
+
+        return finalSyllab
 
 
-main()
+    ## dictionary format: word: [[syllab1],[syllab2]...]
+    def __printDictToFile__(self, Dict):
+        
+        outF = open(self.outFile,'w')
+        #outFile = open("./HMMFiles/SyllabDict.txt",'w')
+
+        for entry in Dict:
+
+            outF.write(str(entry))
+            outF.write(" ")
+            outF.write(str(Dict[entry][0]))
+            outF.write("\n")
+
+        outF.close()
