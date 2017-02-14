@@ -3,6 +3,27 @@ Probabilistic syllabifier of English language using HMM.
 Word sets generated using Brown Corpus with custom tokenization
  
 ---
+###Syllabification
+
+####Programs:
+
+*NIST.py*  
+Interfaces directly with the NIST Syllabifier.  
+*NISTSyllab.py*  
+Syllabifies an entire file of words and outputs resulting dictionary to a new file.  
+*HMM.py*  
+Used to build a Hidden Markov Model: trains A and B matrices.  
+*utils.py*  
+Tools currently associated with training and using HMM matrices.  
+*run.py*  
+Run this file to use the Syllabifier. Used for running NIST, training HMM, and using the HMM. 
+
+####HMM Files:
+
+*syllabDict.txt*  
+houses the dictionary created in NISTSyllab.py. 
+
+---
 ###Tokenization
 
 ####Program Order:
@@ -11,8 +32,6 @@ Word sets generated using Brown Corpus with custom tokenization
 tokenizes a corpus  
 *freqLst.py*  
 generates a file containing the 1000 most frequent words given a tokenized corpus  
-*NISTSyllab.py*  
-generates a file containing a dictionary of word:syllab. Multiple syllabifications will be in tuple format within the dictionary value. Utilizes the NIST syllabifier and pulls word set from freqEditWords.txt  
 *randomWords.py*  
 follows FreqLst.py. generates a random subset of words given a tokenized grouping of words  
 
@@ -28,8 +47,3 @@ every untokenized word in the Editorials category of the Brown corpus
 1000 most frequently used words in the brown corpus  
 *randomWords.txt*  
 random selection of 20 words from freq_words.txt  
-*topSyllabDict.txt*  
-holds dictionary created in NISTSyllab.py  
-tst  
----
-
