@@ -41,7 +41,7 @@ class HMM:
 
         matrixA = self.__insertProbA__(matrixA)
 
-        self.utils.outputMatrix(matrixA, "./HMM/MatrixA.txt")
+        self.utils.outputMatrix(matrixA, "A")
 
         return matrixA
 
@@ -58,7 +58,7 @@ class HMM:
 
         MatrixB = 0 # placeholder
 
-        self.utils.outputMatrix(MatrixB, "./HMM/MatrixB.txt")
+        self.utils.outputMatrix(MatrixB, "B")
 
         return MatrixB
 
@@ -82,12 +82,12 @@ class HMM:
         if(mode == 'A'):
 
             self.syllabDict = self.utils.importSyllabDict("HMMFiles/SyllabDict.txt")
-
             self.syllabLst = self.utils.makeSylLst(self.syllabDict)
             self.sylBigramLst = self.utils.makeBigramLst(self.syllabDict)
             self.sylBigramFreqDict = self.utils.makesylFreqDict(self.sylBigramLst)
             self.sylFreqDict = self.utils.getSyllableFreq(self.syllabDict)
             self.syllabCount = len(self.syllabLst)
+            # print self.syllabCount
 
         elif(mode == 'B'):
             return

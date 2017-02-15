@@ -27,8 +27,11 @@ class Utils:
 
     # Given a matrix created with numpy, outputMatrix sends the matrix
     # to a txt file under the provided name.
-    def outputMatrix(self, matrix, fileName):
-        np.savetxt("matrixA.txt",matrix, newline = '\n',header = fileName - ".txt", footer = "", fmt = '%.10f')
+    def outputMatrix(self, matrix, which):
+        if(which == "A"):
+            np.savetxt("./HMMFiles/MatrixA.txt",matrix, newline = '\n',header = "MatrixA", footer = "", fmt = '%.5f')
+        else:
+            np.savetxt("./HMMFiles/MatrixB.txt",matrix, newline = '\n',header = "MatrixB", footer = "", fmt = '%.5f')
 
 
     # given the name of a file, imports a matrix using the numpy tool.
@@ -111,7 +114,7 @@ class Utils:
 
                 if syllable not in uniques:
                     uniques.append(syllable)
-        print len(uniques)
+
         return uniques
 
 
@@ -148,15 +151,14 @@ class Utils:
     def getSyllableFreq(self, syllabDict):
         hiddenDict = {}
 
-        for syllabification in syllabDict:
+        for word in syllabDict:
 
-            for syllable in syllabification:
+            for syllable in syllabDict[word]:
                 
                 if syllable in hiddenDict:
                     hiddenDict[syllable] += 1
                 else:
                     hiddenDict[syllable] = 1
-
         return hiddenDict
 
 
@@ -189,7 +191,8 @@ class Utils:
     # helper function for makeBigramLst
     def __BigramLstHelper__(self, lst):
         bigramLst = []
+        
         for i in range(0,len(lst) - 1):
-            tup = (lst[i][1],lst[i+1][1]);
+            tup = (lst[i],lst[i+1]);
             bigramLst.append(tup)
         return bigramLst
