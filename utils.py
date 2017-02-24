@@ -45,16 +45,40 @@ class Utils:
         return matrix
 
 
-    # bigramLst: [(phone,phone,int)] where int corresponds to the type 
-    # of boundary. Returns number of unique boundary types.
-    def getBoundCount(self, bigramLst):
+    # allBigramTups: [[(phone,phone,int),(...),],[...],] where int 
+    # corresponds to the type of boundary. 
+    # Returns number of unique boundary types.
+    def getUniqueBoundCount(self, allBigramLst):
         typeLst = []
 
-        for tup in bigramLst:
-            if(tup[2] not in typeLst:
-                typeLst.append(tup[2])
-        return len(typeLst)
+        for phoneme in allBigramLst:
+            for tup in phoneme:
+                if(tup[2] not in typeLst):
+                    typeLst.append(tup[2])
+            return len(typeLst)
 
+
+    # phonemeLst: [(phone,phone,int)]
+    # returns a list of all 
+    def getBoundaryLst(self, phonemeLst):
+        boundLst = []
+
+        for tup in phonemeLst:
+            boundLst.append(tup[2])
+
+        return boundLst
+
+
+    # allBigramTups: [[(phone,phone,int),(...),],[...],]
+    # counts up every tuple in the list of lists. Returns this count
+    def getBoundCount(self, allBigramTups):
+        boundCount = 0
+        
+        for phoneme in allBigramTups:
+            for tup in phoneme:
+                boundCount += 1
+
+        return boundCount
 
     # ------------------------------------------------------
     # helper functions below
