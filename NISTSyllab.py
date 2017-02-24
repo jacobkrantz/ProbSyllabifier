@@ -1,7 +1,7 @@
 '''
 fileName:       NISTSyllab.py
 Authors:        Jacob Krantz
-Date Modified:  2/14/17
+Date Modified:  2/23/17
 
 - Mass syllabifier using CMU Pronouncing Dictionary and 
     NIST Sylabifier. 
@@ -9,7 +9,7 @@ Date Modified:  2/14/17
     by spaces. Creates dictionary of word:syllabification.
     This is outputted as a text file with one dictionary
     entry per line. 
-- Output file: './corpusFiles/topSyllabDict.txt'
+- Output file: './HMMFiles/SyllabDict.txt'
 '''
 import sys
 from nltk.corpus import cmudict
