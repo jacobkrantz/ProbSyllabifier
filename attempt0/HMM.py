@@ -20,21 +20,24 @@ class HMM:
     def __init__(self):
         self.utils = Utils()
 
-        self.bigramCount = 2
-        self.bigramTups = []
-        
+        self.syllabDict = {}
+        self.syllabLst = []
+        self.sylBigramLst = []
+        self.sylBigramFreqDict = {}
+        self.sylFreqDict = {}
+        self.syllabCount = 0
 
 
     # goes through process of creating MatrixA for an HMM.
     # MatrixA is the transition probability of going from one
-    #     boundary to another.
+    #     syllible to another.
     # Loads files necessary, builds matrix probabilities,
     #     outputs final matrix to a file "./HMM/MatrixA.txt"
     #     using numpy. Also returns MatrixA.
     def buildMatrixA(self, outFile):
         self.__loadFiles__('A')
 
-        matrixA = self.utils.initMatrix(self.bigramCount)
+        matrixA = self.utils.initMatrix(self.syllabCount)
 
         matrixA = self.__insertProbA__(matrixA)
 
@@ -79,9 +82,12 @@ class HMM:
         if(mode == 'A'):
 
             self.syllabDict = self.utils.importSyllabDict("HMMFiles/SyllabDict.txt")
-            self.bigramTups = self.utils.getBigramTups()
-            self.boundaryCount = self.utils.getBoundCount(self.bigramTups)
-
+            self.syllabLst = self.utils.makeSylLst(self.syllabDict)
+            self.sylBigramLst = self.utils.makeBigramLst(self.syllabDict)
+            self.sylBigramFreqDict = self.utils.makesylFreqDict(self.sylBigramLst)
+            self.sylFreqDict = self.utils.getSyllableFreq(self.syllabDict)
+            self.syllabCount = len(self.syllabLst)
+            # print self.syllabCount
 
         elif(mode == 'B'):
             return
