@@ -40,16 +40,16 @@ class HMM:
     #     outputs final matrix to a file "./HMM/MatrixA.txt"
     #     using numpy. Also returns MatrixA.
     def buildMatrixA(self, outFile):
-        self.__loadFiles__('A')
 
+        self.__loadFiles__('A')
         matrixA = self.utils.initMatrix(self.bigramCount)
 
         for phoneme in self.AllBigramTups:
 
+            self.boundBigrams = self.utils.getBoundBigrams(phoneme)
             matrixA = self.__insertCountA__(matrixA)
 
-        matrixA = __normalizeA__(self.boundCount)
-
+        matrixA = __normalizeA__(matrixA)
         self.utils.outputMatrix(matrixA, "A")
 
         return matrixA
@@ -111,17 +111,17 @@ class HMM:
     # populates matrixA with these values and return matrixA
     def __insertCountA__(self, matrixA):
 
-        for bigram in self.boundBigrams:
-            if(bigram == [0,0]):
+        for bigramTup in self.boundBigrams:
+            if(bigramTup == (0,0)):
                 matrixA[0,0] = matrixA[0,0] + 1
 
-            elif(bigram == [0,1]):
+            elif(bigramTup == (0,1)):
                 matrixA[0,1] = matrixA[0,1] + 1
 
-            elif(bigram == [1,0]):
+            elif(bigramTup == (1,0)):
                 matrixA[1,0] = matrixA[1,0] + 1
 
-            elif(bigram == [1,1]):
+            elif(bigramTup == (1,1)):
                 matrixA[1,1] = matrixA[1,1] + 1
 
         return matrixA

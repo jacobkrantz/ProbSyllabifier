@@ -45,6 +45,15 @@ class Utils:
         return matrix
 
 
+    # uses SyllabParser to generate a list of lists.
+    # allBigramTups: [[(phone,phone,int),(...),],[...],] where int 
+    # corresponds to the type of boundary.
+    def getAllBigramTups(self):
+        allBigramTups = []
+        
+        return allBigramTups
+
+
     # allBigramTups: [[(phone,phone,int),(...),],[...],] where int 
     # corresponds to the type of boundary. 
     # Returns number of unique boundary types.
@@ -79,6 +88,23 @@ class Utils:
                 boundCount += 1
 
         return boundCount
+
+
+    # for input phoneme: [(phone,phone,int),(...),]
+    # returns a list of tuples containing boundary bigrams.
+    # ex: [(0,0),(0,1),(1,0)]
+    def getBoundBigrams(self, phoneme):
+        boundBigrams = []
+        boundLst = []
+
+        for tup in phoneme:
+            boundLst.append(tup[2])
+
+        for i in range(1,len(boundLst) - 1):
+            tupl = (boundLst[i - 1], boundLst[i])
+            boundBigrams.append(tupl)
+
+        return boundBigrams
 
     # ------------------------------------------------------
     # helper functions below
