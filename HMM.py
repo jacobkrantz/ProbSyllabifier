@@ -20,14 +20,22 @@ class HMM:
     def __init__(self):
         self.utils = Utils()
 
-        self.bigramCount = 2
-        self.bigramTups = []
+        self.uniqueBoundCount = 2
+        self.boundCount = 0
+        self.allBigramTups = []
+        self.boundFreqDict = {}
+        self.boundLst = []
+        self.boundBigrams = [] # how to update this for each entry?
         
 
 
     # goes through process of creating MatrixA for an HMM.
     # MatrixA is the transition probability of going from one
     #     boundary to another.
+    # 
+    # for both x and y, 0 is no boundary.
+    # for both x and y, 1 is a boundary.
+    # 
     # Loads files necessary, builds matrix probabilities,
     #     outputs final matrix to a file "./HMM/MatrixA.txt"
     #     using numpy. Also returns MatrixA.
@@ -36,7 +44,11 @@ class HMM:
 
         matrixA = self.utils.initMatrix(self.bigramCount)
 
-        matrixA = self.__insertProbA__(matrixA)
+        for phoneme in self.AllBigramTups:
+
+            matrixA = self.__insertCountA__(matrixA)
+
+        matrixA = __normalizeA__(self.boundCount)
 
         self.utils.outputMatrix(matrixA, "A")
 
@@ -79,9 +91,10 @@ class HMM:
         if(mode == 'A'):
 
             self.syllabDict = self.utils.importSyllabDict("HMMFiles/SyllabDict.txt")
-            self.bigramTups = self.utils.getBigramTups()
-            self.boundaryCount = self.utils.getBoundCount(self.bigramTups)
-
+            self.allBigramTups = self.utils.getAllBigramTups()
+            self.uniqueBoundCount = self.utils.getUniqueBoundCount(self.AllBigramTups)
+            self.boundaryLst = self.utils.getBoundaryLst(bigramTups)
+            self.boundCount = self.utils.getBoundCount(self.allBigramTups)
 
         elif(mode == 'B'):
             return
@@ -94,20 +107,38 @@ class HMM:
         return
 
 
-    # computes probabilities of a tag given the previous tag
-    # populates matrixB with these values as floating point decimals
-    def __insertProbA__(self, matrixA):
-        for entry in self.sylBigramFreqDict:
-            iTag = entry[0]
-            jTag = entry[1]
+    # inserts the count of a tag given the previous tag
+    # populates matrixA with these values and return matrixA
+    def __insertCountA__(self, matrixA):
 
-            count  = self.sylBigramFreqDict[entry]
-            divisor = self.sylFreqDict[iTag]
-            probability = count / float(divisor)
+        for bigram in self.boundBigrams:
+            if(bigram == [0,0]):
+                matrixA[0,0] = matrixA[0,0] + 1
 
-            iIndex = self.syllabLst.index(iTag) #finds index in matrix with tagLst
-            jIndex = self.syllabLst.index(jTag)
+            elif(bigram == [0,1]):
+                matrixA[0,1] = matrixA[0,1] + 1
 
-            matrixA[iIndex,jIndex] = probability
+            elif(bigram == [1,0]):
+                matrixA[1,0] = matrixA[1,0] + 1
+
+            elif(bigram == [1,1]):
+                matrixA[1,1] = matrixA[1,1] + 1
 
         return matrixA
+
+
+    # normalizes the counts in matrix A to be probabilities by
+    # dividing each count by the total number of bigrams trained on.
+    # probablilites inserted as floating point decimals. Returns matrixA.
+    def __normalizeA__(self, matrixA):
+        totFloat = float(self.boundCount)
+
+        matrixA[0,0] = matrixA[0,0] / totFloat
+        matrixA[0,1] = matrixA[0,1] / totFloat
+        matrixA[1,0] = matrixA[1,0] / totFloat
+        matrixA[1,1] = matrixA[1,1] / totFloat
+
+        return matrixA
+
+
+
