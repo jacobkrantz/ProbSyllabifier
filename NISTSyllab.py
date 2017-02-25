@@ -1,14 +1,14 @@
 '''
 fileName:       NISTSyllab.py
 Authors:        Jacob Krantz
-Date Modified:  2/23/17
+Date Modified:  2/25/17
 
-- Mass syllabifier using CMU Pronouncing Dictionary and 
-    NIST Sylabifier. 
+- Mass syllabifier using CMU Pronouncing Dictionary and
+    NIST Sylabifier.
 - Program takes in file of words to be syllabified separated
     by spaces. Creates dictionary of word:syllabification.
     This is outputted as a text file with one dictionary
-    entry per line. 
+    entry per line.
 - Output file: './HMMFiles/SyllabDict.txt'
 '''
 import sys
@@ -26,14 +26,14 @@ class NISTSyllab:
         self.inFile = ""
 
     # given an input file, will syllabify all the words within.
-    # Outputs as a syllabification dictionary to specified 
+    # Outputs as a syllabification dictionary to specified
     # output file. Parsing of this file shown in 'utils.py'.
     def syllabifyFile(self, inputFile, outputFile):
         self.inFile = inputFile
         self.outFile = outputFile
 
         self.__readWords__()
-        
+
         self.__buildArpabet__()
 
         syllabDict = self.__getSyllabDict__()
@@ -50,21 +50,20 @@ class NISTSyllab:
 
     ## needs textfile of words to exist in specified directory
     ## imports words from file as list of words.
-    ## populates self.wordLst with file contents
+    ## populates self.wordLst with file contents.
+    ## throws IOError if file not found
     def __readWords__(self):
-        try:
-            wordFile = open(self.inFile,'r') 
 
-            words = ""
-            for line in wordFile:
-                words = words + ' ' + line
-            words = words.split()
+        wordFile = open(self.inFile,'r')
+        words = ""
 
-            for i in words:
-                self.wordLst.append(i)
+        for line in wordFile:
+            words = words + ' ' + line
 
-        except:
-            print("Error reading file " + self.inFile)
+        words = words.split()
+
+        for i in words:
+            self.wordLst.append(i)
 
 
     ## looks up each word in cmudict and adds the word and pronunciation
@@ -73,7 +72,7 @@ class NISTSyllab:
     def __buildArpabet__(self):
 
         for word in self.wordLst:
-            unicodeWord = unicode(word) 
+            unicodeWord = unicode(word)
 
             try:
                 self.ArpabetDict[word] = self.CMUDict[unicodeWord][0]
@@ -104,7 +103,7 @@ class NISTSyllab:
             if(len(aPhoneme) == 2):
                 if(aPhoneme[1].isdigit()):
                     aPhoneme = aPhoneme[:1]
-                    
+
             else:
                 if(len(aPhoneme) == 3):
                     if(aPhoneme[2].isdigit()):
@@ -120,9 +119,8 @@ class NISTSyllab:
 
     ## dictionary format: word: [[syllab1],[syllab2]...]
     def __printDictToFile__(self, Dict):
-        
+
         outF = open(self.outFile,'w')
-        #outFile = open("./HMMFiles/SyllabDict.txt",'w')
 
         for entry in Dict:
 
