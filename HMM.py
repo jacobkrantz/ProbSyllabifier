@@ -156,6 +156,9 @@ class HMM:
     # inserts the count of a boundary given a bigram
     # populates matrixA with these values and return matrixB
     def __insertCountB__(self, MatrixB):
+        # ****note: we need a lookup list bigrams so they are inserted into
+        # the correct matrix positions. Question: will these integers fit
+        # the float datatype when count > 9?
         return
 
 
@@ -163,5 +166,8 @@ class HMM:
     # dividing each count by the total number of boundaries trained on.
     # probablilites inserted as floating point decimals. Returns matrixB.
     def __normalizeB__(self, MatrixB):
-        # normalize yes and no bounds separately
-        return
+
+        for i in range(0,numBigrams):
+            # normalize yes and no bounds separately
+            MatrixB[i, 0] = MatrixB[i, 0] / float(self.numNoBounds)
+            MatrixB[i, 1] = MatrixB[i, 1] / float(self.numYesBounds)
