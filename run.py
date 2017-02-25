@@ -8,7 +8,7 @@ Date Modified:  2/14/17
 
 - main file to train and run the Probabilsitic Syllabifier
 - Syllabifies a file using NIST
-- trians HMM 
+- trians HMM
 - runs syllabifier
 '''
 
@@ -24,7 +24,16 @@ def runNIST():
 
     print ("current input file: " + inFile)
     print ("current output file: " + outFile)
-    nistSyllab.syllabifyFile(inFile,outFile)
+
+    user_in = raw_input("Press enter to continue, or 'c' to change: ")
+    if(user_in == 'c'):
+        inFile = raw_input("choose input file: ")
+        outFIle = raw_input("choose output file: ")
+
+    try:
+        nistSyllab.syllabifyFile(inFile,outFile)
+    except IOError as err:
+        print err
 
 
 def trainHMM():
