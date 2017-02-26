@@ -45,15 +45,15 @@ class HMM:
     #     using numpy. Also returns MatrixA.
     def buildMatrixA(self, outFile):
 
-        self.__loadFiles__('A')
+        self.__loadFiles('A')
         matrixA = self.utils.initMatrix(self.bigramCount, self.bigramCount)
 
         for phoneme in self.AllBigramTups:
 
             self.boundBigrams = self.utils.getBoundBigrams(phoneme)
-            matrixA = self.__insertCountA__(matrixA)
+            matrixA = self.__insertCountA(matrixA)
 
-        matrixA = __normalizeA__(matrixA)
+        matrixA = __normalizeA(matrixA)
         self.utils.outputMatrix(matrixA, "A")
 
         return matrixA
@@ -69,11 +69,11 @@ class HMM:
     #     using numpy. Also returns MatrixB.
     def buildMatrixB(self):
 
-        self.__loadFiles__('B')
+        self.__loadFiles('B')
         MatrixB = self.utils.initMatrix(self.numBigrams,2)
 
-        MatrixB = self.__insertCountB__(MatrixB)
-        MatrixB = self.__normalizeB__(Matrix)
+        MatrixB = self.__insertCountB(MatrixB)
+        MatrixB = self.__normalizeB(Matrix)
 
         self.utils.outputMatrix(MatrixB, "B")
 
@@ -94,7 +94,7 @@ class HMM:
     #       - boundCount
     # if mode == 'B', loads data necessary for B matrix
     #       - numBigrams
-    def __loadFiles__(self,mode):
+    def __loadFiles(self,mode):
 
         self.allBigramTups = self.utils.getAllBigramTups()
         self.uniqueBoundCount = self.utils.getUniqueBoundCount(self.AllBigramTups)
@@ -121,7 +121,7 @@ class HMM:
 
     # inserts the count of a tag given the previous tag
     # populates matrixA with these values and return matrixA
-    def __insertCountA__(self, matrixA):
+    def __insertCountA(self, matrixA):
 
         for bigramTup in self.boundBigrams:
             if(bigramTup == (0,0)):
@@ -142,7 +142,7 @@ class HMM:
     # normalizes the counts in matrix A to be probabilities by
     # dividing each count by the total number of bigrams trained on.
     # probablilites inserted as floating point decimals. Returns matrixA.
-    def __normalizeA__(self, matrixA):
+    def __normalizeA(self, matrixA):
         totFloat = float(self.boundCount)
 
         matrixA[0,0] = matrixA[0,0] / totFloat
@@ -155,7 +155,7 @@ class HMM:
 
     # inserts the count of a boundary given a bigram
     # populates matrixA with these values and return matrixB
-    def __insertCountB__(self, MatrixB):
+    def __insertCountB(self, MatrixB):
         # ****note: we need a lookup list bigrams so they are inserted into
         # the correct matrix positions. Question: will these integers fit
         # the float datatype when count > 9?
@@ -165,7 +165,7 @@ class HMM:
     # normalizes the counts in matrix A to be probabilities by
     # dividing each count by the total number of boundaries trained on.
     # probablilites inserted as floating point decimals. Returns matrixB.
-    def __normalizeB__(self, MatrixB):
+    def __normalizeB(self, MatrixB):
 
         for i in range(0,numBigrams):
             # normalize yes and no bounds separately

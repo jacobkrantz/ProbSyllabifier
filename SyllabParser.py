@@ -1,43 +1,26 @@
-from utils import Utils
 import sys
 
 '''
 fileName:       SyllabParser.py
 Authors:        Max Dulin
-Date Modified:  2/23/17
+Date Modified:  2/26/17
 
 -Functions:
     makeBigramList
+    setFile
 
 - Parses the SyllabDict.txt into a list of tuples.
-- Necessary files:
+- Default input file:
     - ./HMMFiles/SyllabDict.txt
 
 '''
 
 class SyllabParser:
 
-    #Creates the list of bigrams
-    def makeBiagramList(self):
-
-        self.__bringInFile("./HMMFiles/SyllabDict.txt")
-        self.__makeParseWord(0)
-        self.__makeParseWord(1)
-
-        for i in range(self.countLines):
-            self.__makeParseWord(i)
-
-        #print self.bigramLst
-        return self.bigramLst
-
-
-    ## ------------------------------
-    ##            PRIVATE
-    ## ------------------------------
-
-
     #constructor
     def __init__(self):
+
+        self.fileName = "./HMMFiles/SyllabDict.txt"
         #spot on the line
         self.spot = 0
         #the amount of lines in the text file of syllbabifactions inputted
@@ -48,6 +31,30 @@ class SyllabParser:
         self.bigramLst = []
         #the string line from the file inputted
         self.line = ''
+
+
+    # Creates a list of phonemes. Phonemes consist of bigrams of the
+    # form: [['d', 'aa', 0], ['aa', 'l', 1], ['l', 'er', 0]]
+    def makePhonemeLst(self):
+
+        self.__bringInFile(self.fileName)
+        self.__makeParseWord(0)
+        self.__makeParseWord(1)
+
+        for i in range(self.countLines):
+            self.__makeParseWord(i)
+
+        return self.bigramLst
+
+
+    # sets the file to be parsed within 'makePhonemeLst'
+    def setFile(self, newFile):
+        self.fileName = newFile
+
+
+    ## ------------------------------
+    ##            PRIVATE
+    ## ------------------------------
 
     ##brings in the contents of the file
     ##Puts them into initialList, a class variable
