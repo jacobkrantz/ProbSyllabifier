@@ -26,10 +26,13 @@ class HMM:
         self.boundFreqDict = {}
         self.boundLst = []
         self.boundBigrams = [] # how to update this for each entry?
+        self.allBigramTups = []
 
         self.numBigrams = 0
         self.numYesBounds = 0
         self.numNoBounds = 0
+
+        self.__loadFiles('shared')
 
 
 
@@ -46,14 +49,14 @@ class HMM:
     def buildMatrixA(self, outFile):
 
         self.__loadFiles('A')
-        matrixA = self.utils.initMatrix(self.bigramCount, self.bigramCount)
-
-        for phoneme in self.AllBigramTups:
+        matrixA = self.utils.initMatrix(2,2)
+        
+        for phoneme in self.allBigramTups:
 
             self.boundBigrams = self.utils.getBoundBigrams(phoneme)
             matrixA = self.__insertCountA(matrixA)
 
-        matrixA = __normalizeA(matrixA)
+        matrixA = self.__normalizeA(matrixA)
         self.utils.outputMatrix(matrixA, "A")
 
         return matrixA
@@ -89,34 +92,34 @@ class HMM:
     # loads values into necessary data structures for building the HMM
     #       - allBigramTups
     #       - uniqueBoundCount
-    #       - boundaryLst
+    #       - boundLst
+    # if mode == 'shared', loads data necessary for both matrices
     # if mode == 'A', loads data necessary for A matrix
     #       - boundCount
     # if mode == 'B', loads data necessary for B matrix
     #       - numBigrams
-    def __loadFiles(self,mode):
+    def __loadFiles(self, mode):
+        if(mode == 'shared'):
 
-        self.allBigramTups = self.utils.getAllBigramTups()
-        self.uniqueBoundCount = self.utils.getUniqueBoundCount(self.AllBigramTups)
-        self.boundaryLst = self.utils.getBoundaryLst(bigramTups)
+            self.allBigramTups = self.utils.getAllBigramTups()
+            self.uniqueBoundCount = self.utils.getUniqueBoundCount(self.allBigramTups)
 
-        if(mode == 'A'):
+        elif(mode == 'A'):
 
             self.boundCount = self.utils.getBoundCount(self.allBigramTups)
+            print("Files loaded for A matrix.")
 
         elif(mode == 'B'):
 
+            self.boundLst = self.utils.getBoundLst(self.allBigramTups)
             self.numBigrams = self.utils.getNumBigrams(self.allBigramTups)
-            self.numYesBounds = self.utils.getNumBounds(self.boundaryLst, 1)
-            self.numNoBounds = self.utils.getNumBounds(self.boundaryLst, 0)
-
+            self.numYesBounds = self.utils.getNumBounds(self.boundLst, 1)
+            self.numNoBounds = self.utils.getNumBounds(self.boundLst, 0)
+            print("Files loaded for B matrix.")
 
         else:
-            print("Error: mode can be either 'A' or 'B'.")
+            print("Error: mode can be either 'A', 'B', or 'shared'.")
             sys.exit()
-
-        print("Success: loaded files for " + mode + " matrix.")
-        return
 
 
     # inserts the count of a tag given the previous tag
@@ -143,7 +146,8 @@ class HMM:
     # dividing each count by the total number of bigrams trained on.
     # probablilites inserted as floating point decimals. Returns matrixA.
     def __normalizeA(self, matrixA):
-        totFloat = float(self.boundCount)
+        totFloat = matrixA[0,0] + matrixA[0,1] + matrixA[1,0] + matrixA[1,1]
+        totFloat = float(totFloat)
 
         matrixA[0,0] = matrixA[0,0] / totFloat
         matrixA[0,1] = matrixA[0,1] / totFloat

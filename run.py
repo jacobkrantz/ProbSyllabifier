@@ -41,7 +41,6 @@ def trainHMM():
     outFileA = "./HMMFiles/MatrixA.txt"
     outFileB = "./HMMFiles/MatrixB.txt"
 
-    print("current output files: " + outFileA + " " + outFileB)
     hmm.buildMatrixA(outFileA)
     #hmm.buildMatrixB(outFileB)
 

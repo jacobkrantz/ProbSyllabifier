@@ -31,9 +31,20 @@ class Utils:
     # to a txt file under the provided name.
     def outputMatrix(self, matrix, which):
         if(which == "A"):
-            np.savetxt("./HMMFiles/MatrixA.txt",matrix, newline = '\n',header = "MatrixA", footer = "", fmt = '%.5f')
+
+            fileName = "./HMMFiles/MatrixA.txt"
+            Header = "MatrixA"
+
+        elif(which == "B"):
+
+            fileName = "./HMMFiles/MatrixB.txt"
+            Header = "matrixB"
+
         else:
-            np.savetxt("./HMMFiles/MatrixB.txt",matrix, newline = '\n',header = "MatrixB", footer = "", fmt = '%.5f')
+            print ("'" + which + "'' does not match any option.")
+
+        np.savetxt(fileName,matrix, newline = '\n',header = Header, footer = "", fmt = '%.5f')
+        print ("Matrix " + which + " outputted to : " + fileName)
 
 
     # given the name of a file, imports a matrix using the numpy tool.
@@ -51,12 +62,9 @@ class Utils:
     # allBigramTups: [[(phone,phone,int),(...),],[...],] where int
     # corresponds to the type of boundary.
     def getAllBigramTups(self):
-        allBigramTups = []
         sylParser = SyllabParser()
 
-        #allBigramTups = sylParser.parseSyllabs()
-
-        return allBigramTups
+        return sylParser.makePhonemeLst()
 
 
     # allBigramTups: [[(phone,phone,int),(...),],[...],] where int
@@ -72,13 +80,14 @@ class Utils:
             return len(typeLst)
 
 
-    # phonemeLst: [(phone,phone,int)]
+    # phonemeLst is allBigramTups
     # returns a list of all
-    def getBoundaryLst(self, phonemeLst):
+    def getBoundLst(self, phonemeLst):
         boundLst = []
 
-        for tup in phonemeLst:
-            boundLst.append(tup[2])
+        for phoneme in phonemeLst:
+            for tup in phoneme:
+                boundLst.append(tup[2])
 
         return boundLst
 
