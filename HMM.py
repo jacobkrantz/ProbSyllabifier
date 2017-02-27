@@ -14,6 +14,7 @@ Date Modified:  2/26/17
 - Functions:
     - buildMatrixA()
     - buildMatrixB()
+    - getBigramLookup()
 '''
 
 class HMM:
@@ -82,6 +83,9 @@ class HMM:
 
         return MatrixB
 
+    # returns the bigramLookup list where bigrams are inserted as tuples
+    def getBigramLookup(self):
+        return self.bigramLookup
 
     # ------------------------------------------------------
     # helper functions below
