@@ -38,11 +38,11 @@ def runNIST():
 
 def trainHMM():
     hmm = HMM()
-    outFileA = "./HMMFiles/MatrixA.txt"
-    outFileB = "./HMMFiles/MatrixB.txt"
+    # outFileA = "./HMMFiles/MatrixA.txt"
+    # outFileB = "./HMMFiles/MatrixB.txt"
 
-    hmm.buildMatrixA(outFileA)
-    #hmm.buildMatrixB(outFileB)
+    hmm.buildMatrixA()
+    hmm.buildMatrixB()
 
 def runS():
     print "not yet complete"

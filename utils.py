@@ -124,20 +124,6 @@ class Utils:
     # B Matrix functions below
     # ------------------------------------------------------
 
-    # allBigramTups: [[(phone,phone,int),(...),],[...],]
-    # returns the total number of unique bigrams.
-    def getNumBigrams(self, allBigramTups):
-        bigs = []
-
-        for phoneme in allBigramTups:
-            for tup in phoneme:
-
-                bigram = (tup[0],tup[1])
-                if bigram not in bigs:
-                    bigs.append(bigram)
-
-        return len(bigs)
-
     # counts and returns the number of boundaries matching
     # the passed in integer within boundaryLst.
     def getNumBounds(self, boundaryLst, match):
@@ -148,6 +134,21 @@ class Utils:
                 total += 1
 
         return total
+
+
+    # allBigramTups: [[(phone,phone,int),(...),],[...],]
+    # creates a master lookup list for all unique bigrams trained on.
+    # bigrams are inserted into the list as tuples:
+    # [(phone,phone),(phone,phone)...]
+    def getBigramLookup(self, allBigramTups):
+        bigramLookup = []
+
+        for phoneme in allBigramTups:
+            for bigram in phoneme:
+                newTup = (bigram[0],bigram[1])
+                if newTup not in bigramLookup:
+                    bigramLookup.append(newTup)
+        return bigramLookup
 
 
     # ------------------------------------------------------

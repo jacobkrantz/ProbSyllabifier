@@ -1,11 +1,10 @@
 from utils import Utils
 import sys
 
-
 '''
 fileName:       HMM.py
 Authors:        Jacob Krantz
-Date Modified:  2/14/17
+Date Modified:  2/26/17
 
 - Builds A and B matrices of an HMM
 - Necessary files:
@@ -15,6 +14,7 @@ Date Modified:  2/14/17
     - buildMatrixA()
     - buildMatrixB()
 '''
+
 class HMM:
 
     def __init__(self):
@@ -25,15 +25,15 @@ class HMM:
         self.allBigramTups = []
         self.boundFreqDict = {}
         self.boundLst = []
-        self.boundBigrams = [] # how to update this for each entry?
+        self.boundBigrams = []
         self.allBigramTups = []
 
         self.numBigrams = 0
         self.numYesBounds = 0
         self.numNoBounds = 0
+        self.bigramLookup = []
 
         self.__loadFiles('shared')
-
 
 
     # goes through process of creating MatrixA for an HMM.
@@ -46,11 +46,11 @@ class HMM:
     # Loads files necessary, builds matrix probabilities,
     #     outputs final matrix to a file "./HMM/MatrixA.txt"
     #     using numpy. Also returns MatrixA.
-    def buildMatrixA(self, outFile):
+    def buildMatrixA(self):
 
         self.__loadFiles('A')
         matrixA = self.utils.initMatrix(2,2)
-        
+
         for phoneme in self.allBigramTups:
 
             self.boundBigrams = self.utils.getBoundBigrams(phoneme)
@@ -76,7 +76,7 @@ class HMM:
         MatrixB = self.utils.initMatrix(self.numBigrams,2)
 
         MatrixB = self.__insertCountB(MatrixB)
-        MatrixB = self.__normalizeB(Matrix)
+        MatrixB = self.__normalizeB(MatrixB)
 
         self.utils.outputMatrix(MatrixB, "B")
 
@@ -112,14 +112,20 @@ class HMM:
         elif(mode == 'B'):
 
             self.boundLst = self.utils.getBoundLst(self.allBigramTups)
-            self.numBigrams = self.utils.getNumBigrams(self.allBigramTups)
             self.numYesBounds = self.utils.getNumBounds(self.boundLst, 1)
             self.numNoBounds = self.utils.getNumBounds(self.boundLst, 0)
+            self.bigramLookup = self.utils.getBigramLookup(self.allBigramTups)
+            self.numBigrams = len(self.bigramLookup)
             print("Files loaded for B matrix.")
 
         else:
             print("Error: mode can be either 'A', 'B', or 'shared'.")
             sys.exit()
+
+        # test to make sure boundary counts are done correctly
+        assert(len(self.boundLst) == self.numNoBounds + self.numYesBounds)
+        # test to make sure all items in lookup are unique
+        assert(len(self.bigramLookup) == len(set(self.bigramLookup)))
 
 
     # inserts the count of a tag given the previous tag
@@ -171,7 +177,7 @@ class HMM:
     # probablilites inserted as floating point decimals. Returns matrixB.
     def __normalizeB(self, MatrixB):
 
-        for i in range(0,numBigrams):
+        for i in range(0,self.numBigrams):
             # normalize yes and no bounds separately
             MatrixB[i, 0] = MatrixB[i, 0] / float(self.numNoBounds)
             MatrixB[i, 1] = MatrixB[i, 1] / float(self.numYesBounds)
