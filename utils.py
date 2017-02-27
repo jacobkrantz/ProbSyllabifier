@@ -5,19 +5,19 @@ import numpy as np
 '''
 fileName:       utils.py
 Authors:        Jacob Krantz
-Date Modified:  2/5/17
+Date Modified:  2/26/17
 
 Common utilies needed for building matrices with a HMM
+- initMatrix
 - outputMatrix
 - importMatrix
 - getAllBigramTups
-- getUniqueBoundCount
-- getBoundaryLst
+- getBoundLst
 - getBoundCount
 - getBoundBigrams
-
+- getNumBounds
+- getBigramLookup
 '''
-
 
 class Utils:
 
@@ -32,19 +32,16 @@ class Utils:
     def outputMatrix(self, matrix, which):
         if(which == "A"):
 
-            fileName = "./HMMFiles/MatrixA.txt"
-            Header = "MatrixA"
+            np.savetxt("./HMMFiles/MatrixA.txt",matrix, newline = '\n',header = "matrixA", fmt = '%.5f')
+            print ("Matrix A outputted to: ./HMMFiles/MatrixA.txt")
 
         elif(which == "B"):
 
-            fileName = "./HMMFiles/MatrixB.txt"
-            Header = "matrixB"
+            np.savetxt("./HMMFiles/MatrixB.txt",matrix, newline = '\n',header = "matrixB", fmt = '%.5f')
+            print ("Matrix B outputted to: ./HMMFiles/MatrixB.txt")
 
         else:
             print ("'" + which + "'' does not match any option.")
-
-        np.savetxt(fileName,matrix, newline = '\n',header = Header, footer = "", fmt = '%.5f')
-        print ("Matrix " + which + " outputted to : " + fileName)
 
 
     # given the name of a file, imports a matrix using the numpy tool.
@@ -65,19 +62,6 @@ class Utils:
         sylParser = SyllabParser()
 
         return sylParser.makePhonemeLst()
-
-
-    # allBigramTups: [[(phone,phone,int),(...),],[...],] where int
-    # corresponds to the type of boundary.
-    # Returns number of unique boundary types.
-    def getUniqueBoundCount(self, allBigramLst):
-        typeLst = []
-
-        for phoneme in allBigramLst:
-            for tup in phoneme:
-                if(tup[2] not in typeLst):
-                    typeLst.append(tup[2])
-            return len(typeLst)
 
 
     # phonemeLst is allBigramTups
@@ -149,8 +133,3 @@ class Utils:
                 if newTup not in bigramLookup:
                     bigramLookup.append(newTup)
         return bigramLookup
-
-
-    # ------------------------------------------------------
-    # helper functions below
-    # ------------------------------------------------------

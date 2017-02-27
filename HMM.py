@@ -9,7 +9,8 @@ Date Modified:  2/26/17
 - Builds A and B matrices of an HMM
 - Necessary files:
     - ./HMM/SyllabDict.txt      *contains dict of [word]:syllabification
-    -
+    - ./utils.py
+    - ./SyllabParser.py
 - Functions:
     - buildMatrixA()
     - buildMatrixB()
@@ -20,7 +21,6 @@ class HMM:
     def __init__(self):
         self.utils = Utils()
 
-        self.uniqueBoundCount = 2
         self.boundCount = 0
         self.allBigramTups = []
         self.boundFreqDict = {}
@@ -83,26 +83,26 @@ class HMM:
         return MatrixB
 
 
-
     # ------------------------------------------------------
     # helper functions below
     # ------------------------------------------------------
 
 
     # loads values into necessary data structures for building the HMM
-    #       - allBigramTups
-    #       - uniqueBoundCount
-    #       - boundLst
     # if mode == 'shared', loads data necessary for both matrices
+    #       - allBigramTups
     # if mode == 'A', loads data necessary for A matrix
     #       - boundCount
     # if mode == 'B', loads data necessary for B matrix
+    #       - boundLst
+    #       - numYesBounds
+    #       - numNoBounds
+    #       - bigramLookup
     #       - numBigrams
     def __loadFiles(self, mode):
         if(mode == 'shared'):
 
             self.allBigramTups = self.utils.getAllBigramTups()
-            self.uniqueBoundCount = self.utils.getUniqueBoundCount(self.allBigramTups)
 
         elif(mode == 'A'):
 
@@ -163,13 +163,23 @@ class HMM:
         return matrixA
 
 
-    # inserts the count of a boundary given a bigram
-    # populates matrixA with these values and return matrixB
+    # inserts the count of a bigram given a boundary
+    # populates matrixB with these values and return matrixB
     def __insertCountB(self, MatrixB):
-        # ****note: we need a lookup list bigrams so they are inserted into
-        # the correct matrix positions. Question: will these integers fit
-        # the float datatype when count > 9?
-        return
+
+        for phoneme in self.allBigramTups:
+            for bigram in phoneme:
+
+                tup = (bigram[0],bigram[1])
+                i = self.bigramLookup.index(tup)
+
+                if(bigram[2] == 0): # increment no boundary count
+                    MatrixB[i, 0] = MatrixB[i, 0] + 1
+
+                else: # increment yes boundary count
+                    MatrixB[i, 1] = MatrixB[i, 1] + 1
+
+        return MatrixB
 
 
     # normalizes the counts in matrix A to be probabilities by
@@ -178,6 +188,10 @@ class HMM:
     def __normalizeB(self, MatrixB):
 
         for i in range(0,self.numBigrams):
+            assert(MatrixB[i,0] + MatrixB[i,1] != 0)
+
             # normalize yes and no bounds separately
             MatrixB[i, 0] = MatrixB[i, 0] / float(self.numNoBounds)
             MatrixB[i, 1] = MatrixB[i, 1] / float(self.numYesBounds)
+
+        return MatrixB
