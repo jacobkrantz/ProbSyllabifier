@@ -1,10 +1,11 @@
 from NISTSyllab import NISTSyllab
+from ProbSyllabifier import ProbSyllabifier
 from HMM import HMM
 
 '''
 fileName:       run.py
 Authors:        Jacob Krantz
-Date Modified:  2/14/17
+Date Modified:  2/28/17
 
 - main file to train and run the Probabilsitic Syllabifier
 - Syllabifies a file using NIST
@@ -38,15 +39,22 @@ def runNIST():
 
 def trainHMM():
     hmm = HMM()
-    # outFileA = "./HMMFiles/MatrixA.txt"
-    # outFileB = "./HMMFiles/MatrixB.txt"
 
-    hmm.buildMatrixA()
-    hmm.buildMatrixB()
+    hmm.buildMatrixA() # "./HMMFiles/MatrixA.txt"
+    hmm.buildMatrixB() # "./HMMFiles/MatrixB.txt"
+    hmm.makeViterbiFiles()
+
 
 def runS():
-    print "not yet complete"
-    return
+    '''ps = ProbSyllabifier()
+    obs = raw_input("Enter filename or phoneme: ")
+    syl = ""
+
+    if("." in obs):
+        ps.syllabifyFile(obs)
+    else:
+        syl = ps.syllabify(obs)
+        print("Syllabification:\n" + syl)'''
 
 
 def main():

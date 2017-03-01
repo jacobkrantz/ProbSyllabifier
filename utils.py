@@ -133,3 +133,49 @@ class Utils:
                 if newTup not in bigramLookup:
                     bigramLookup.append(newTup)
         return bigramLookup
+
+    # ------------------------------------------------------
+    # File outputs for Viterbi
+    # ------------------------------------------------------
+
+    # outputs a list to a file. Entries separated by newline char
+    def makeLookup(self, lookup, fileName):
+        File = open(fileName,'w')
+        for item in lookup:
+            File.write(str(item))
+            File.write('\n')
+        File.close()
+
+
+    # generates a dictionary of hiddenState: probability
+    def makeHiddenProb(self, hiddenLst):
+        hiddenProb = self.__makeHiddenProbHelper(hiddenLst)
+        File = open("./HMMFiles/hiddenProb.txt",'w')
+
+        for state in hiddenProb:
+
+            File.write(str(state))
+            File.write(' ')
+            File.write(str(hiddenProb[state]))
+            File.write('\n')
+
+        File.close()
+
+
+    #returns a dictionary of the probability of a hidden state
+    #equation: hiddenProb = count(state) / count(all states)
+    def __makeHiddenProbHelper(self, hiddenLst):
+        hiddenProb = {}
+
+        # insert counts int dict
+        for state in hiddenLst:
+            if state not in hiddenProb:
+                hiddenProb[state] = 1
+            else:
+                hiddenProb[state] += 1
+
+        # normalize counts to list length
+        for state in hiddenProb:
+            hiddenProb[state] = hiddenProb[state] / float(len(hiddenLst))
+
+        return hiddenProb

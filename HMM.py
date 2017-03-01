@@ -87,6 +87,23 @@ class HMM:
     def getBigramLookup(self):
         return self.bigramLookup
 
+
+    # creates files that allow the Viterbi algorithm to use the matrices
+    # created. Creates files:
+    # - ./HMMFiles/obsLookup.txt
+    # - ./HMMFiles/hiddenLookup.txt
+    # - ./HMMFiles/hiddenProb.txt
+    def makeViterbiFiles(self):
+
+        if(len(self.boundLst) == 0):
+            self.__loadFiles('B')
+        elif(len(self.bigramLookup) == 0):
+            self.__loadFiles('B')
+            
+        self.utils.makeLookup(self.bigramLookup,"./HMMFiles/obsLookup.txt")
+        self.utils.makeLookup([0,1], "./HMMFiles/hiddenLookup.txt")
+        self.utils.makeHiddenProb(self.boundLst)
+
     # ------------------------------------------------------
     # helper functions below
     # ------------------------------------------------------

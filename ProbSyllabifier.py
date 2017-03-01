@@ -1,0 +1,2 @@
+class ProbSyllabifier:
+    pass
