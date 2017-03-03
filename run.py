@@ -1,6 +1,7 @@
 from NISTSyllab import NISTSyllab
 from ProbSyllabifier import ProbSyllabifier
 from HMM import HMM
+import sys
 
 '''
 fileName:       run.py
@@ -46,7 +47,7 @@ def trainHMM():
 
 
 def runS():
-    '''ps = ProbSyllabifier()
+    ps = ProbSyllabifier()
     obs = raw_input("Enter filename or phoneme: ")
     syl = ""
 
@@ -54,7 +55,7 @@ def runS():
         ps.syllabifyFile(obs)
     else:
         syl = ps.syllabify(obs)
-        print("Syllabification:\n" + syl)'''
+        print("Syllabification: " + syl)
 
 
 def main():
