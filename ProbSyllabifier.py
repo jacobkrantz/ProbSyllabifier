@@ -2,11 +2,23 @@ import numpy as np
 import sys
 from ast import literal_eval
 
+'''
+fileName:       ProbSyllabifier.py
+Authors:        Jacob Krantz
+Date Modified:  3/3/17
+
+- Purpose: Syllabifies a given phoneme (or file of phonemes)
+    - uses the Viterbi Algrithm
+    - skips syllabification if a foreign phone bigram is parsed
+- Functions:
+    - syllabifyFile(fileIN, fileOUT)
+    - syllabify(phonemeString)
+'''
 
 class ProbSyllabifier:
 
-    # initializes all data structures necessary to syllabify a phoneme or
-    # a file.
+    # initializes all data structures necessary
+    # to syllabify a phoneme or a file.
     def __init__(self):
         self.__matrixA = self.__loadMatrix('A')
         self.__matrixB = self.__loadMatrix('B')
@@ -19,9 +31,16 @@ class ProbSyllabifier:
         self.__loadStructures()
 
 
-    def syllabifyFile(self, fileName):
+    # given a file consisting of phonemes separated by newline chars,
+    # syllabifies each and outputs the results into a new file under the
+    # new file name.
+    # param 1: phoneme file in
+    # param 2: fileName for syllabification out
+    def syllabifyFile(self, fileIN, fileOUT):
+        #phonemeLst = self.__getPhonemeLst(fileIN)
+        #syllabLst = self.__syllabifyAll(phonemeLst)
+        #self.__sendToFile(syllabLst)
         pass
-
 
     # given an observation string, generates the most likely hidden state.
     # what should this return?
@@ -95,6 +114,7 @@ class ProbSyllabifier:
         for obs in self.__obsLookup:
             tmpLst.append(literal_eval(obs))
         return tmpLst
+
 
     # given a filename, loads the dictionary that exists inside of it.
     # each line of the file contains the key followed by a space then the
@@ -219,7 +239,7 @@ class ProbSyllabifier:
     # returns the final string, formed nicely.
     def __makeFinalStr(self, obsLst, outputLst):
         finalStr = ""
-        
+
         for i in range(0, len(obsLst)):
 
             finalStr += obsLst[i][0]
@@ -230,3 +250,15 @@ class ProbSyllabifier:
 
         finalStr += obsLst[len(obsLst) - 1][1]
         return finalStr
+
+
+    # given a list of phonemes, syllabifies all of them.
+    # returns a list of syllabifications, with indices corresponding
+    # to the inputted phoneme list.
+    def __syllabifyAll(self, phonemeLst):
+        syllabified = []
+
+        for phoneme in phonemeLst:
+            syllabified.append(self.syllabify(phoneme))
+
+        return syllabified

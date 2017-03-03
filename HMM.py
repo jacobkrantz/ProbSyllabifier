@@ -4,17 +4,18 @@ import sys
 '''
 fileName:       HMM.py
 Authors:        Jacob Krantz
-Date Modified:  2/26/17
+Date Modified:  3/3/17
 
 - Builds A and B matrices of an HMM
 - Necessary files:
-    - ./HMM/SyllabDict.txt      *contains dict of [word]:syllabification
-    - ./utils.py
-    - ./SyllabParser.py
+    - ./HMM/SyllabDict.txt  *contains dict of [word]:syllabification
+    - ./utils.py            *utilities for training HMM
+    - ./SyllabParser.py     *parses the syllabification dictionary file
 - Functions:
     - buildMatrixA()
     - buildMatrixB()
-    - getBigramLookup()
+    - makeViterbiFiles()
+    - getTrainingSize()
 '''
 
 class HMM:
@@ -83,10 +84,6 @@ class HMM:
 
         return MatrixB
 
-    # returns the bigramLookup list where bigrams are inserted as tuples
-    def getBigramLookup(self):
-        return self.bigramLookup
-
 
     # creates files that allow the Viterbi algorithm to use the matrices
     # created. Creates files:
@@ -99,10 +96,15 @@ class HMM:
             self.__loadFiles('B')
         elif(len(self.bigramLookup) == 0):
             self.__loadFiles('B')
-            
+
         self.utils.makeLookup(self.bigramLookup,"./HMMFiles/obsLookup.txt")
         self.utils.makeLookup([0,1], "./HMMFiles/hiddenLookup.txt")
         self.utils.makeHiddenProb(self.boundLst)
+
+
+    # return an integer of the number of items that exist in the training set.
+    def getTrainingSize(self):
+        return len(self.allBigramTups)
 
     # ------------------------------------------------------
     # helper functions below

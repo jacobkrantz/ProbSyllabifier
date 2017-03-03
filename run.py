@@ -44,19 +44,28 @@ def trainHMM():
     hmm.buildMatrixA() # "./HMMFiles/MatrixA.txt"
     hmm.buildMatrixB() # "./HMMFiles/MatrixB.txt"
     hmm.makeViterbiFiles()
+    print("Items in training set: " + str(hmm.getTrainingSize()))
 
 
 def runS():
     ps = ProbSyllabifier()
-    obs = raw_input("Enter filename or phoneme: ")
-    syl = ""
+    obs = " "
 
-    if("." in obs):
-        ps.syllabifyFile(obs)
-    else:
-        syl = ps.syllabify(obs)
-        print("Syllabification: " + syl)
+    while(obs != ''):
 
+        obs = raw_input("Enter filename or phoneme: ")
+        syl = ""
+        if("." in obs):
+            ps.syllabifyFile(obs)
+        elif(obs != ''):
+            syl = ps.syllabify(obs.lower())
+            print("Syllabification: " + syl)
+
+def help():
+    print "Running the Syllabifier:"
+    print "     To syllabify a phoneme, enter phones separated by a space."
+    print "     To return to the main menu, hit enter with no input."
+    print "     *File syllabification is currently under development."
 
 def main():
     choice = ""
@@ -65,13 +74,14 @@ def main():
     print "Welcome to the Probabilistic Syllabifier"
     print "----------------------------------------"
 
-    while(choice != 4):
+    while(choice != 5):
         print("\n" + color.BOLD + "Main Menu" + color.END)
         print "Choose an option:"
         print "1. Syllabify with NIST"
         print "2. Train the HMM"
         print "3. Run the Syllabifier"
-        choice = input("4. Quit\n")
+        print "4. Help"
+        choice = input("5. Quit\n")
 
         if(choice == 1):
             runNIST()
@@ -79,5 +89,7 @@ def main():
             trainHMM()
         elif(choice == 3):
             runS()
+        elif(choice == 4):
+            help()
 
 main()
