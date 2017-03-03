@@ -1,102 +1,118 @@
-'''
-Takes in a file of all tokenized words
-Adds word and # of occurrances to a dictionary
-outputs top 1000 words and their probability 
-Note: all top 1000 words must exist in CMU pronouncing dictionary
-'''
 import sys
 from nltk.corpus import cmudict
 
-def getWords():
-    if(len(sys.argv) == 2 and sys.argv[1] == '-e'):
-        fileName = './corpusFiles/editorial_words.txt'
-    else:
-        fileName = './corpusFiles/raw_words.txt'
+'''
+Takes in a file of all tokenized words
+Adds word and # of occurrances to a dictionary
+outputs top 1000 words and their probability
+Note: all top 1000 words must exist in CMU pronouncing dictionary
+'''
 
-    wordFile = open(fileName,'r')
-    print("Extracting from: " + fileName)
-    words = ""
+class FrequentWords:
 
-    for line in wordFile:
-        words = words + ' ' + line
+    def __init__(self):
+        self.__inFile = ""
+        self.__outFile = ""
+        self.__numWords = 0
+        self.__wordLst = []
+        self.__freqLst = []
 
-    words = words.split()
+    # inFile = './corpusFiles/editorial_words.txt'
+    # inFile = './corpusFiles/raw_words.txt'
+    # param 1: inFile. file for raw word input
+    # param 2: outFile. file to output the most frequent words.
+    # param 3: numWords. Number of most frequent words to be outputted.
+    def generateMostFreq(self, inFile, outFile, numWords):
+        self.CMUDict = cmudict.dict()
+        self.__inFile = inFile
+        self.__outFile = outFile
+        self.__numWords = numWords
 
-    return words, fileName
+        words = self.__getWords()
+
+        wordDict = self.__createWordDict(words)
+
+        self.__createFreqDict(wordDict,len(words))
+
+        self.__printLst(self.__wordLst)
 
 
-def getWordCount(words):
-    return len(words)
+    # displays the most frequent words to the console with their
+    # respective frequency counts. Prints total word count.
+    def viewMost(self):
+        for i in range(len(self.__wordLst)):
+            sys.stdout.write(str(self.__freqLst[i]))
+            sys.stdout.write(' ')
+            sys.stdout.write(self.__wordLst[i])
+            sys.stdout.write('\n')
+
+        print('\n' + "Number of words: " + str(len(self.__wordLst)))
+
+    ## ------------------------------
+    ##            PRIVATE
+    ## ------------------------------
+
+    # imports the words contained in the inFile specified.
+    # returns all words in split fashion.
+    def __getWords(self):
+        wordFile = open(self.__inFile,'r')
+        print("Extracting from: " + self.__inFile)
+        words = ""
+
+        for line in wordFile:
+            words = words + ' ' + line
+
+        return words.split()
 
 
-def createWordDict(words):
-    wordDict = {}
+    # creates a dictionary of word: word count given a list of words.
+    def __createWordDict(self, words):
+        wordDict = {}
 
-    for word in words:
-        if word in wordDict:
-            wordDict[word] = wordDict[word] + 1
-        else:
-            wordDict[word] = 1
+        for word in words:
+            if word in wordDict:
+                wordDict[word] = wordDict[word] + 1
+            else:
+                wordDict[word] = 1
 
-    return wordDict
+        return wordDict
 
 
-def createFreqDict(wordDict, count):
-    CMUDict = cmudict.dict()
-    freqLst = []
-    wordLst = []
-    freqCount = 0
+    def __createFreqDict(self, wordDict, count):
+        freqCount = 0
 
-    while(freqCount < 1000):
+        while(freqCount < self.__numWords):
 
-        maxWord = max(wordDict, key=wordDict.get)
-        unicodeWord = unicode(maxWord)
+            maxWord = max(wordDict, key=wordDict.get)
+            unicodeWord = unicode(maxWord)
 
-        try:
+            try:
 
-            CMUDict[unicodeWord]
-            wordLst.append(maxWord)
-            freqLst.append(wordDict[maxWord])
-            del wordDict[maxWord]
-            freqCount = freqCount + 1
+                self.CMUDict[unicodeWord]
+                self.__wordLst.append(maxWord)
+                self.__freqLst.append(wordDict[maxWord])
+                del wordDict[maxWord]
+                freqCount += 1
 
-        except:
+            except:
+                del wordDict[maxWord]
 
-            del wordDict[maxWord]            
 
-    return wordLst, freqLst
+    # outputs a list to a file. List entries are
+    # separated by spaces
+    def __printLst(self, w):
+        txt = open(self.__outFile,'w')
+        for word in w:
+            txt.write(word)
+            txt.write(' ')
 
-def viewMost(w, f):
-    for i in range(len(w)):
-        sys.stdout.write(str(f[i]))
-        sys.stdout.write(' ')
-        sys.stdout.write(w[i])
-        sys.stdout.write('\n')
 
-def printLst(w,fileName):
-    if('editorial' in fileName):
-        outFile = './corpusFiles/freqEditWords.txt'
-    else:
-        outFile = './corpusFiles/freqWords.txt'
+if(__name__ == "__main__"):
+    fw = FrequentWords()
+    #inFile = raw_input("enter file in: ")
+    #outFile = raw_input("enter file out: ")
+    inFile = './corpusFiles/editorial_words.txt'
+    outFile = './corpusFiles/FEWtst.txt'
 
-    txt = open(outFile,'w')
-    for word in w:
-        txt.write(word)
-        txt.write(' ')
-
-def main():
-    words,fileName = getWords()
-
-    count = getWordCount(words)
-
-    wordDict = createWordDict(words)
-
-    wordLst, freqLst = createFreqDict(wordDict,count)
-
-    viewMost(wordLst, freqLst)
-
-    print('\n' + "Number of words: " + str(len(wordLst)))
-
-    printLst(wordLst,fileName)
-
-main()
+    fw.generateMostFreq(inFile, outFile, 10)
+    fw.viewMost()
