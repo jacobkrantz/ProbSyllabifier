@@ -78,7 +78,8 @@ class HMM:
         MatrixB = self.utils.initMatrix(self.numBigrams,2)
 
         MatrixB = self.__insertCountB(MatrixB)
-        MatrixB = self.__normalizeB(MatrixB)
+        MatrixB = self.normalizeNaiveB(MatrixB)
+        #MatrixB = self.__normalizeB(MatrixB)
 
         self.utils.outputMatrix(MatrixB, "B")
 
@@ -139,6 +140,7 @@ class HMM:
             self.numNoBounds = self.utils.getNumBounds(self.boundLst, 0)
             self.bigramLookup = self.utils.getBigramLookup(self.allBigramTups)
             self.numBigrams = len(self.bigramLookup)
+            self.bigramFreqDict = self.utils.getBigramFreqDict(self.allBigramTups, self.numBigrams)
             print("Files loaded for B matrix.")
 
         else:
@@ -216,5 +218,20 @@ class HMM:
             # normalize yes and no bounds separately
             MatrixB[i, 0] = MatrixB[i, 0] / float(self.numNoBounds)
             MatrixB[i, 1] = MatrixB[i, 1] / float(self.numYesBounds)
+
+        return MatrixB
+
+
+    # normaliziation strategy: divide all MatrixB entries by the probability
+    # of the bigram occurring.
+    def normalizeNaiveB(self, MatrixB):
+
+        for i in range(0, self.numBigrams):
+
+            bigram = self.bigramLookup[i]
+            bigramProb = self.bigramFreqDict[bigram]
+            print bigram,bigramProb
+            MatrixB[i, 0] = MatrixB[i, 0] / float(bigramProb)
+            MatrixB[i, 1] = MatrixB[i, 1] / float(bigramProb)
 
         return MatrixB
