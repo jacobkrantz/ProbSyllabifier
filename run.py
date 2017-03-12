@@ -1,3 +1,4 @@
+from freqLst import FrequentWords as FW
 from NISTSyllab import NISTSyllab
 from ProbSyllabifier import ProbSyllabifier
 from HMM import HMM
@@ -6,7 +7,7 @@ import sys
 '''
 fileName:       run.py
 Authors:        Jacob Krantz
-Date Modified:  2/28/17
+Date Modified:  3/11/17
 
 - main file to train and run the Probabilsitic Syllabifier
 - Syllabifies a file using NIST
@@ -20,7 +21,7 @@ class color:
 
 
 def runNIST():
-    inFile = "./corpusFiles/freqEditWords.txt"
+    inFile = "./corpusFiles/freqWords.txt"
     outFile = "./HMMFiles/SyllabDict.txt"
     nistSyllab = NISTSyllab()
 
@@ -32,10 +33,26 @@ def runNIST():
         inFile = raw_input("choose input file: ")
         outFIle = raw_input("choose output file: ")
 
+    generateWords()
+
     try:
         nistSyllab.syllabifyFile(inFile,outFile)
     except IOError as err:
         print err
+
+def generateWords():
+    fw = FW()
+    numWords = int(raw_input("Enter number of words to syllabify: "))
+    numTestWords = int(raw_input("Enter number of words to test on: "))
+
+    # pulling from entire corpus or editorials
+    fwIn = "./corpusFiles/editorial_words.txt"
+    fwOut = "./corpusFiles/freqWords.txt"
+    testingOut = "./corpusFiles/testSet.txt"
+
+    fw.generateMostFreq(fwIn, fwOut, numWords)
+    fw.generateTesting(testingOut, numTestWords)
+
 
 
 def trainHMM():
@@ -77,7 +94,7 @@ def main():
     while(choice != 5):
         print("\n" + color.BOLD + "Main Menu" + color.END)
         print "Choose an option:"
-        print "1. Syllabify with NIST"
+        print "1. Build sets with NIST"
         print "2. Train the HMM"
         print "3. Run the Syllabifier"
         print "4. Help"
@@ -91,5 +108,8 @@ def main():
             runS()
         elif(choice == 4):
             help()
+
+
+
 
 main()
