@@ -49,9 +49,11 @@ class FrequentWords:
     def generateTesting(self, testingOut, numTestWords):
         if(numTestWords == 0):
             return
-            
+
         self.__outFile = testingOut
         self.__numWords = numTestWords
+        self.__wordLst = []
+        self.__freqLst = []
 
         # current issue: same file output as generateMostFreq.
         self.__createFreqDict(len(self.wordDict))

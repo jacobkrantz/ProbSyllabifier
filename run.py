@@ -64,7 +64,7 @@ def generateWords(fwOut):
 
 
 # build A and B matrices. Makes files to be used in the Viterbi
-# decoding algorithm. 
+# decoding algorithm.
 def trainHMM():
     hmm = HMM()
 
@@ -91,6 +91,11 @@ def runS():
 
 def testSyllabifier():
     cNIST = CompareNIST()
+    ps = ProbSyllabifier()
+
+    testIN = "./corpusFiles/testSet.txt"
+    testOUT = "./HMMFiles/probSyllabs.txt"
+    ps.syllabifyFile(testIN, testOUT)
 
     NISTname = "./HMMFiles/NISTtest.txt"
     probName = "./HMMFiles/probSyllabs.txt"

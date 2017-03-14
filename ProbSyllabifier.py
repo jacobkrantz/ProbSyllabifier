@@ -1,3 +1,4 @@
+from NISTSyllab import NISTSyllab
 import numpy as np
 import sys
 from ast import literal_eval
@@ -31,16 +32,21 @@ class ProbSyllabifier:
         self.__loadStructures()
 
 
-    # given a file consisting of phonemes separated by newline chars,
+    # given a file containing a dict of word: syllab,
     # syllabifies each and outputs the results into a new file under the
     # new file name.
     # param 1: phoneme file in
     # param 2: fileName for syllabification out
     def syllabifyFile(self, fileIN, fileOUT):
-        #phonemeLst = self.__getPhonemeLst(fileIN)
-        #syllabLst = self.__syllabifyAll(phonemeLst)
-        #self.__sendToFile(syllabLst)
-        pass
+        self.sTools = NISTSyllab()
+        self.sTools.inFile = fileIN
+        self.sTools.outFile = fileOUT
+
+        self.sTools.readWords()
+        self.sTools.buildArpabet()
+        syllabDict = self.__syllabifyAll()
+        self.sTools.printDictToFile(syllabDict)
+
 
     # given an observation string, generates the most likely hidden state.
     # what should this return?
@@ -255,10 +261,35 @@ class ProbSyllabifier:
     # given a list of phonemes, syllabifies all of them.
     # returns a list of syllabifications, with indices corresponding
     # to the inputted phoneme list.
-    def __syllabifyAll(self, phonemeLst):
-        syllabified = []
+    def __syllabifyAll(self):
+        syllabDict = {}
 
-        for phoneme in phonemeLst:
-            syllabified.append(self.syllabify(phoneme))
+        for key in self.sTools.ArpabetDict:
 
-        return syllabified
+            syllabif = self.__getSyllabification(self.sTools.ArpabetDict[key])
+            syllabDict[key] = syllabif
+
+        return syllabDict
+
+
+    def __getSyllabification(self, pronunciation):
+        ArpString = ""
+
+        for phoneme in pronunciation:
+            aPhoneme = phoneme.encode('ascii','ignore')
+
+            if(len(aPhoneme) == 2):
+                if(aPhoneme[1].isdigit()):
+                    aPhoneme = aPhoneme[:1]
+
+            else:
+                if(len(aPhoneme) == 3):
+                    if(aPhoneme[2].isdigit()):
+                        aPhoneme = aPhoneme[:2]
+
+            ArpString = ArpString + aPhoneme + " "
+
+        ## ArpString ready for syllabification
+        finalSyllab = self.syllabify(ArpString.lower())
+
+        return finalSyllab
