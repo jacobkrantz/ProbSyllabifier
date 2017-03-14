@@ -39,14 +39,15 @@ class SyllabParser:
 
         self.fileName = fileName
         self.__bringInFile(self.fileName)
-        self.__makeParseWord(0)
-        self.__makeParseWord(1)
+        #self.__makeParseWord(0)
+        #self.__makeParseWord(1)
 
         for i in range(self.countLines):
             self.__makeParseWord(i)
 
-        #print self.bigramLst
-        return self.bigramLst
+        bigs = self.bigramLst
+        self.__init__()
+        return bigs
 
 
     # sets the file to be parsed within 'makePhonemeLst'

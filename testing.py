@@ -21,8 +21,9 @@ class CompareNIST:
     def compare(self, NISTfile, compFile):
 
         nSyllabs = self.__importFile(NISTfile)
+
         cSyllabs = self.__importFile(compFile)
-        #self.seeSyllabs(nSyllabs)
+        #self.seeSyllabs(cSyllabs)
         percentSim = self.__runComparison(nSyllabs, cSyllabs)
         self.__outputResults(percentSim)
 
@@ -43,18 +44,22 @@ class CompareNIST:
     def __runComparison(self, nSyllabs, cSyllabs):
         end = len(nSyllabs)
         sameCount = 0
+        same = True
 
-        for i in range(0, end):
-            if(nSyllabs[i][0][2] == cSyllabs[i][0][2]):
-                sameCount += sameCount
+        for i in range(0, end): # loop lines
+            for j in range(0,len(nSyllabs[i])): # loop bigrams
+                if(nSyllabs[i][j][2] != cSyllabs[i][j][2]):
+                    print "dif"
+                    same = False
 
-        return (sameCount / float(end))
+            if(same):
+                sameCount += 1
+            else:
+                same = True
+
+        return (sameCount / float(end) * 100)
 
 
+    # prints the percentage to the commandline
     def __outputResults(self, percentSim):
         print("File is " + str(percentSim) + "% similar to NIST.")
-
-
-    def seeSyllabs(self, syllabs):
-        for item in syllabs:
-            print item
