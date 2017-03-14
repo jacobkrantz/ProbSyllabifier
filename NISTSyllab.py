@@ -1,7 +1,7 @@
 '''
 fileName:       NISTSyllab.py
 Authors:        Jacob Krantz
-Date Modified:  2/25/17
+Date Modified:  3/14/17
 
 - Mass syllabifier using CMU Pronouncing Dictionary and
     NIST Sylabifier.
@@ -45,7 +45,7 @@ class NISTSyllab:
 
 
     # ------------------------------------------------------
-    # private functions below
+    # Helper functions below
     # ------------------------------------------------------
 
 

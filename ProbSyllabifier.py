@@ -6,7 +6,7 @@ from ast import literal_eval
 '''
 fileName:       ProbSyllabifier.py
 Authors:        Jacob Krantz
-Date Modified:  3/3/17
+Date Modified:  3/14/17
 
 - Purpose: Syllabifies a given phoneme (or file of phonemes)
     - uses the Viterbi Algrithm

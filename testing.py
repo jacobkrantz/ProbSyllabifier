@@ -3,16 +3,20 @@ from SyllabParser import SyllabParser
 '''
 fileName:       testing.py
 Authors:        Jacob Krantz
-Date Modified:  3/13/17
+Date Modified:  3/14/17
 
 Contains classes for testing the perfomance of Sylabifiers.
 - CompareNIST
+    * compare
+    * viewDifferences
+
 '''
 
 class CompareNIST:
 
     def __init__(self):
         self.sParser = SyllabParser()
+        self.__difLst = []
 
 
     # compares the syllabifications of compFile to those done by NIST.
@@ -21,11 +25,24 @@ class CompareNIST:
     def compare(self, NISTfile, compFile):
 
         nSyllabs = self.__importFile(NISTfile)
-
         cSyllabs = self.__importFile(compFile)
-        #self.seeSyllabs(cSyllabs)
+
         percentSim = self.__runComparison(nSyllabs, cSyllabs)
         self.__outputResults(percentSim)
+
+
+    # prints the differences between NIST and the compared file
+    def viewDifferences(self):
+
+        for i in range(1, len(self.__difLst), 2):
+            print("NIST: "),
+            print(self.__difLst[i-1])
+            print("Prob: "),
+            print(self.__difLst[i])
+            print
+
+        self.__difLst = []
+
 
     # ------------------------------------------------------
     # Private functions below
@@ -49,13 +66,14 @@ class CompareNIST:
         for i in range(0, end): # loop lines
             for j in range(0,len(nSyllabs[i])): # loop bigrams
                 if(nSyllabs[i][j][2] != cSyllabs[i][j][2]):
-                    print "dif"
                     same = False
 
             if(same):
                 sameCount += 1
             else:
                 same = True
+                self.__difLst.append(nSyllabs[i])
+                self.__difLst.append(cSyllabs[i])
 
         return (sameCount / float(end) * 100)
 

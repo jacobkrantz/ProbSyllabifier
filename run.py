@@ -8,7 +8,7 @@ import sys
 '''
 fileName:       run.py
 Authors:        Jacob Krantz
-Date Modified:  3/11/17
+Date Modified:  3/14/17
 
 - main file to train and run the Probabilsitic Syllabifier
 - Syllabifies a file using NIST
@@ -37,7 +37,6 @@ def runNIST():
         inFile = raw_input("choose input file: ")
         outFIle = raw_input("choose output file: ")
 
-
     generateWords(inTest)
 
     try:
@@ -49,6 +48,7 @@ def runNIST():
         print err
 
 
+# builds word set files to be used in NIST syllabification
 def generateWords(fwOut):
     fw = FW()
     numWords = int(raw_input("Enter number of words to syllabify: "))
@@ -74,6 +74,7 @@ def trainHMM():
     print("Items in training set: " + str(hmm.getTrainingSize()))
 
 
+# runs the probabilistic syllabifier for either a phoneme or file.
 def runS():
     ps = ProbSyllabifier()
     obs = " "
@@ -89,6 +90,7 @@ def runS():
             print("Syllabification: " + syl)
 
 
+# compares the results of ProbS to that of NIST
 def testSyllabifier():
     cNIST = CompareNIST()
     ps = ProbSyllabifier()
@@ -101,12 +103,16 @@ def testSyllabifier():
     probName = "./HMMFiles/probSyllabs.txt"
     cNIST.compare(NISTname, probName)
 
+    viewDif = raw_input("view differences (y): ")
+    if(viewDif == 'y'):
+        cNIST.viewDifferences()
+
 
 def help():
     print "Running the Syllabifier:"
     print "     To syllabify a phoneme, enter phones separated by a space."
     print "     To return to the main menu, hit enter with no input."
-    print "     *File syllabification is currently under development."
+
 
 def main():
     choice = ""
@@ -135,8 +141,6 @@ def main():
             testSyllabifier()
         elif(choice == 5):
             help()
-
-
 
 
 main()
