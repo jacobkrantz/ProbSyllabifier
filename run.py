@@ -1,7 +1,8 @@
-from freqLst import FrequentWords as FW
 from NISTSyllab import NISTSyllab
-from ProbSyllabifier import ProbSyllabifier
+from freqLst import FrequentWords as FW
 from HMM import HMM
+from ProbSyllabifier import ProbSyllabifier
+from testing import CompareNIST
 import sys
 
 '''
@@ -23,6 +24,9 @@ class color:
 def runNIST():
     inFile = "./corpusFiles/freqWords.txt"
     outFile = "./HMMFiles/SyllabDict.txt"
+
+    outTest = "./HMMFiles/NISTtest.txt"
+    inTest = "./corpusFiles/testSet.txt"
     nistSyllab = NISTSyllab()
 
     print ("current input file: " + inFile)
@@ -33,14 +37,19 @@ def runNIST():
         inFile = raw_input("choose input file: ")
         outFIle = raw_input("choose output file: ")
 
-    generateWords()
+
+    generateWords(inTest)
 
     try:
+
         nistSyllab.syllabifyFile(inFile,outFile)
+        nistSyllab.syllabifyFile(inTest, outTest)
+
     except IOError as err:
         print err
 
-def generateWords():
+
+def generateWords(fwOut):
     fw = FW()
     numWords = int(raw_input("Enter number of words to syllabify: "))
     numTestWords = int(raw_input("Enter number of words to test on: "))
@@ -54,7 +63,8 @@ def generateWords():
     fw.generateTesting(testingOut, numTestWords)
 
 
-
+# build A and B matrices. Makes files to be used in the Viterbi
+# decoding algorithm. 
 def trainHMM():
     hmm = HMM()
 
@@ -78,6 +88,15 @@ def runS():
             syl = ps.syllabify(obs.lower())
             print("Syllabification: " + syl)
 
+
+def testSyllabifier():
+    cNIST = CompareNIST()
+
+    NISTname = "./HMMFiles/NISTtest.txt"
+    probName = "./HMMFiles/probSyllabs.txt"
+    cNIST.compare(NISTname, probName)
+
+
 def help():
     print "Running the Syllabifier:"
     print "     To syllabify a phoneme, enter phones separated by a space."
@@ -91,14 +110,15 @@ def main():
     print "Welcome to the Probabilistic Syllabifier"
     print "----------------------------------------"
 
-    while(choice != 5):
+    while(choice != 6):
         print("\n" + color.BOLD + "Main Menu" + color.END)
         print "Choose an option:"
         print "1. Build sets with NIST"
         print "2. Train the HMM"
         print "3. Run the Syllabifier"
-        print "4. Help"
-        choice = input("5. Quit\n")
+        print "4. Test Results"
+        print "5. Help"
+        choice = input("6. Quit\n")
 
         if(choice == 1):
             runNIST()
@@ -107,6 +127,8 @@ def main():
         elif(choice == 3):
             runS()
         elif(choice == 4):
+            testSyllabifier()
+        elif(choice == 5):
             help()
 
 
