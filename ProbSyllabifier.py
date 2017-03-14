@@ -45,7 +45,8 @@ class ProbSyllabifier:
         self.sTools.readWords()
         self.sTools.buildArpabet()
         syllabDict = self.__syllabifyAll()
-        self.sTools.printDictToFile(syllabDict)
+
+        self.__printDictToFile(syllabDict)
 
 
     # given an observation string, generates the most likely hidden state.
@@ -53,6 +54,7 @@ class ProbSyllabifier:
     def syllabify(self, observation):
         obsLst = self.__makeObsLst(observation)
         obsLst = self.__convertToBigrams(obsLst)
+
         isValid, problemObs = self.__isValidObs(obsLst)
 
         if(isValid):
@@ -290,6 +292,30 @@ class ProbSyllabifier:
             ArpString = ArpString + aPhoneme + " "
 
         ## ArpString ready for syllabification
-        finalSyllab = self.syllabify(ArpString.lower())
+        finalSyllab = self.syllabify(ArpString.lower().strip(" "))
 
         return finalSyllab
+
+
+    # prints the contents of a syllabification dictionary to a file.
+    # Comforms to format of 'SyllabDict.txt' for future parsing.
+    def __printDictToFile(self, syllabDict):
+        outF = open(self.sTools.outFile,'w')
+
+        for entry in syllabDict:
+
+            outF.write(str(entry))
+            outF.write(" ")
+            outF.write("[ ")
+            valueString = syllabDict[entry].split(" ")
+
+            for char in valueString:
+                if(char == '|'):
+                    outF.write("][")
+                else:
+                    outF.write(char)
+
+                outF.write(" ")
+
+            outF.write("]")
+            outF.write('\n')

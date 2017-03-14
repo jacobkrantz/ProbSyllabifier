@@ -20,42 +20,41 @@ class CompareNIST:
     # Both compFile and NISTfile must be in specific formats.
     def compare(self, NISTfile, compFile):
 
-        nSyllabs = self.__importNISTfile(NISTfile)
+        nSyllabs = self.__importFile(NISTfile)
         cSyllabs = self.__importFile(compFile)
-
-        #percentSim = self.__runComparison(nSyllabs, cSyllabs)
-        #self.__outputResults(percentSim)
+        #self.seeSyllabs(nSyllabs)
+        percentSim = self.__runComparison(nSyllabs, cSyllabs)
+        self.__outputResults(percentSim)
 
     # ------------------------------------------------------
     # Private functions below
     # ------------------------------------------------------
 
-    # Imports a file that is generated from a NIST file syllabification.
+    # Imports a file that is formatted like 'SyllabDict.txt'.
     # Parses file with SyllabParser and returns result (list of lists).
-    def __importNISTfile(self, fileName):
-        self.sParser.setFile(fileName)
-        return self.sParser.makePhonemeLst()
-
-
-    # ***ProbSyllabifier file syllabification not done yet
     def __importFile(self, fileName):
-        pass
+        #self.sParser.setFile(fileName)
+        return self.sParser.makePhonemeLst(fileName)
 
 
     # assumes that the ordering of nSyllabs is the same as cSyllabs.
     # iterates through both datasets. For each that are the same, adds
     # to same count. Also counts total entries. Returns percent.
     def __runComparison(self, nSyllabs, cSyllabs):
-        assert(len(nSyllabs) == len(cSyllabs))
         end = len(nSyllabs)
         sameCount = 0
 
         for i in range(0, end):
-            if(nSyllabs[i] == cSyllabs[i]):
+            if(nSyllabs[i][0][2] == cSyllabs[i][0][2]):
                 sameCount += sameCount
 
         return (sameCount / float(end))
 
 
     def __outputResults(self, percentSim):
-        print("File is " + str(percentSim) + " similar to NIST.")
+        print("File is " + str(percentSim) + "% similar to NIST.")
+
+
+    def seeSyllabs(self, syllabs):
+        for item in syllabs:
+            print item

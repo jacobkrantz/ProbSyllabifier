@@ -35,8 +35,9 @@ class SyllabParser:
 
     # Creates a list of phonemes. Phonemes consist of bigrams of the
     # form: [['d', 'aa', 0], ['aa', 'l', 1], ['l', 'er', 0]]
-    def makePhonemeLst(self):
+    def makePhonemeLst(self, fileName):
 
+        self.fileName = fileName
         self.__bringInFile(self.fileName)
         self.__makeParseWord(0)
         self.__makeParseWord(1)
@@ -44,6 +45,7 @@ class SyllabParser:
         for i in range(self.countLines):
             self.__makeParseWord(i)
 
+        #print self.bigramLst
         return self.bigramLst
 
 
