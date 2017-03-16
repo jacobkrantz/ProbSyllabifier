@@ -300,22 +300,27 @@ class ProbSyllabifier:
     # prints the contents of a syllabification dictionary to a file.
     # Comforms to format of 'SyllabDict.txt' for future parsing.
     def __printDictToFile(self, syllabDict):
+        #print syllabDict
         outF = open(self.sTools.outFile,'w')
 
         for entry in syllabDict:
 
-            outF.write(str(entry))
-            outF.write(" ")
-            outF.write("[ ")
-            valueString = syllabDict[entry].split(" ")
-
-            for char in valueString:
-                if(char == '|'):
-                    outF.write("][")
-                else:
-                    outF.write(char)
-
+            try:
+                valueString = syllabDict[entry].split(" ")
+                outF.write(str(entry))
                 outF.write(" ")
+                outF.write("[ ")
 
-            outF.write("]")
-            outF.write('\n')
+                for char in valueString:
+                    if(char == '|'):
+                        outF.write("][")
+                    else:
+                        outF.write(char)
+
+                    outF.write(" ")
+
+                outF.write("]")
+                outF.write('\n')
+                
+            except:
+                pass

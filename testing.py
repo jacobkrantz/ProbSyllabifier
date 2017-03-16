@@ -59,23 +59,48 @@ class CompareNIST:
     # iterates through both datasets. For each that are the same, adds
     # to same count. Also counts total entries. Returns percent.
     def __runComparison(self, nSyllabs, cSyllabs):
-        end = len(nSyllabs)
+        end = len(cSyllabs)
         sameCount = 0
         same = True
+        nSylIndex = 0
 
         for i in range(0, end): # loop lines
+
+            if(not self.__isSamePhoneme(nSyllabs[i],cSyllabs[i])):
+                print nSyllabs[i]
+                nSylIndex += 1
+
             for j in range(0,len(nSyllabs[i])): # loop bigrams
-                if(nSyllabs[i][j][2] != cSyllabs[i][j][2]):
+
+                if(nSyllabs[nSylIndex][j][2] != cSyllabs[i][j][2]):
                     same = False
 
             if(same):
                 sameCount += 1
             else:
                 same = True
-                self.__difLst.append(nSyllabs[i])
+                self.__difLst.append(nSyllabs[nSylIndex])
                 self.__difLst.append(cSyllabs[i])
 
+            nSylIndex += 1
+
         return (sameCount / float(end) * 100)
+
+
+    # checks if both phonemes to be compared are the same. Loops through
+    # checking each bigram contents.
+    def __isSamePhoneme(self,nSyllab, cSyllab):
+        if(len(nSyllab) != len(cSyllab)):
+            return False
+
+        for i in range(0, len(nSyllab)):
+
+            if(nSyllab[0] != cSyllab[0]):
+                return False
+            elif(nSyllab[1] != cSyllab[1]):
+                return False
+
+        return True
 
 
     # prints the percentage to the commandline

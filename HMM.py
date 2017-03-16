@@ -199,8 +199,8 @@ class HMM:
                 i = self.bigramLookup.index(tup)
 
                 # easy test for bigram occurance
-                if(tup == ('ae','l')):
-                    print bigram
+                #if(tup == ('ae','l')):
+                #    print bigram
                 if(bigram[2] == 0): # increment no boundary count
                     MatrixB[i, 0] = MatrixB[i, 0] + 1
 

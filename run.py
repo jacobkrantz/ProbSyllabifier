@@ -55,7 +55,7 @@ def generateWords(fwOut):
     numTestWords = int(raw_input("Enter number of words to test on: "))
 
     # pulling from entire corpus or editorials
-    fwIn = "./corpusFiles/editorial_words.txt"
+    fwIn = "./corpusFiles/editorial_words.txt" #/brown_words.txt
     fwOut = "./corpusFiles/freqWords.txt"
     testingOut = "./corpusFiles/testSet.txt"
 
