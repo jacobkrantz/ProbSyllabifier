@@ -129,7 +129,11 @@ def main():
         print "3. Run the Syllabifier"
         print "4. Test Results"
         print "5. Help"
-        choice = input("6. Quit\n")
+
+        try:
+            choice = input("6. Quit\n")
+        except:
+            choice = 7 # just loop again
 
         if(choice == 1):
             runNIST()
