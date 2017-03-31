@@ -1,0 +1,9 @@
+monophthongs AO AA IY UW EH IH UH AH AX AE
+diphthongs EY AY OW AW OY
+r-colored vowels ER AXR
+stops P B T D K G
+affricates CH JH
+fricatives F V TH DH S Z SH ZH HH
+nasals M EM N EN NG ENG
+liquids L EL R DX NX
+isemivowels Y W Q
