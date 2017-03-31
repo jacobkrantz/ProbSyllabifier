@@ -64,6 +64,51 @@ class Utils:
         return sylParser.makePhonemeLst()
 
 
+    # generates the tag list by iterating though the bigram tuples and
+    # looking up what type of consonant or vowel each phone belongs to.
+    # returns list.
+    def getTagLookup(self, allBigramTups):
+        tagLst = []
+        spot = 0
+        spot1 = 0
+        spot2 = 0
+
+        for phoneme in allBigramTups:
+            for tup in phoneme:
+
+                spot = self.getCategory(tup[0])
+                spot1 = str(tup[2])
+                spot2 = self.getCategory(tup[2])
+                tagString = spot + spot1 + spot2
+                tagLst.append(tagString)
+
+        return set(tagLst) # return only unique items
+
+
+    # returns the category that the phone belongs to
+    def getCategory(self, phone):
+        cat = ""
+        tagNames = self.getTagNames()
+
+        for category in tagNames:
+            if phone in category:
+                cat = category[0]
+                return cat[0] # remove trailing unique ID
+
+
+        # imports the tags from a specific file.
+        # returns as a list of lists.
+    def getTagNames(self):
+        inFile = open("./HMMFiles/phoneCategories.txt",'r')
+        tags = []
+
+        for line in inFile:
+            tmpLst = line.splt(' ')
+            tags.append(tmpLst)
+
+        return tags
+
+
     # phonemeLst is allBigramTups
     # returns a list of all
     def getBoundLst(self, phonemeLst):
@@ -89,20 +134,23 @@ class Utils:
 
 
     # for input phoneme: [(phone,phone,int),(...),]
-    # returns a list of tuples containing boundary bigrams.
-    # ex: [(0,0),(0,1),(1,0)]
-    def getBoundBigrams(self, phoneme):
-        boundBigrams = []
-        boundLst = []
+    # returns a list of tuples containing boundary bigrams with v/c knowledge.
+    # ex: [('m0d','d1s'),('s0n','n1l'),('la1','a0m')]
+    def getTagBigrams(self, phoneme):
+        TagBigrams = []
+        tagLst = []
 
         for tup in phoneme:
-            boundLst.append(tup[2])
+            spot0 = self.getCategory(tup[0])
+            spot2 = self.getCategory(tup[1])
+            tagString = spot0 + str(tup[2]) + spot2
+            tagLst.append(tagString)
 
-        for i in range(1,len(boundLst) - 1):
-            tupl = (boundLst[i - 1], boundLst[i])
-            boundBigrams.append(tupl)
+        for i in range(1,len(tagLst) - 1):
+            tupl = (tagLst[i - 1], tagLst[i])
+            TagBigrams.append(tupl)
 
-        return boundBigrams
+        return TagBigrams
 
     # ------------------------------------------------------
     # B Matrix functions below
