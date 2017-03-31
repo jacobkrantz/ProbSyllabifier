@@ -172,27 +172,39 @@ class HMM:
                 matrixA[1,1] = matrixA[1,1] + 1
         '''
 
-        tagDict = {}
+        bigramDict = {}
 
         for bigramTup in self.boundBigrams:
-            if bigramTup[1] in tagDict:
-                tagDict[bigramTup[1]] +=1
+            if bigramTup[1] in bigramDict:
+                bigramDict[bigramTup[1]] +=1
             else:
-                tagDict[bigramTup[1]] = 1
-                
-        return tagDict,len(tagDict.keys())
+                bigramDict[bigramTup[1]] = 1
 
-
-
-
-
+        return bigramDict,len(bigramDict.keys())
 
     # normalizes the counts in matrix A to be probabilities by
     # dividing each count by the total number of bigrams trained on.
     # probablilites inserted as floating point decimals. Returns matrixA.
-    def __normalizeA(self, matrixA):
+    def __normalizeA(self, bigramDict):
+
+        for entry in bigramDict:
+            iTag = entry[0]
+            jTag = entry[1]
+
+            #This is the count of the iTag's that we need to normalize it.
+            #count = classificationDict[iTag]
+            divisor = tagDict[iTag]
+            probability = count / float(divisor)
+
+            iIndex = classificationLst.index(iTag)
+             #finds the index in the matrix from the lookup
+            jIndex = tagLst.index(jTag)
+            #finds the index in the matrix from the lookup
+
+            matrixA[iIndex,jIndex] = probability
 
 
+        '''
         totFloat = matrixA[0,0] + matrixA[0,1] + matrixA[1,0] + matrixA[1,1]
         totFloat = float(totFloat)
 
@@ -200,7 +212,7 @@ class HMM:
         matrixA[0,1] = matrixA[0,1] / totFloat
         matrixA[1,0] = matrixA[1,0] / totFloat
         matrixA[1,1] = matrixA[1,1] / totFloat
-
+        '''
         return matrixA
 
 
