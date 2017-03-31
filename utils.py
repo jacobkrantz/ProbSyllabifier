@@ -67,11 +67,13 @@ class Utils:
     # generates the tag dictionary by iterating though the bigram tuples and
     # looking up what type of consonant or vowel each phone belongs to.
     # returns a dictionary of [tag]: [number of occurances]
+    # also returns a lookup list for matrix indices.
     def getTagLookup(self, allBigramTups):
         spot = 0
         spot1 = 0
         spot2 = 0
         tagDict = {}
+        tagLst = []
 
         for phoneme in allBigramTups:
             for tup in phoneme:
@@ -80,12 +82,13 @@ class Utils:
                 spot1 = str(tup[2])
                 spot2 = self.getCategory(tup[1])
                 tagString = spot + spot1 + spot2
+                tagLst.append(tagString)
                 if tagString in tagDict:
                     tagDict[tagString] += 1
                 else:
                     tagDict[tagString] = 1
         print len(tagDict)
-        return tagDict
+        return tagDict, set(tagLst) 
 
 
     # returns the category that the phone belongs to
