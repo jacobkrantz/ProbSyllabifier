@@ -34,7 +34,7 @@ class HMM:
         self.numYesBounds = 0
         self.numNoBounds = 0
         self.bigramLookup = []
-        self.tagLookup = []
+        self.tagLookupDict = {}
 
         self.__loadFiles('shared')
 
@@ -59,7 +59,7 @@ class HMM:
             self.boundBigrams = self.utils.getTagBigrams(phoneme)
             matrixA = self.__insertCountA(matrixA)
 
-        matrixA = self.__normalizeA(matrixA)
+        #matrixA = self.__normalizeA(matrixA)
         self.utils.outputMatrix(matrixA, "A")
 
         return matrixA
@@ -100,7 +100,7 @@ class HMM:
             self.__loadFiles('B')
 
         self.utils.makeLookup(self.bigramLookup,"./HMMFiles/obsLookup.txt")
-        self.utils.makeLookup(self.tagLookup, "./HMMFiles/hiddenLookup.txt")
+        self.utils.makeLookup(self.tagLookupDict, "./HMMFiles/hiddenLookup.txt")
         self.utils.makeHiddenProb(self.boundLst)
 
 
@@ -128,7 +128,7 @@ class HMM:
         if(mode == 'shared'):
 
             self.allBigramTups = self.utils.getAllBigramTups()
-            self.tagLookup = self.utils.getTagLookup(self.allBigramTups)
+            self.tagLookupDict = self.utils.getTagLookup(self.allBigramTups)
 
         elif(mode == 'A'):
 
@@ -181,7 +181,7 @@ class HMM:
                 tagDict[bigramTup[1]] +=1
             else:
                 tagDict[bigramTup[1]] = 1
-                
+
         return tagDict,len(tagDict.keys())
 
 

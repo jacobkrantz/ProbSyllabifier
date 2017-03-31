@@ -64,36 +64,42 @@ class Utils:
         return sylParser.makePhonemeLst()
 
 
-    # generates the tag list by iterating though the bigram tuples and
+    # generates the tag dictionary by iterating though the bigram tuples and
     # looking up what type of consonant or vowel each phone belongs to.
-    # returns list.
+    # returns a dictionary of [tag]: [number of occurances]
     def getTagLookup(self, allBigramTups):
-        tagLst = []
         spot = 0
         spot1 = 0
         spot2 = 0
+        tagDict = {}
 
         for phoneme in allBigramTups:
             for tup in phoneme:
 
                 spot = self.getCategory(tup[0])
                 spot1 = str(tup[2])
-                spot2 = self.getCategory(tup[2])
+                spot2 = self.getCategory(tup[1])
                 tagString = spot + spot1 + spot2
-                tagLst.append(tagString)
-
-        return set(tagLst) # return only unique items
+                if tagString in tagDict:
+                    tagDict[tagString] += 1
+                else:
+                    tagDict[tagString] = 1
+        print len(tagDict)
+        return tagDict
 
 
     # returns the category that the phone belongs to
     def getCategory(self, phone):
         cat = ""
         tagNames = self.getTagNames()
+        phone = phone.upper()
 
         for category in tagNames:
             if phone in category:
                 cat = category[0]
                 return cat[0] # remove trailing unique ID
+        print "not found in tagset."
+        return ""
 
 
         # imports the tags from a specific file.
@@ -103,7 +109,8 @@ class Utils:
         tags = []
 
         for line in inFile:
-            tmpLst = line.splt(' ')
+            tmpLst = line.split(' ')
+            tmpLst[len(tmpLst) - 1] = tmpLst[len(tmpLst) - 1].strip('\r\n')
             tags.append(tmpLst)
 
         return tags
