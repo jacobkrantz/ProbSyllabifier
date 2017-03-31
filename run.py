@@ -1,12 +1,14 @@
 from NISTSyllab import NISTSyllab
-from ProbSyllabifier import ProbSyllabifier
+from freqLst import FrequentWords as FW
 from HMM import HMM
+from ProbSyllabifier import ProbSyllabifier
+from testing import CompareNIST
 import sys
 
 '''
 fileName:       run.py
 Authors:        Jacob Krantz
-Date Modified:  2/28/17
+Date Modified:  3/14/17
 
 - main file to train and run the Probabilsitic Syllabifier
 - Syllabifies a file using NIST
@@ -20,8 +22,11 @@ class color:
 
 
 def runNIST():
-    inFile = "./corpusFiles/freqEditWords.txt"
+    inFile = "./corpusFiles/freqWords.txt"
     outFile = "./HMMFiles/SyllabDict.txt"
+
+    outTest = "./HMMFiles/NISTtest.txt"
+    inTest = "./corpusFiles/testSet.txt"
     nistSyllab = NISTSyllab()
 
     print ("current input file: " + inFile)
@@ -32,12 +37,34 @@ def runNIST():
         inFile = raw_input("choose input file: ")
         outFIle = raw_input("choose output file: ")
 
+    generateWords(inTest)
+
     try:
+
         nistSyllab.syllabifyFile(inFile,outFile)
+        nistSyllab.syllabifyFile(inTest, outTest)
+
     except IOError as err:
         print err
 
 
+# builds word set files to be used in NIST syllabification
+def generateWords(fwOut):
+    fw = FW()
+    numWords = int(raw_input("Enter number of words to syllabify: "))
+    numTestWords = int(raw_input("Enter number of words to test on: "))
+
+    # pulling from entire corpus or editorials
+    fwIn = "./corpusFiles/editorial_words.txt" #/brown_words.txt
+    fwOut = "./corpusFiles/freqWords.txt"
+    testingOut = "./corpusFiles/testSet.txt"
+
+    fw.generateMostFreq(fwIn, fwOut, numWords)
+    fw.generateTesting(testingOut, numTestWords)
+
+
+# build A and B matrices. Makes files to be used in the Viterbi
+# decoding algorithm.
 def trainHMM():
     hmm = HMM()
 
@@ -47,6 +74,7 @@ def trainHMM():
     print("Items in training set: " + str(hmm.getTrainingSize()))
 
 
+# runs the probabilistic syllabifier for either a phoneme or file.
 def runS():
     ps = ProbSyllabifier()
     obs = " "
@@ -61,11 +89,30 @@ def runS():
             syl = ps.syllabify(obs.lower())
             print("Syllabification: " + syl)
 
+
+# compares the results of ProbS to that of NIST
+def testSyllabifier():
+    cNIST = CompareNIST()
+    ps = ProbSyllabifier()
+
+    testIN = "./corpusFiles/testSet.txt"
+    testOUT = "./HMMFiles/probSyllabs.txt"
+    ps.syllabifyFile(testIN, testOUT)
+
+    NISTname = "./HMMFiles/NISTtest.txt"
+    probName = "./HMMFiles/probSyllabs.txt"
+    cNIST.compare(NISTname, probName)
+
+    viewDif = raw_input("view differences (y): ")
+    if(viewDif == 'y'):
+        cNIST.viewDifferences()
+
+
 def help():
     print "Running the Syllabifier:"
     print "     To syllabify a phoneme, enter phones separated by a space."
     print "     To return to the main menu, hit enter with no input."
-    print "     *File syllabification is currently under development."
+
 
 def main():
     choice = ""
@@ -74,14 +121,19 @@ def main():
     print "Welcome to the Probabilistic Syllabifier"
     print "----------------------------------------"
 
-    while(choice != 5):
+    while(choice != 6):
         print("\n" + color.BOLD + "Main Menu" + color.END)
         print "Choose an option:"
-        print "1. Syllabify with NIST"
+        print "1. Build sets with NIST"
         print "2. Train the HMM"
         print "3. Run the Syllabifier"
-        print "4. Help"
-        choice = input("5. Quit\n")
+        print "4. Test Results"
+        print "5. Help"
+
+        try:
+            choice = input("6. Quit\n")
+        except:
+            choice = 7 # just loop again
 
         if(choice == 1):
             runNIST()
@@ -90,6 +142,9 @@ def main():
         elif(choice == 3):
             runS()
         elif(choice == 4):
+            testSyllabifier()
+        elif(choice == 5):
             help()
+
 
 main()

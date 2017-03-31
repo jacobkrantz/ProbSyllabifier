@@ -1,7 +1,7 @@
 '''
 fileName:       NISTSyllab.py
 Authors:        Jacob Krantz
-Date Modified:  2/25/17
+Date Modified:  3/14/17
 
 - Mass syllabifier using CMU Pronouncing Dictionary and
     NIST Sylabifier.
@@ -32,19 +32,20 @@ class NISTSyllab:
         self.inFile = inputFile
         self.outFile = outputFile
 
-        self.__readWords__()
+        self.readWords()
 
-        self.__buildArpabet__()
+        self.buildArpabet()
 
-        syllabDict = self.__getSyllabDict__()
+        syllabDict = self.__getSyllabDict()
 
-        self.__printDictToFile__(syllabDict)
+        self.printDictToFile(syllabDict)
 
         print "File successfully syllabified."
+        self.__init__()
 
 
     # ------------------------------------------------------
-    # private functions below
+    # Helper functions below
     # ------------------------------------------------------
 
 
@@ -52,7 +53,7 @@ class NISTSyllab:
     ## imports words from file as list of words.
     ## populates self.wordLst with file contents.
     ## throws IOError if file not found
-    def __readWords__(self):
+    def readWords(self):
 
         wordFile = open(self.inFile,'r')
         words = ""
@@ -69,7 +70,7 @@ class NISTSyllab:
     ## looks up each word in cmudict and adds the word and pronunciation
     ## to a dictionary. Values are in list format with unicode phonemes.
     ## Only takes the first pronounciation for CMU when multiple exist.
-    def __buildArpabet__(self):
+    def buildArpabet(self):
 
         for word in self.wordLst:
             unicodeWord = unicode(word)
@@ -83,18 +84,18 @@ class NISTSyllab:
                 sys.exit()
 
 
-    def __getSyllabDict__(self):
+    def __getSyllabDict(self):
         syllabDict = {}
 
         for key in self.ArpabetDict:
 
-            syllabif = self.__getSyllabification__(self.ArpabetDict[key])
+            syllabif = self.__getSyllabification(self.ArpabetDict[key])
             syllabDict[key] = syllabif
 
         return syllabDict
 
 
-    def __getSyllabification__(self, pronunciation):
+    def __getSyllabification(self, pronunciation):
         ArpString = ""
 
         for phoneme in pronunciation:
@@ -118,7 +119,7 @@ class NISTSyllab:
 
 
     ## dictionary format: word: [[syllab1],[syllab2]...]
-    def __printDictToFile__(self, Dict):
+    def printDictToFile(self, Dict):
 
         outF = open(self.outFile,'w')
 

@@ -134,6 +134,32 @@ class Utils:
                     bigramLookup.append(newTup)
         return bigramLookup
 
+
+    # builds a dictionary containing bigram: P(bigram)
+    # used for normalizing MatrixB
+    def getBigramFreqDict(self, allBigramTups, numBigrams):
+        bigramFreqDict = {}
+
+        for phoneme in allBigramTups:
+            for bigram in phoneme:
+
+                newTup = (bigram[0],bigram[1])
+
+                if(newTup not in bigramFreqDict):
+                    bigramFreqDict[newTup] = 1
+                else:
+                    bigramFreqDict[newTup] += 1
+
+        return self.__normBigramFreqDict(bigramFreqDict, numBigrams)
+
+
+    # nornamlize the bigramFreqDict to (countBigram / countAllBigrams)
+    def __normBigramFreqDict(self, bigramFreqDict, numBigrams):
+        for bigram in bigramFreqDict:
+            bigramFreqDict[bigram] = bigramFreqDict[bigram] / float(numBigrams)
+
+        return bigramFreqDict
+
     # ------------------------------------------------------
     # File outputs for Viterbi
     # ------------------------------------------------------

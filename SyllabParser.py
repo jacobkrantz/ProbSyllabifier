@@ -2,12 +2,11 @@ import sys
 
 '''
 fileName:       SyllabParser.py
-Authors:        Max Dulin
-Date Modified:  2/26/17
+Authors:        Max Dulin, Jacob Krantz
+Date Modified:  3/15/17
 
 -Functions:
-    makeBigramList
-    setFile
+    makePhonemeLst
 
 - Parses the SyllabDict.txt into a list of tuples.
 - Default input file:
@@ -17,7 +16,7 @@ Date Modified:  2/26/17
 
 class SyllabParser:
 
-    #constructor
+
     def __init__(self):
 
         self.fileName = "./HMMFiles/SyllabDict.txt"
@@ -35,21 +34,18 @@ class SyllabParser:
 
     # Creates a list of phonemes. Phonemes consist of bigrams of the
     # form: [['d', 'aa', 0], ['aa', 'l', 1], ['l', 'er', 0]]
-    def makePhonemeLst(self):
+    # filename param defaults to ./HMMFiles./SyllabDict.txt
+    def makePhonemeLst(self, fileName="./HMMFiles/SyllabDict.txt"):
 
-        self.__bringInFile(self.fileName)
-        self.__makeParseWord(0)
-        self.__makeParseWord(1)
+        self.fileName = fileName
+        self.__bringInFile()
 
         for i in range(self.countLines):
             self.__makeParseWord(i)
 
-        return self.bigramLst
-
-
-    # sets the file to be parsed within 'makePhonemeLst'
-    def setFile(self, newFile):
-        self.fileName = newFile
+        bigs = self.bigramLst
+        self.__init__()
+        return bigs
 
 
     ## ------------------------------
@@ -58,12 +54,13 @@ class SyllabParser:
 
     ##brings in the contents of the file
     ##Puts them into initialList, a class variable
-    def __bringInFile(self,inputFile):
+    def __bringInFile(self):
 
-        with open(inputFile) as f:
+        with open(self.fileName) as f:
             for line in f:
                 self.initialList.append(line)
                 self.countLines+=1
+
 
     #Parses a word into bigrams and whether there was a boundary between them.
     #In the format (firstPhone,secondPhone,boundary)
