@@ -153,8 +153,9 @@ class HMM:
 
     # inserts the count of a tag given the previous tag
     # populates matrixA with these values and return matrixA
-    def __insertCountA(self, matrixA):
+    def insertCountA(self):
 
+        '''
         for bigramTup in self.boundBigrams:
             if(bigramTup == (0,0)):
                 matrixA[0,0] = matrixA[0,0] + 1
@@ -167,14 +168,29 @@ class HMM:
 
             elif(bigramTup == (1,1)):
                 matrixA[1,1] = matrixA[1,1] + 1
+        '''
 
-        return matrixA
+        tagDict = {}
+
+        for bigramTup in self.boundBigrams:
+            if bigramTup[1] in tagDict:
+                tagDict[bigramTup[1]] +=1
+            else:
+                tagDict[bigramTup[1]] = 1
+                
+        return tagDict,len(tagDict.keys())
+
+
+
+
 
 
     # normalizes the counts in matrix A to be probabilities by
     # dividing each count by the total number of bigrams trained on.
     # probablilites inserted as floating point decimals. Returns matrixA.
     def __normalizeA(self, matrixA):
+
+
         totFloat = matrixA[0,0] + matrixA[0,1] + matrixA[1,0] + matrixA[1,1]
         totFloat = float(totFloat)
 
@@ -218,3 +234,10 @@ class HMM:
             MatrixB[i, 1] = MatrixB[i, 1] / float(self.numYesBounds)
 
         return MatrixB
+
+def main():
+
+    H = HMM()
+    H.insertCountA()
+
+main()
