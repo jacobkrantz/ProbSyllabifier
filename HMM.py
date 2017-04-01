@@ -1,5 +1,6 @@
 from utils import Utils
 import sys
+import numpy as np
 
 '''
 fileName:       HMM.py
@@ -53,14 +54,13 @@ class HMM:
     def buildMatrixA(self):
 
         self.__loadFiles('A')
-        matrixA = self.utils.initMatrix(2,2)
-
+        #print self.allBigramTups
         for phoneme in self.allBigramTups:
+            self.tagBigrams += self.utils.getTagBigrams(phoneme)
+        #print self.tagBigrams
+        bigramDict= self.__insertCountA()
+        matrixA = self.__normalizeA(bigramDict)
 
-            self.tagBigrams = self.utils.getTagBigrams(phoneme)
-            matrixA = self.__insertCountA(matrixA)
-
-        #matrixA = self.__normalizeA(matrixA)
         self.utils.outputMatrix(matrixA, "A")
 
         return matrixA
@@ -129,8 +129,11 @@ class HMM:
         if(mode == 'shared'):
 
             self.allBigramTups = self.utils.getAllBigramTups()
-            self.tagDict, self.tagLookup = self.utils.getTagLookup(self.allBigramTups)
-
+            #I didn't want to delete the tag look set construct because I hope
+            #we can still do that.
+            self.tagDict, self.tagLookup= self.utils.getTagLookup(self.allBigramTups)
+            self.tagLookup = self.utils.getTagLst(self.tagDict.copy())
+            #self.tagLookup = self.makeTagLst(self.tagDict.copy())
         elif(mode == 'A'):
 
             self.boundCount = self.utils.getBoundCount(self.allBigramTups)
@@ -155,10 +158,9 @@ class HMM:
         # test to make sure all items in lookup are unique
         assert(len(self.bigramLookup) == len(set(self.bigramLookup)))
 
-
     # inserts the count of a tag given the previous tag
     # populates matrixA with these values and return matrixA
-    def __insertCountA(self, matrixA):
+    def __insertCountA(self):
 
         '''
         for bigramTup in self.tagBigrams:
@@ -176,36 +178,41 @@ class HMM:
         '''
 
         bigramDict = {}
-
+        #print(self.tagBigrams)
         for bigramTup in self.tagBigrams:
-            if bigramTup[1] in bigramDict:
-                bigramDict[bigramTup[1]] +=1
+            if bigramTup in bigramDict:
+                bigramDict[bigramTup] +=1
             else:
-                bigramDict[bigramTup[1]] = 1
-
-        return bigramDict,len(bigramDict.keys())
+                bigramDict[bigramTup] = 1
+        #print bigramDict
+        return bigramDict
 
     # normalizes the counts in matrix A to be probabilities by
     # dividing each count by the total number of bigrams trained on.
     # probablilites inserted as floating point decimals. Returns matrixA.
+    #
     def __normalizeA(self, bigramDict):
-
+        #makes a matrix as big as the the tagLookUp is
+        matrixA = np.zeros((len(self.tagLookup),len(self.tagLookup)), dtype=np.float)
+        #print(self.tagLookup)
         for entry in bigramDict:
             iTag = entry[0]
             jTag = entry[1]
 
+            #the total count of times that the bigram of tags appears in the order
+            count = bigramDict[entry]
             #This is the count of the iTag's that we need to normalize it.
-            #count = classificationDict[iTag]
-            divisor = tagDict[iTag]
+            divisor = self.tagDict[iTag]
+            #normalizes the probability
             probability = count / float(divisor)
 
-            iIndex = classificationLst.index(iTag)
-             #finds the index in the matrix from the lookup
-            jIndex = tagLst.index(jTag)
-            #finds the index in the matrix from the lookup
+            #these find the index of where they should be on matrixA
+            #tagLookup cooresponds to the spot on the matrix
+            iIndex = self.tagLookup.index(iTag)
+            jIndex = self.tagLookup.index(jTag)
 
+            #sets the value into the matrix
             matrixA[iIndex,jIndex] = probability
-
 
         '''
         totFloat = matrixA[0,0] + matrixA[0,1] + matrixA[1,0] + matrixA[1,1]
@@ -269,3 +276,7 @@ class HMM:
             MatrixB[i, 1] = MatrixB[i, 1] / float(bigramProb)
 
         return MatrixB
+if(__name__ == "__main__"):
+    #b = Board( 'W', 'B', 'W', 'B')
+    H = HMM()
+    H.buildMatrixA()

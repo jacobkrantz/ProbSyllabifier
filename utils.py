@@ -88,7 +88,7 @@ class Utils:
                 else:
                     tagDict[tagString] = 1
         print len(tagDict)
-        return tagDict, set(tagLst) 
+        return tagDict, set(tagLst)
 
 
     # returns the category that the phone belongs to
@@ -142,7 +142,16 @@ class Utils:
 
         return boundCount
 
-
+    #Puts the tagDict into a list
+    #This is the label for each of the matrix spots
+    def getTagLst(self,tagDict):
+        tagLst = []
+        for i in range(0,len(tagDict)):
+            largest = max(tagDict, key=tagDict.get)
+            tagLst.append(largest)
+            del tagDict[largest]
+        return tagLst
+        
     # for input phoneme: [(phone,phone,int),(...),]
     # returns a list of tuples containing boundary bigrams with v/c knowledge.
     # ex: [('m0d','d1s'),('s0n','n1l'),('la1','a0m')]
