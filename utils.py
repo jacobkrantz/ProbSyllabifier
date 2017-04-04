@@ -88,7 +88,7 @@ class Utils:
                 else:
                     tagDict[tagString] = 1
         print len(tagDict)
-        return tagDict, set(tagLst)
+        return tagDict, list(set(tagLst))
 
 
     # returns the category that the phone belongs to
@@ -151,10 +151,10 @@ class Utils:
             tagLst.append(largest)
             del tagDict[largest]
         return tagLst
-        
+
     # for input phoneme: [(phone,phone,int),(...),]
     # returns a list of tuples containing boundary bigrams with v/c knowledge.
-    # ex: [('m0d','d1s'),('s0n','n1l'),('la1','a0m')]
+    # ex: [('m0d','d1s'),('d1s','n1l'),('n1l','a0m')]
     def getTagBigrams(self, phoneme):
         TagBigrams = []
         tagLst = []
@@ -170,6 +170,20 @@ class Utils:
             TagBigrams.append(tupl)
 
         return TagBigrams
+
+
+    # param: all tag bigrams, including duplicates.
+    # creates a dictionary of [bigram]: [number of occurances]
+    def buildTagBigramDict(self, tagBigrams):
+        tagBigramDict = {}
+
+        for bigramTup in tagBigrams:
+            if bigramTup in tagBigramDict:
+                tagBigramDict[bigramTup] +=1
+            else:
+                tagBigramDict[bigramTup] = 1
+
+        return tagBigramDict
 
     # ------------------------------------------------------
     # B Matrix functions below

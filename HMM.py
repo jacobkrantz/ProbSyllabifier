@@ -47,6 +47,7 @@ class HMM:
     #
     # for both x and y, 0 is no boundary.
     # for both x and y, 1 is a boundary.
+    # each entry is normalized by prior tag count.
     #
     # Loads files necessary, builds matrix probabilities,
     #     outputs final matrix to a file "./HMM/MatrixA.txt"
@@ -54,12 +55,12 @@ class HMM:
     def buildMatrixA(self):
 
         self.__loadFiles('A')
-        #print self.allBigramTups
+
         for phoneme in self.allBigramTups:
             self.tagBigrams += self.utils.getTagBigrams(phoneme)
-        #print self.tagBigrams
-        bigramDict= self.__insertCountA()
-        matrixA = self.__normalizeA(bigramDict)
+
+        tagBigramDict = self.utils.buildTagBigramDict(self.tagBigrams)
+        matrixA = self.__insertProbA(tagBigramDict)
 
         self.utils.outputMatrix(matrixA, "A")
 
@@ -117,6 +118,8 @@ class HMM:
     # loads values into necessary data structures for building the HMM
     # if mode == 'shared', loads data necessary for both matrices
     #       - allBigramTups
+    #       - tagDict
+    #       - tagLookup
     # if mode == 'A', loads data necessary for A matrix
     #       - boundCount
     # if mode == 'B', loads data necessary for B matrix
@@ -125,15 +128,13 @@ class HMM:
     #       - numNoBounds
     #       - bigramLookup
     #       - numBigrams
+    #       - bigramFreqDict
     def __loadFiles(self, mode):
         if(mode == 'shared'):
 
             self.allBigramTups = self.utils.getAllBigramTups()
-            #I didn't want to delete the tag look set construct because I hope
-            #we can still do that.
-            self.tagDict, self.tagLookup= self.utils.getTagLookup(self.allBigramTups)
-            self.tagLookup = self.utils.getTagLst(self.tagDict.copy())
-            #self.tagLookup = self.makeTagLst(self.tagDict.copy())
+            self.tagDict, self.tagLookup = self.utils.getTagLookup(self.allBigramTups)
+
         elif(mode == 'A'):
 
             self.boundCount = self.utils.getBoundCount(self.allBigramTups)
@@ -158,49 +159,21 @@ class HMM:
         # test to make sure all items in lookup are unique
         assert(len(self.bigramLookup) == len(set(self.bigramLookup)))
 
+
     # inserts the count of a tag given the previous tag
-    # populates matrixA with these values and return matrixA
-    def __insertCountA(self):
+    # populates matrixA with these values after normalizing the
+    # probabilities by the occurance count of the prior tag (tagDict).
+    def __insertProbA(self, tagBigramDict):
+        #makes a matrix as big as the the tagLookUp is. X = Y.
+        xy = len(self.tagLookup)
+        matrixA = self.utils.initMatrix(xy,xy)
 
-        '''
-        for bigramTup in self.tagBigrams:
-            if(bigramTup == (0,0)):
-                matrixA[0,0] = matrixA[0,0] + 1
-
-            elif(bigramTup == (0,1)):
-                matrixA[0,1] = matrixA[0,1] + 1
-
-            elif(bigramTup == (1,0)):
-                matrixA[1,0] = matrixA[1,0] + 1
-
-            elif(bigramTup == (1,1)):
-                matrixA[1,1] = matrixA[1,1] + 1
-        '''
-
-        bigramDict = {}
-        #print(self.tagBigrams)
-        for bigramTup in self.tagBigrams:
-            if bigramTup in bigramDict:
-                bigramDict[bigramTup] +=1
-            else:
-                bigramDict[bigramTup] = 1
-        #print bigramDict
-        return bigramDict
-
-    # normalizes the counts in matrix A to be probabilities by
-    # dividing each count by the total number of bigrams trained on.
-    # probablilites inserted as floating point decimals. Returns matrixA.
-    #
-    def __normalizeA(self, bigramDict):
-        #makes a matrix as big as the the tagLookUp is
-        matrixA = np.zeros((len(self.tagLookup),len(self.tagLookup)), dtype=np.float)
-        #print(self.tagLookup)
-        for entry in bigramDict:
+        for entry in tagBigramDict:
             iTag = entry[0]
             jTag = entry[1]
 
             #the total count of times that the bigram of tags appears in the order
-            count = bigramDict[entry]
+            count = tagBigramDict[entry]
             #This is the count of the iTag's that we need to normalize it.
             divisor = self.tagDict[iTag]
             #normalizes the probability
@@ -214,15 +187,6 @@ class HMM:
             #sets the value into the matrix
             matrixA[iIndex,jIndex] = probability
 
-        '''
-        totFloat = matrixA[0,0] + matrixA[0,1] + matrixA[1,0] + matrixA[1,1]
-        totFloat = float(totFloat)
-
-        matrixA[0,0] = matrixA[0,0] / totFloat
-        matrixA[0,1] = matrixA[0,1] / totFloat
-        matrixA[1,0] = matrixA[1,0] / totFloat
-        matrixA[1,1] = matrixA[1,1] / totFloat
-        '''
         return matrixA
 
 
