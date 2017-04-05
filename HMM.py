@@ -78,7 +78,7 @@ class HMM:
     def buildMatrixB(self):
 
         self.__loadFiles('B')
-        MatrixB = self.utils.initMatrix(self.numBigrams,2)
+        MatrixB = self.utils.initMatrix(self.numBigrams,len(self.tagLookup))
 
         MatrixB = self.__insertCountB(MatrixB)
         MatrixB = self.normalizeNaiveB(MatrixB)
@@ -134,6 +134,7 @@ class HMM:
 
             self.allBigramTups = self.utils.getAllBigramTups()
             self.tagDict, self.tagLookup = self.utils.getTagLookup(self.allBigramTups)
+            self.allBigramTups = self.utils.expandTags(self.allBigramTups)
 
         elif(mode == 'A'):
 
@@ -142,9 +143,6 @@ class HMM:
 
         elif(mode == 'B'):
 
-            self.boundLst = self.utils.getBoundLst(self.allBigramTups)
-            self.numYesBounds = self.utils.getNumBounds(self.boundLst, 1)
-            self.numNoBounds = self.utils.getNumBounds(self.boundLst, 0)
             self.bigramLookup = self.utils.getBigramLookup(self.allBigramTups)
             self.numBigrams = len(self.bigramLookup)
             self.bigramFreqDict = self.utils.getBigramFreqDict(self.allBigramTups, self.numBigrams)
@@ -166,6 +164,7 @@ class HMM:
     def __insertProbA(self, tagBigramDict):
         #makes a matrix as big as the the tagLookUp is. X = Y.
         xy = len(self.tagLookup)
+
         matrixA = self.utils.initMatrix(xy,xy)
 
         for entry in tagBigramDict:
@@ -203,15 +202,15 @@ class HMM:
                 # easy test for bigram occurance
                 #if(tup == ('ae','l')):
                 #    print bigram
-                if(bigram[2] == 0): # increment no boundary count
-                    MatrixB[i, 0] = MatrixB[i, 0] + 1
 
-                else: # increment yes boundary count
-                    MatrixB[i, 1] = MatrixB[i, 1] + 1
+                curTag = bigram[2]
+                j = self.tagLookup.index(curTag)
+                MatrixB[i, j] = MatrixB[i, j] + 1
+
 
         return MatrixB
 
-
+    '''
     # normalizes the counts in matrix A to be probabilities by
     # dividing each count by the total number of boundaries trained on.
     # probablilites inserted as floating point decimals. Returns matrixB.
@@ -225,22 +224,26 @@ class HMM:
             MatrixB[i, 1] = MatrixB[i, 1] / float(self.numYesBounds)
 
         return MatrixB
-
+    '''
 
     # normaliziation strategy: divide all MatrixB entries by the probability
     # of the bigram occurring.
     def normalizeNaiveB(self, MatrixB):
 
-        for i in range(0, self.numBigrams):
+        for i in range(0, self.numBigrams):     # loop through each phone bigram
 
             bigram = self.bigramLookup[i]
             bigramProb = self.bigramFreqDict[bigram]
-            # print bigram,bigramProb
-            MatrixB[i, 0] = MatrixB[i, 0] / float(bigramProb)
-            MatrixB[i, 1] = MatrixB[i, 1] / float(bigramProb)
+
+            for j in range(0, len(self.tagLookup)):     # loop through each tag
+                MatrixB[i,j] = MatrixB[i,j] / float(bigramProb)
 
         return MatrixB
+
+
 if(__name__ == "__main__"):
-    #b = Board( 'W', 'B', 'W', 'B')
+    # train whole machine
     H = HMM()
     H.buildMatrixA()
+    H.buildMatrixB()
+    H.makeViterbiFiles()

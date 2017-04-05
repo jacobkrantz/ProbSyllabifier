@@ -147,6 +147,15 @@ class ProbSyllabifier:
         obs = observation.split(' ')
 
         for phone in obs:
+            if phone[0] == '"':     # *****for removing ' or " at start.
+                phone = phone[1:]
+            elif phone[0] == "'":
+                phone = phone[1:]
+            if phone[-1] == '"':    # for removing from end.
+                phone = phone[:-1]
+            elif phone[-1] == "'":
+                phone = phone[:-1]
+
             obsLst.append(phone)
 
         return obsLst
@@ -321,6 +330,6 @@ class ProbSyllabifier:
 
                 outF.write("]")
                 outF.write('\n')
-                
+
             except:
                 pass

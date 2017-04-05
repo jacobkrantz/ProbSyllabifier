@@ -82,6 +82,7 @@ def runS():
     while(obs != ''):
 
         obs = raw_input("Enter filename or phoneme: ")
+        
         syl = ""
         if("." in obs):
             ps.syllabifyFile(obs)

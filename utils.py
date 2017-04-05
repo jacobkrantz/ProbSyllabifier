@@ -69,9 +69,9 @@ class Utils:
     # returns a dictionary of [tag]: [number of occurances]
     # also returns a lookup list for matrix indices.
     def getTagLookup(self, allBigramTups):
-        spot = 0
-        spot1 = 0
-        spot2 = 0
+        spot = ''
+        spot1 = ''
+        spot2 = ''
         tagDict = {}
         tagLst = []
 
@@ -87,7 +87,7 @@ class Utils:
                     tagDict[tagString] += 1
                 else:
                     tagDict[tagString] = 1
-        print len(tagDict)
+
         return tagDict, list(set(tagLst))
 
 
@@ -153,20 +153,13 @@ class Utils:
         return tagLst
 
     # for input phoneme: [(phone,phone,int),(...),]
-    # returns a list of tuples containing boundary bigrams with v/c knowledge.
+    # returns a list of bigram tuples.
     # ex: [('m0d','d1s'),('d1s','n1l'),('n1l','a0m')]
     def getTagBigrams(self, phoneme):
         TagBigrams = []
-        tagLst = []
 
-        for tup in phoneme:
-            spot0 = self.getCategory(tup[0])
-            spot2 = self.getCategory(tup[1])
-            tagString = spot0 + str(tup[2]) + spot2
-            tagLst.append(tagString)
-
-        for i in range(1,len(tagLst) - 1):
-            tupl = (tagLst[i - 1], tagLst[i])
+        for i in range(1,len(phoneme) - 1):
+            tupl = (phoneme[i - 1][2], phoneme[i][2])
             TagBigrams.append(tupl)
 
         return TagBigrams
@@ -188,6 +181,27 @@ class Utils:
     # ------------------------------------------------------
     # B Matrix functions below
     # ------------------------------------------------------
+
+
+    # expands the tagset to have vowel/consonant
+    # knowledge in place of boundary 1 or 0.
+    # returns the adjusted phoneme list
+    def expandTags(self, phonemeLst):
+        spot = ''
+        spot1 = ''
+        spot2 = ''
+
+        for phoneme in phonemeLst:
+            for tup in phoneme:
+
+                spot = self.getCategory(tup[0])
+                spot1 = str(tup[2])
+                spot2 = self.getCategory(tup[1])
+                tagString = spot + spot1 + spot2
+                tup[2] = tagString
+
+        return phonemeLst
+
 
     # counts and returns the number of boundaries matching
     # the passed in integer within boundaryLst.
