@@ -260,7 +260,7 @@ class ProbSyllabifier:
         for i in range(0, len(obsLst)):
 
             finalStr += obsLst[i][0]
-            if(outputLst[i] == '0'):
+            if(outputLst[i][1] == '0'):
                 finalStr += " "
             else:
                 finalStr += " | "
