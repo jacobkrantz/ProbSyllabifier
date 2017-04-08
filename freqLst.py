@@ -46,7 +46,8 @@ class FrequentWords:
     # testingOut: file output to hold generated words.
     # numTestWords: number of words to be in said file.
     # **Note: must be run after function 'generateMostFreq'
-    def generateTesting(self, testingOut, numTestWords):
+    def generateTesting(self, testingIn, testingOut, numTestWords):
+        self.__inFile = testingIn
         if(numTestWords == 0):
             return
 

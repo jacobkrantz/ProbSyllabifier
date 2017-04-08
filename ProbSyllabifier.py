@@ -256,11 +256,13 @@ class ProbSyllabifier:
     # returns the final string, formed nicely.
     def __makeFinalStr(self, obsLst, outputLst):
         finalStr = ""
+        isTruncated = False
 
         for i in range(0, len(obsLst)):
 
+            isTruncated = (i == len(obsLst) - 1)
             finalStr += obsLst[i][0]
-            if(outputLst[i][1] == '0'):
+            if(outputLst[i][1] == '0' or isTruncated):
                 finalStr += " "
             else:
                 finalStr += " | "

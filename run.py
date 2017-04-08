@@ -22,11 +22,13 @@ class color:
 
 
 def runNIST():
-    inFile = "./corpusFiles/freqWords.txt"
+    inFile = "./corpusFiles/brown_words.txt" #/editorial_words.txt
     outFile = "./HMMFiles/SyllabDict.txt"
+    freqFile = "./corpusFiles/freqWords.txt"
 
-    outTest = "./HMMFiles/NISTtest.txt"
     inTest = "./corpusFiles/testSet.txt"
+    outTest = "./HMMFiles/NISTtest.txt"
+
     nistSyllab = NISTSyllab()
 
     print ("current input file: " + inFile)
@@ -37,11 +39,11 @@ def runNIST():
         inFile = raw_input("choose input file: ")
         outFIle = raw_input("choose output file: ")
 
-    generateWords(inTest)
+    generateWords(inFile, inTest)
 
     try:
 
-        nistSyllab.syllabifyFile(inFile,outFile)
+        nistSyllab.syllabifyFile(freqFile,outFile)
         nistSyllab.syllabifyFile(inTest, outTest)
 
     except IOError as err:
@@ -49,18 +51,17 @@ def runNIST():
 
 
 # builds word set files to be used in NIST syllabification
-def generateWords(fwOut):
+def generateWords(fileIn, testFileIn):
     fw = FW()
     numWords = int(raw_input("Enter number of words to syllabify: "))
     numTestWords = int(raw_input("Enter number of words to test on: "))
 
     # pulling from entire corpus or editorials
-    fwIn = "./corpusFiles/editorial_words.txt" #/brown_words.txt
+    fileIn = "./corpusFiles/brown_words.txt" #/editorial_words.txt
     fwOut = "./corpusFiles/freqWords.txt"
-    testingOut = "./corpusFiles/testSet.txt"
 
-    fw.generateMostFreq(fwIn, fwOut, numWords)
-    fw.generateTesting(testingOut, numTestWords)
+    fw.generateMostFreq(fileIn, fwOut, numWords)
+    fw.generateTesting(fileIn, testFileIn, numTestWords) # testFileIn is outfile
 
 
 # build A and B matrices. Makes files to be used in the Viterbi
@@ -82,7 +83,7 @@ def runS():
     while(obs != ''):
 
         obs = raw_input("Enter filename or phoneme: ")
-        
+
         syl = ""
         if("." in obs):
             ps.syllabifyFile(obs)

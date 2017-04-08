@@ -40,7 +40,7 @@ class NISTSyllab:
 
         self.printDictToFile(syllabDict)
 
-        print "File successfully syllabified."
+        print ("File successfully syllabified to: " + self.outFile)
         self.__init__()
 
 
