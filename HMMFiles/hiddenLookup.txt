@@ -28,17 +28,17 @@ a0s
 i0m
 i0r
 r0d
-a0m
+r0f
 r0m
 r0l
 a0d
 r0n
 s1s
+a0m
 s1n
 s1l
 s1a
 s1f
-r0f
 r1i
 n1s
 n1a
@@ -63,6 +63,7 @@ d0s
 d0r
 f1l
 f1a
+f1f
 d0f
 d0a
 f1s

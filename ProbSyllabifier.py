@@ -23,6 +23,7 @@ class ProbSyllabifier:
     def __init__(self):
         self.__matrixA = self.__loadMatrix('A')
         self.__matrixB = self.__loadMatrix('B')
+        self.__exceptionLst = []
         self.__obsLookup = []
         self.__hiddenLookup = []
         self.__hiddenProb = {}
@@ -41,10 +42,14 @@ class ProbSyllabifier:
         self.sTools = NISTSyllab()
         self.sTools.inFile = fileIN
         self.sTools.outFile = fileOUT
+        self.getExceptionLst # for reset
 
         self.sTools.readWords()
         self.sTools.buildArpabet()
         syllabDict = self.__syllabifyAll()
+
+        numSkips = len(self.getExceptionLst()) # resets the exception list
+        print("Number of words skipped: " + str(numSkips))
 
         self.__printDictToFile(syllabDict)
 
@@ -53,9 +58,12 @@ class ProbSyllabifier:
     # what should this return?
     def syllabify(self, observation):
         obsLst = self.__makeObsLst(observation)
+        if(not (len(obsLst) - 1)): # early return for single phone obs
+            return obsLst[0]
         obsLst = self.__convertToBigrams(obsLst)
 
         isValid, problemObs = self.__isValidObs(obsLst)
+
 
         if(isValid):
 
@@ -64,10 +72,22 @@ class ProbSyllabifier:
             finalStr = self.__makeFinalStr(obsLst, outputLst)
 
         else:
-              print("Error: '" + problemObs[0] +  " " + problemObs[1] + "' does not exist in training set.")
-              return []
+
+            badBigram = problemObs[0] +  " " + problemObs[1]
+            #print("Error: '" + badBigram + "' does not exist in training set.")
+            self.__exceptionLst.append(badBigram)
+            return []
 
         return finalStr
+
+
+    # returns a list containing all bigrams that were not present in the
+    # training set. Also resets the exception list.
+    def getExceptionLst(self):
+        allExceptions = list(self.__exceptionLst)
+        self.__exceptionLst= []
+
+        return allExceptions
 
 
     # ------------------------------------------------------
@@ -196,6 +216,9 @@ class ProbSyllabifier:
         self.__jMax = len(obsLst)
         matrixV = np.zeros((self.__iMax,self.__jMax), dtype=np.float) # Viterbi matrix
         matrixP = np.zeros((self.__iMax,self.__jMax), dtype='int,int') # backpointer matrix
+
+        if(self.__jMax == 0): # no bigrams, just one phone
+            return matrixV, matrixP
 
         for i in range(0,self.__iMax):                #initialization step
             obsIndex = self.__obsLookup.index(obsLst[0])
