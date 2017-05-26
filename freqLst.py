@@ -1,6 +1,6 @@
 import sys
 from nltk.corpus import cmudict
-
+from subprocess import check_output
 '''
 fileName:       run.py
 Authors:        Jacob Krantz
@@ -98,7 +98,8 @@ class FrequentWords:
             else:
                 self.wordDict[word] = 1
 
-
+    #Adds the words to the dictionary of frequency
+    #*Note: If the word is not in the dictionary then it's ignored
     def __createFreqDict(self, count):
         if(self.__numWords > count):
             print("Source too small. Cannot pull " + self.__numWords + " items.")
@@ -113,6 +114,7 @@ class FrequentWords:
             try:
 
                 self.CMUDict[unicodeWord]
+                #print self.CMUDict[unicodeWord]
                 self.__wordLst.append(maxWord)
                 self.__freqLst.append(self.wordDict[maxWord])
                 del self.wordDict[maxWord]
@@ -120,7 +122,6 @@ class FrequentWords:
 
             except:
                 del self.wordDict[maxWord]
-
 
     # outputs a list to a file. List entries are
     # separated by spaces
@@ -133,7 +134,8 @@ class FrequentWords:
 
 if(__name__ == "__main__"):
     fw = FrequentWords()
-    inFile = './corpusFiles/editorial_words.txt'
+    #this will need to be fixed to './corpusFiles/editorial_words.txt'
+    inFile = './corpusFiles/testIPA.txt'
     outFile = './corpusFiles/FEWtst.txt'
 
     fw.generateMostFreq(inFile, outFile, 10)

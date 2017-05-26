@@ -3,8 +3,8 @@ fileName:       NISTSyllab.py
 Authors:        Jacob Krantz
 Date Modified:  3/14/17
 
-- Mass syllabifier using CMU Pronouncing Dictionary and
-    NIST Sylabifier.
+- Mass syllabifier using espeak and
+    NIST Sylabifier (needs to be the celex database)
 - Program takes in file of words to be syllabified separated
     by spaces. Creates dictionary of word:syllabification.
     This is outputted as a text file with one dictionary
@@ -14,14 +14,15 @@ Date Modified:  3/14/17
 import sys
 from nltk.corpus import cmudict
 from NIST import NIST
+from subprocess import check_output
 
 class NISTSyllab:
 
     def __init__(self):
         self.NIST = NIST()
-        self.CMUDict = cmudict.dict()
+        #self.CMUDict = cmudict.dict()
         self.wordLst = []
-        self.ArpabetDict = {}
+        self.IPADict = {}
         self.outFile = ""
         self.inFile = ""
 
@@ -34,7 +35,7 @@ class NISTSyllab:
 
         self.readWords()
 
-        self.buildArpabet()
+        self.buildIPA()
 
         syllabDict = self.__getSyllabDict()
 
@@ -67,29 +68,34 @@ class NISTSyllab:
             self.wordLst.append(i)
 
 
-    ## looks up each word in cmudict and adds the word and pronunciation
+    ## looks up the IPA translation for each word
     ## to a dictionary. Values are in list format with unicode phonemes.
-    ## Only takes the first pronounciation for CMU when multiple exist.
-    def buildArpabet(self):
+    #this will literally parse anything that it is given.
+    #What did Celex use for the word to phone converter?
+    def buildIPA(self):
 
         for word in self.wordLst:
             unicodeWord = unicode(word)
-
+            print unicodeWord
             try:
-                self.ArpabetDict[word] = self.CMUDict[unicodeWord][0]
-
+                #self.IPADict[word] = self.CMUDict[unicodeWord][0]
+                self.IPADict[word] = check_output(["espeak", "-q","--ipa",'-v','en-us',unicodeWord]).decode('utf-8')
+                print check_output(["espeak", "-q","--ipa",'-v','en-us',unicodeWord]).decode('utf-8')
             except:
 
                 print(unicodeWord + " not found in CMUDict")
                 sys.exit()
 
+        for key in self.IPADict:
+            print self.IPADict[key].decode('utf-8')
+
 
     def __getSyllabDict(self):
         syllabDict = {}
 
-        for key in self.ArpabetDict:
+        for key in self.IPADict:
 
-            syllabif = self.__getSyllabification(self.ArpabetDict[key])
+            syllabif = self.__getSyllabification(self.IPADict[key])
             syllabDict[key] = syllabif
 
         return syllabDict
@@ -129,5 +135,11 @@ class NISTSyllab:
             outF.write(" ")
             outF.write(str(Dict[entry][0]))
             outF.write("\n")
+            print str(Dict[entry][0])
 
         outF.close()
+
+
+if(__name__ == "__main__"):
+    N = NISTSyllab()
+    N.syllabifyFile("./corpusFiles/testIPA.txt","IPAoutput.txt")
