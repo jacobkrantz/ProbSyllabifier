@@ -37,9 +37,10 @@ class NISTSyllab:
 
         self.buildIPA()
 
-        syllabDict = self.__getSyllabDict()
+        #this will need to be celex
+        #syllabDict = self.__getSyllabDict()
 
-        self.printDictToFile(syllabDict)
+        self.printDictToFile(self.IPADict)
 
         print ("File successfully syllabified to: " + self.outFile)
         self.__init__()
@@ -77,17 +78,16 @@ class NISTSyllab:
         for word in self.wordLst:
             unicodeWord = unicode(word)
             print unicodeWord
+            self.IPADict[word] = str(check_output(["espeak", "-q","--ipa",'-v','en-us',unicodeWord]))
+
             try:
                 #self.IPADict[word] = self.CMUDict[unicodeWord][0]
-                self.IPADict[word] = check_output(["espeak", "-q","--ipa",'-v','en-us',unicodeWord]).decode('utf-8')
-                print check_output(["espeak", "-q","--ipa",'-v','en-us',unicodeWord]).decode('utf-8')
+                self.IPADict[word] = str(check_output(["espeak", "-q","--ipa",'-v','en-us',unicodeWord]))
+                print check_output(["espeak", "-q","--ipa",'-v','en-us',unicodeWord]).decode('utf8')
             except:
 
                 print(unicodeWord + " not found in CMUDict")
                 sys.exit()
-
-        for key in self.IPADict:
-            print self.IPADict[key].decode('utf-8')
 
 
     def __getSyllabDict(self):
@@ -102,6 +102,7 @@ class NISTSyllab:
 
 
     def __getSyllabification(self, pronunciation):
+
         ArpString = ""
 
         for phoneme in pronunciation:
@@ -128,14 +129,14 @@ class NISTSyllab:
     def printDictToFile(self, Dict):
 
         outF = open(self.outFile,'w')
-
+        print Dict
         for entry in Dict:
 
             outF.write(str(entry))
             outF.write(" ")
-            outF.write(str(Dict[entry][0]))
+            outF.write(str(Dict[entry]))
             outF.write("\n")
-            print str(Dict[entry][0])
+            #print str(Dict[entry])
 
         outF.close()
 
