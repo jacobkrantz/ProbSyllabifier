@@ -66,7 +66,6 @@ class ProbSyllabifier:
 
 
         if(isValid):
-
             matrixV, matrixP = self.__buildMatrixV(obsLst)
             outputLst = self.__decodeMatrix(matrixV, matrixP, obsLst)
             finalStr = self.__makeFinalStr(obsLst, outputLst)
@@ -164,9 +163,11 @@ class ProbSyllabifier:
     # obersvation list. returns list.
     def __makeObsLst(self, observation):
         obsLst = []
+        #print unicode(observation)
         obs = observation.split(' ')
 
         for phone in obs:
+            '''
             if phone[0] == '"':     # *****for removing ' or " at start.
                 phone = phone[1:]
             elif phone[0] == "'":
@@ -175,7 +176,7 @@ class ProbSyllabifier:
                 phone = phone[:-1]
             elif phone[-1] == "'":
                 phone = phone[:-1]
-
+            '''
             obsLst.append(phone)
 
         return obsLst
@@ -300,9 +301,9 @@ class ProbSyllabifier:
     def __syllabifyAll(self):
         syllabDict = {}
 
-        for key in self.sTools.ArpabetDict:
+        for key in self.sTools.IPADict:
 
-            syllabif = self.__getSyllabification(self.sTools.ArpabetDict[key])
+            syllabif = self.__getSyllabification(self.sTools.IPADict[key])
             syllabDict[key] = syllabif
 
         return syllabDict
@@ -312,7 +313,8 @@ class ProbSyllabifier:
         ArpString = ""
 
         for phoneme in pronunciation:
-            aPhoneme = phoneme.encode('ascii','ignore')
+            aPhoneme = phoneme
+            #aPhoneme = phoneme.encode('ascii','ignore')
 
             if(len(aPhoneme) == 2):
                 if(aPhoneme[1].isdigit()):

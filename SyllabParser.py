@@ -71,8 +71,8 @@ class SyllabParser:
         line = self.initialList[index]
 
         #takes out the beginning word in the dictionary
-        while(line[0] != ' '):
-            line = line[1:]
+        #while(line[0] != ' '):
+            #line = line[1:]
         self.line = line[1:]
 
         #stores the first phone into oldPhone

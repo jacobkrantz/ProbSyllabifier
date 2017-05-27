@@ -76,14 +76,15 @@ class NISTSyllab:
     def buildIPA(self):
 
         for word in self.wordLst:
-            unicodeWord = unicode(word)
-            print unicodeWord
+            unicodeWord = word
+            #unicodeWord = unicode(word)
+            #print unicodeWord
             self.IPADict[word] = str(check_output(["espeak", "-q","--ipa",'-v','en-us',unicodeWord]))
 
             try:
                 #self.IPADict[word] = self.CMUDict[unicodeWord][0]
                 self.IPADict[word] = str(check_output(["espeak", "-q","--ipa",'-v','en-us',unicodeWord]))
-                print check_output(["espeak", "-q","--ipa",'-v','en-us',unicodeWord]).decode('utf8')
+                #print check_output(["espeak", "-q","--ipa",'-v','en-us',unicodeWord]).decode('utf8')
             except:
 
                 print(unicodeWord + " not found in CMUDict")
@@ -129,7 +130,6 @@ class NISTSyllab:
     def printDictToFile(self, Dict):
 
         outF = open(self.outFile,'w')
-        print Dict
         for entry in Dict:
 
             outF.write(str(entry))

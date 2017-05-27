@@ -96,7 +96,6 @@ class Utils:
         cat = ""
         tagNames = self.getTagNames()
         phone = phone.upper()
-
         for category in tagNames:
             if phone in category:
                 cat = category[0]
