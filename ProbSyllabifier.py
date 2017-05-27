@@ -38,14 +38,14 @@ class ProbSyllabifier:
     # new file name.
     # param 1: phoneme file in
     # param 2: fileName for syllabification out
-    def syllabifyFile(self, fileIN, fileOUT):
+    def syllabifyFile(self, fileIN):
         self.sTools = NISTSyllab()
         self.sTools.inFile = fileIN
-        self.sTools.outFile = fileOUT
+        self.sTools.outFile = "outputFile.txt"
         self.getExceptionLst # for reset
 
         self.sTools.readWords()
-        self.sTools.buildArpabet()
+        self.sTools.buildIPA()
         syllabDict = self.__syllabifyAll()
 
         numSkips = len(self.getExceptionLst()) # resets the exception list
