@@ -68,7 +68,7 @@ class Utils:
     # looking up what type of consonant or vowel each phone belongs to.
     # returns a dictionary of [tag]: [number of occurances]
     # also returns a lookup list for matrix indices.
-    def getTagLookup(self, allBigramTups):
+    def getTagLookup(self, allBigramTups,lang):
         spot = ''
         spot1 = ''
         spot2 = ''
@@ -78,9 +78,9 @@ class Utils:
         for phoneme in allBigramTups:
             for tup in phoneme:
 
-                spot = self.getCategory(tup[0])
+                spot = self.getCategory(tup[0],lang)
                 spot1 = str(tup[2])
-                spot2 = self.getCategory(tup[1])
+                spot2 = self.getCategory(tup[1],lang)
                 tagString = spot + spot1 + spot2
                 tagLst.append(tagString)
                 if tagString in tagDict:
@@ -92,10 +92,11 @@ class Utils:
 
 
     # returns the category that the phone belongs to
-    def getCategory(self, phone):
+    def getCategory(self, phone,lang):
         cat = ""
-        tagNames = self.getTagNames()
+        tagNames = self.getTagNames(lang)
         phone = phone.upper()
+
         for category in tagNames:
             if phone in category:
                 cat = category[0]
@@ -106,8 +107,11 @@ class Utils:
 
         # imports the tags from a specific file.
         # returns as a list of lists.
-    def getTagNames(self):
-        inFile = open("./HMMFiles/phoneCategories.txt",'r')
+    def getTagNames(self,lang):
+        if(lang == 1):
+            inFile = open("./HMMFiles/phoneCategoriesArp.txt",'r')
+        else:
+            inFile = open("./HMMFiles/phoneCategoriesIPA.txt",'r')
         tags = []
 
         for line in inFile:
@@ -185,7 +189,7 @@ class Utils:
     # expands the tagset to have vowel/consonant
     # knowledge in place of boundary 1 or 0.
     # returns the adjusted phoneme list
-    def expandTags(self, phonemeLst):
+    def expandTags(self, phonemeLst,lang):
         spot = ''
         spot1 = ''
         spot2 = ''
@@ -193,9 +197,9 @@ class Utils:
         for phoneme in phonemeLst:
             for tup in phoneme:
 
-                spot = self.getCategory(tup[0])
+                spot = self.getCategory(tup[0],lang)
                 spot1 = str(tup[2])
-                spot2 = self.getCategory(tup[1])
+                spot2 = self.getCategory(tup[1],lang)
                 tagString = spot + spot1 + spot2
                 tup[2] = tagString
 

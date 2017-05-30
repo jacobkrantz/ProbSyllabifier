@@ -1,100 +1,50 @@
-and  ˈænd
-
-all  ˈɔːl
-
-would  wˈʊd
-
-when  wˈɛn
-
-is  ˈɪz
-
-it  ˈɪt
-
-an  ˈɐn
-
-as  ˈæz
-
-at  ˈæt
-
-have  hˈæv
-
-in  ˈɪn
-
-if  ˈɪf
-
-from  fɹˈʌm
-
-for  fˈɔːɹ
-
-their  ðˈɛɹ
-
-there  ðˈɛɹ
-
-had  hˈæd
-
-been  bˈɪn
-
-him  hˈɪm
-
-to  tˈuː
-
-which  wˈɪtʃ
-
-you  jˈuː
-
-has  hˈæz
-
-was  wˈʌz
-
-more  mˈoːɹ
-
-be  bˈiː
-
-we  wˈiː
-
-his  hˈɪz
-
-that  ðˈæt
-
-who  hˈuː
-
-but  bˈʌt
-
-they  ðˈeɪ
-
-not  nˈɑːt
-
-one  wˈʌn
-
-with  wˈɪð
-
-by  bˈaɪ
-
-he  hˈiː
-
-a  ˈeɪ
-
-on  ˈɑːn
-
-her  hˈɜː
-
-i  ˈaɪ
-
-of  ˈʌv
-
-no  nˈoʊ
-
-will  wˈɪl
-
-this  ðˈɪs
-
-she  ʃˈiː
-
-were  wˈɜː
-
-the  ðˈə
-
-or  ˈɔːɹ
-
-are  ˈɑːɹ
-
+and I
+all I
+would I
+when I
+is I
+it I
+an I
+as I
+at I
+have I
+in I
+if I
+from I
+for I
+their I
+there I
+had I
+been I
+him I
+to I
+which I
+you I
+has I
+was I
+more I
+be I
+we I
+his I
+that I
+who I
+but I
+they I
+not I
+one I
+with I
+by I
+he I
+a I
+on I
+her I
+i I
+of I
+no I
+will I
+this I
+she I
+were I
+the I
+or I
+are I

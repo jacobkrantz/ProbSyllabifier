@@ -1,4 +1,4 @@
-from NISTSyllab import NISTSyllab
+from SyllabInfo import SyllabInfo
 import numpy as np
 import sys
 from ast import literal_eval
@@ -38,14 +38,14 @@ class ProbSyllabifier:
     # new file name.
     # param 1: phoneme file in
     # param 2: fileName for syllabification out
-    def syllabifyFile(self, fileIN):
-        self.sTools = NISTSyllab()
+    def syllabifyFile(self, fileIN, fileOUT,lang):
+        self.sTools = SyllabInfo(lang)
         self.sTools.inFile = fileIN
-        self.sTools.outFile = "outputFile.txt"
+        self.sTools.outFile = fileOUT
         self.getExceptionLst # for reset
 
         self.sTools.readWords()
-        self.sTools.buildIPA()
+        self.sTools.buildArpabet()
         syllabDict = self.__syllabifyAll()
 
         numSkips = len(self.getExceptionLst()) # resets the exception list
@@ -60,10 +60,9 @@ class ProbSyllabifier:
         obsLst = self.__makeObsLst(observation)
         if(not (len(obsLst) - 1)): # early return for single phone obs
             return obsLst[0]
+
         obsLst = self.__convertToBigrams(obsLst)
-
         isValid, problemObs = self.__isValidObs(obsLst)
-
 
         if(isValid):
             matrixV, matrixP = self.__buildMatrixV(obsLst)
@@ -71,7 +70,6 @@ class ProbSyllabifier:
             finalStr = self.__makeFinalStr(obsLst, outputLst)
 
         else:
-
             badBigram = problemObs[0] +  " " + problemObs[1]
             #print("Error: '" + badBigram + "' does not exist in training set.")
             self.__exceptionLst.append(badBigram)
@@ -163,11 +161,9 @@ class ProbSyllabifier:
     # obersvation list. returns list.
     def __makeObsLst(self, observation):
         obsLst = []
-        #print unicode(observation)
         obs = observation.split(' ')
 
         for phone in obs:
-            '''
             if phone[0] == '"':     # *****for removing ' or " at start.
                 phone = phone[1:]
             elif phone[0] == "'":
@@ -176,7 +172,7 @@ class ProbSyllabifier:
                 phone = phone[:-1]
             elif phone[-1] == "'":
                 phone = phone[:-1]
-            '''
+
             obsLst.append(phone)
 
         return obsLst
@@ -301,9 +297,9 @@ class ProbSyllabifier:
     def __syllabifyAll(self):
         syllabDict = {}
 
-        for key in self.sTools.IPADict:
+        for key in self.sTools.ArpabetDict:
 
-            syllabif = self.__getSyllabification(self.sTools.IPADict[key])
+            syllabif = self.__getSyllabification(self.sTools.ArpabetDict[key])
             syllabDict[key] = syllabif
 
         return syllabDict
@@ -313,8 +309,7 @@ class ProbSyllabifier:
         ArpString = ""
 
         for phoneme in pronunciation:
-            aPhoneme = phoneme
-            #aPhoneme = phoneme.encode('ascii','ignore')
+            aPhoneme = phoneme.encode('ascii','ignore')
 
             if(len(aPhoneme) == 2):
                 if(aPhoneme[1].isdigit()):

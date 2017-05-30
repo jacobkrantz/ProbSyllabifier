@@ -1,8 +1,9 @@
-from NISTSyllab import NISTSyllab
+from SyllabInfo import SyllabInfo
 from freqLst import FrequentWords as FW
 from HMM import HMM
 from ProbSyllabifier import ProbSyllabifier
 from testing import CompareNIST
+from testing import CompareCELEX
 import sys
 
 '''
@@ -17,11 +18,12 @@ Date Modified:  3/14/17
 '''
 
 class color:
+    YELLOW = '\033[93m'
     BOLD = '\033[1m'
     END = '\033[0m'
 
 
-def runNIST():
+def runDatabase(lang):
     inFile = "./corpusFiles/brown_words.txt" #/editorial_words.txt
     outFile = "./HMMFiles/SyllabDict.txt"
     freqFile = "./corpusFiles/freqWords.txt"
@@ -29,8 +31,11 @@ def runNIST():
     inTest = "./corpusFiles/testSet.txt"
     outTest = "./HMMFiles/NISTtest.txt"
 
-    nistSyllab = NISTSyllab()
-
+    if(lang ==1):
+        nistSyllab = SyllabInfo(lang)
+    #will be for celex database at some point
+    else:
+        celexSyllab = SyllabInfo(lang)
     print ("current input file: " + inFile)
     print ("current output file: " + outFile)
 
@@ -42,10 +47,12 @@ def runNIST():
     generateWords(inFile, inTest)
 
     try:
-
-        nistSyllab.syllabifyFile(freqFile,outFile)
-        nistSyllab.syllabifyFile(inTest, outTest)
-
+        if(lang == 1):
+            nistSyllab.syllabifyFile(freqFile,outFile)
+            nistSyllab.syllabifyFile(inTest,outTest)
+        else:
+            celexSyllab.syllabifyFile(freqFile,outFile)
+            celexSyllab.syllabifyFile(inTest, outTest)
     except IOError as err:
         print err
 
@@ -66,17 +73,17 @@ def generateWords(fileIn, testFileIn):
 
 # build A and B matrices. Makes files to be used in the Viterbi
 # decoding algorithm.
-def trainHMM():
-    hmm = HMM()
+def trainHMM(lang):
+    hmm = HMM(lang)
 
     hmm.buildMatrixA() # "./HMMFiles/MatrixA.txt"
     hmm.buildMatrixB() # "./HMMFiles/MatrixB.txt"
     hmm.makeViterbiFiles()
     print("Items in training set: " + str(hmm.getTrainingSize()))
 
-
+# this currently doesn't work
 # runs the probabilistic syllabifier for either a phoneme or file.
-def runS():
+def runS(lang):
     ps = ProbSyllabifier()
     obs = " "
 
@@ -85,68 +92,129 @@ def runS():
         obs = raw_input("Enter filename or phoneme: ")
 
         syl = ""
+
         if("." in obs):
-            ps.syllabifyFile(obs)
+            #for some reason the output file wasn't here so I created
+            #one to be used in order for the function to work
+            ps.syllabifyFile(obs,"HMMFiles/outfile.txt",lang)
         elif(obs != ''):
             syl = ps.syllabify(obs.lower())
             print("Syllabification: " + syl)
 
 
 # compares the results of ProbS to that of NIST
-def testSyllabifier():
-    cNIST = CompareNIST()
-    ps = ProbSyllabifier()
+def testSyllabifier(lang):
 
-    testIN = "./corpusFiles/testSet.txt"
-    testOUT = "./HMMFiles/probSyllabs.txt"
-    ps.syllabifyFile(testIN, testOUT)
 
-    NISTname = "./HMMFiles/NISTtest.txt"
-    probName = "./HMMFiles/probSyllabs.txt"
-    cNIST.compare(NISTname, probName)
 
-    viewDif = raw_input("view differences (y): ")
-    if(viewDif == 'y'):
-        cNIST.viewDifferences()
+    if(lang == 1):
+        cNIST = CompareNIST()
+        ps = ProbSyllabifier()
+        testIN = "./corpusFiles/testSet.txt"
+        testOUT = "./HMMFiles/probSyllabs.txt"
+        ps.syllabifyFile(testIN, testOUT,lang)
 
+        NISTname = "./HMMFiles/NISTtest.txt"
+        probName = "./HMMFiles/probSyllabs.txt"
+        cNIST.compare(NISTname, probName)
+
+        viewDif = raw_input("view differences (y): ")
+        if(viewDif == 'y'):
+            cNIST.viewDifferences()
+    else:
+        cCelex = CompareCELEX()
+        print "Run on Celex. Next version will have this feature"
 
 def help():
     print "Running the Syllabifier:"
     print "     To syllabify a phoneme, enter phones separated by a space."
     print "     To return to the main menu, hit enter with no input."
 
+#gets the type of syllabifaction that the user wants to do
+def getState():
+    state = 0
+    while state != 1 and state != 2:
+        print("\n" + color.BOLD + "Main Menu" + color.END)
+        print "Choose an option:"
+        print "1. Arpabet"
+        print "2. IPA"
+        state = input("")
+    return state
+
+#Ensures that IPA is not being mixed with arpabet and vice versa
+def getCheck(state1,state2,state3,state4,curState,choice):
+    return True
+    #checks the train hmm option
+    if(curState == state2 and choice == 2):
+        if(curState == state1):
+            return True
+        else:
+            print "Please enter the information in either Arpabet or IPA."
+            return False
+
+    #checks the run syllabifer option
+    if(curState == state2 and curState == state1 and curState == state3 and choice == 3):
+        return True
+
+    #checks the test results option
+    if(curState == state1 and curState == state2 and curState == state4 and choice == 4):
+        return True
+
+    print "Please enter the information in either Arpabet or IPA."
+    return False
 
 def main():
     choice = ""
-
+    state1= state2= state3=state4 = 0
     print "----------------------------------------"
     print "Welcome to the Probabilistic Syllabifier"
     print "----------------------------------------"
 
-    while(choice != 6):
-        print("\n" + color.BOLD + "Main Menu" + color.END)
+    state = getState()
+    while(choice != 7):
+        if(state == 1):
+            displayState = "Arpabet"
+        else:
+            displayState = "IPA"
+
+        print("\n" + color.BOLD + "Main Menu"+ color.END)
+        print("Mode: " +color.YELLOW + displayState+ color.END)
         print "Choose an option:"
-        print "1. Build sets with NIST"
+        print "1. Build sets"
         print "2. Train the HMM"
         print "3. Run the Syllabifier"
         print "4. Test Results"
         print "5. Help"
+        print "6. Switch Phonetic Languages"
 
         try:
-            choice = input("6. Quit\n")
+            choice = input("7. Quit\n")
         except:
-            choice = 7 # just loop again
+            choice = 8 # just loop again
 
         if(choice == 1):
-            runNIST()
+            state1 = state
+            runDatabase(state)
+
         elif(choice == 2):
-            trainHMM()
+            state2 = state
+            if(getCheck(state1,state2,state3,state4,state,choice)):
+                trainHMM(state)
+
         elif(choice == 3):
-            runS()
+            state3 = state
+            if(getCheck(state1,state2,state3,state4,state,choice)):
+                runS(state)
+
         elif(choice == 4):
-            testSyllabifier()
+            state4 = state
+            if(getCheck(state1,state2,state3,state4,state,choice)):
+                testSyllabifier(state)
+
+
         elif(choice == 5):
             help()
-
+        elif(choice == 6):
+            state = getState()
 
 main()

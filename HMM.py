@@ -21,9 +21,10 @@ Date Modified:  3/3/17
 
 class HMM:
 
-    def __init__(self):
+    #takes in 1 for Arpabet and 2 for IPA
+    def __init__(self,lang):
         self.utils = Utils()
-
+        self.lang = lang
         self.boundCount = 0
         self.allBigramTups = []
         self.boundFreqDict = {}
@@ -133,8 +134,8 @@ class HMM:
         if(mode == 'shared'):
 
             self.allBigramTups = self.utils.getAllBigramTups()
-            self.tagDict, self.tagLookup = self.utils.getTagLookup(self.allBigramTups)
-            self.allBigramTups = self.utils.expandTags(self.allBigramTups)
+            self.tagDict, self.tagLookup = self.utils.getTagLookup(self.allBigramTups,self.lang)
+            self.allBigramTups = self.utils.expandTags(self.allBigramTups,self.lang)
 
         elif(mode == 'A'):
 

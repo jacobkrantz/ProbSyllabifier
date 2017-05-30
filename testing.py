@@ -107,3 +107,8 @@ class CompareNIST:
     # prints the percentage to the commandline
     def __outputResults(self, percentSim):
         print("File is " + str(percentSim) + "% similar to NIST.")
+
+#This is the start of the comparing process for our syllabification to Celex
+#Could be in a different file, if need be
+class CompareCELEX:
+    pass
