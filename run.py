@@ -8,7 +8,7 @@ import sys
 
 '''
 fileName:       run.py
-Authors:        Jacob Krantz
+Authors:        Jacob Krantz, Max Dulin
 Date Modified:  3/14/17
 
 - main file to train and run the Probabilsitic Syllabifier
@@ -143,7 +143,7 @@ def getState():
 
 #Ensures that IPA is not being mixed with arpabet and vice versa
 def getCheck(state1,state2,state3,state4,curState,choice):
-    return True
+    #return True
     #checks the train hmm option
     if(curState == state2 and choice == 2):
         if(curState == state1):
@@ -184,8 +184,8 @@ def main():
         print "2. Train the HMM"
         print "3. Run the Syllabifier"
         print "4. Test Results"
-        print "5. Help"
-        print "6. Switch Phonetic Languages"
+        print "5. Switch Phonetic Languages"
+        print "6. Help"
 
         try:
             choice = input("7. Quit\n")
@@ -211,10 +211,10 @@ def main():
             if(getCheck(state1,state2,state3,state4,state,choice)):
                 testSyllabifier(state)
 
-
         elif(choice == 5):
-            help()
-        elif(choice == 6):
             state = getState()
+        elif(choice == 6):
+            help()
+
 
 main()

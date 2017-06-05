@@ -37,6 +37,10 @@ class CompareNIST:
     def viewDifferences(self):
 
         for i in range(1, len(self.__difLst), 2):
+            #This should also print the word; but this would require
+            #the datatype to change from a list into a dictionary
+            #or for two different lists to be present.
+            print "Word: "
             print("NIST: "),
             print(self.__difLst[i-1])
             print("Prob: "),

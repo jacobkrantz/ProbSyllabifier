@@ -2,7 +2,7 @@
 ## assumes tsylb2 file exists in directory '~/NIST/tsylb2-1.1/'
 
 from subprocess import Popen, PIPE, STDOUT
-import subprocess 
+import subprocess
 import shlex
 import re
 
@@ -36,26 +36,29 @@ class NIST:
 
 
     ## takes in a phonetic pronounciation and runs them through NIST
-    ## returns the proper syllabification(s) in a list  
+    ## returns the proper syllabification(s) in a list
+    # Param 1: An arpabet string
     def __runNIST(self,ArpString):
         sylbLst = []
 
-        p = subprocess.Popen("cd ~/NIST/tsylb2-1.1/ && ./tsylb2 -n phon1ax.pcd", shell = True,stdin = PIPE,stdout = PIPE,stderr = PIPE, bufsize = 1) 
+        p = subprocess.Popen("cd ~/NIST/tsylb2-1.1/ && ./tsylb2 -n phon1ax.pcd", shell = True,stdin = PIPE,stdout = PIPE,stderr = PIPE, bufsize = 1)
 
         data = p.communicate(input = ArpString + "\n")[0] # data = output
-        
+
         return data
 
 
-    ## takes in the raw output of NIST 
+    ## takes in the raw output of NIST
     ## parses for pronounciations and returns all in a list
+    # Param 1: ????
+    # Param 2: ???
     def __parseNISTData(self, data, ArpString):
         pattern   = '\/.*?\/'
         pattern2 = '[^0-9]'
         error     = 'ERR'
         returnLst = []
         proLst    = []
-        
+
         data = str(data)
 
         if(len(re.findall(error, data))):
@@ -63,15 +66,14 @@ class NIST:
 
         proLst = re.findall(pattern, data)
         proLst = proLst[1:]
-       
+
         for item in proLst:
             tmp = item.strip('/# ')
             tmp = tmp.strip('#')
             newString = ""
             for i in range(len(tmp)):
                 if(tmp[i] !='0' and tmp[i] != '1' and tmp[i] != '2' and tmp[i] !="'"):
-                    newString += tmp[i]   
+                    newString += tmp[i]
             returnLst.append(newString)
 
         return returnLst
-

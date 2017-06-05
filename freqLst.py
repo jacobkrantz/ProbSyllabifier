@@ -34,11 +34,23 @@ class FrequentWords:
 
         words = self.__getWords()
 
-        self.__createWordDict(words)
 
-        self.__createFreqDict(len(words))
+        self.__createWordDict(words)
+        #this is the ordered way
+        #self.__createFreqDict(len(words))
+
+        #unordered way
+        #however, because this is in a dictionary this is
+        #only partially random. The dictionary has an unordered system
+        #that is the same every single time
+        self.__createPassDict(len(words))
 
         self.__printLst(self.__wordLst)
+
+    #would create a dictionary with trully random words in it
+    #Param1: a list of all the words in the file
+    def createRandomDict(self,words):
+        pass
 
 
     # builds a file of words to be tested on once the HMM is trained.
@@ -90,6 +102,7 @@ class FrequentWords:
 
 
     # creates a dictionary of word: word count given a list of words.
+    #Param1: a List of words
     def __createWordDict(self, words):
 
         for word in words:
@@ -99,6 +112,8 @@ class FrequentWords:
                 self.wordDict[word] = 1
 
 
+    #creates a list of words to be syllabifier
+    #Param1: the number of words to be choosen
     def __createFreqDict(self, count):
         if(self.__numWords > count):
             print("Source too small. Cannot pull " + self.__numWords + " items.")
@@ -121,9 +136,38 @@ class FrequentWords:
             except:
                 del self.wordDict[maxWord]
 
+    #Grabs random words to put into the dictionary
+    #Will be used to train the HMM
+    #Param1: the number of words ot be used
+    def __createPassDict(self,count):
+        if(self.__numWords > count):
+            print("Source too small. Cannot pull " + self.__numWords + " items.")
+            return
+        freqCount = 0
+
+        for key in self.wordDict:
+            if(freqCount < self.__numWords):
+                word = key #self.wordDict[key]
+                #maxWord = max(self.wordDict, key=self.wordDict.get)
+                unicodeWord = unicode(word)
+
+                try:
+
+                    self.CMUDict[unicodeWord]
+                    self.__wordLst.append(word)
+                    self.__freqLst.append(self.wordDict[word])
+                    #del self.wordDict[word]
+                    freqCount += 1
+
+                except:
+                    pass
+                    #del self.wordDict[word]
+            else:
+                return
 
     # outputs a list to a file. List entries are
     # separated by spaces
+    # Param1: ???
     def __printLst(self, w):
         txt = open(self.__outFile,'w')
         for word in w:

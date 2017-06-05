@@ -162,6 +162,7 @@ class HMM:
     # inserts the count of a tag given the previous tag
     # populates matrixA with these values after normalizing the
     # probabilities by the occurance count of the prior tag (tagDict).
+    # Param 1: a dictionary of bigrams as the key: value is the number of occuarances
     def __insertProbA(self, tagBigramDict):
         #makes a matrix as big as the the tagLookUp is. X = Y.
         xy = len(self.tagLookup)
@@ -192,6 +193,7 @@ class HMM:
 
     # inserts the count of a bigram given a boundary
     # populates matrixB with these values and return matrixB
+    # Param 1: A matrix
     def __insertCountB(self, MatrixB):
 
         for phoneme in self.allBigramTups:
@@ -229,6 +231,7 @@ class HMM:
 
     # normaliziation strategy: divide all MatrixB entries by the probability
     # of the bigram occurring.
+    # Param 1: The matrix that is to be normalized
     def normalizeNaiveB(self, MatrixB):
 
         for i in range(0, self.numBigrams):     # loop through each phone bigram

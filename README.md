@@ -1,6 +1,8 @@
 # ProbSyllabifier
 Probabilistic syllabifier of English language using HMM.
 Word sets generated using Brown Corpus with custom tokenization
+Currently training from NIST and testing on NIST with Arpabet.
+In the next beta it be able to be trained from CELEX on IPA
 
 ---
 ###Syllabification
@@ -9,7 +11,7 @@ Word sets generated using Brown Corpus with custom tokenization
 
 *NIST.py*  
 Interfaces directly with the NIST Syllabifier.  
-*NISTSyllab.py*  
+*SyllabInfo.py*  
 Syllabifies an entire file of words and outputs resulting dictionary to a new file.  
 *SyllabParser.py*  
 Takes in the syllabDict.txt and outputs a list containing each word with a bigram that was a phone given the previous phone, along with whether there was a syllable boundary.  
@@ -18,7 +20,19 @@ Used to build a Hidden Markov Model: trains A and B matrices.
 *utils.py*  
 Tools currently associated with training and using HMM matrices.  
 *run.py*  
-Run this file to use the Syllabifier. Used for running NIST, training HMM, and using the HMM.
+This is the main file to run on:
+Run this file to use the Syllabifier. Used for building the sets for the syllabifier, training the matrices, running the syllabifier and testing the syllabifier. T
+
+
+###Tokenization
+
+*brownTokenizer.py*  
+tokenizes a corpus  
+*freqLst.py*  
+generates a file containing the 1000 most frequent words given a tokenized corpus  
+*randomWords.py*  
+follows FreqLst.py. generates a random subset of words given a tokenized grouping of words
+
 
 ####HMM Files:
 *MatrixA.txt*  
@@ -26,19 +40,12 @@ Holds the information from Matrix A
 *MatrixB.txt*  
 Holds the information from Matrix B  
 *syllabDict.txt*  
-Houses the dictionary created in NISTSyllab.py.  
+Houses the dictionary created in NISTSyllab.py.
+*phoneCategoriesArp.txt*
+Holds the categories for the Arpabet phones
+*phoneCategoriesIPA.txt*
+Holds the temporary categories for the IPA phones
 
----
-###Tokenization
-
-####Program Order:
-
-*brownTokenizer.py*  
-tokenizes a corpus  
-*freqLst.py*  
-generates a file containing the 1000 most frequent words given a tokenized corpus  
-*randomWords.py*  
-follows FreqLst.py. generates a random subset of words given a tokenized grouping of words  
 
 ####Corpus Files:
 

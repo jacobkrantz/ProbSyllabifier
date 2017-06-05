@@ -55,7 +55,6 @@ class ProbSyllabifier:
 
 
     # given an observation string, generates the most likely hidden state.
-    # what should this return?
     def syllabify(self, observation):
         obsLst = self.__makeObsLst(observation)
         if(not (len(obsLst) - 1)): # early return for single phone obs
