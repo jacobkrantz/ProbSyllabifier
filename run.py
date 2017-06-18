@@ -105,8 +105,6 @@ def runS(lang):
 # compares the results of ProbS to that of NIST
 def testSyllabifier(lang):
 
-
-
     if(lang == 1):
         cNIST = CompareNIST()
         ps = ProbSyllabifier()
