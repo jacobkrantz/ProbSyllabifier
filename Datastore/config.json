@@ -1,0 +1,18 @@
+{
+    "wordformsDB":{
+        "path":"wordforms.db",
+        "check_same_thread":false,
+        "execute_parameters":"PRAGMA journal_mode = WAL",
+        "default_alphabet":"CLA",
+        "read_permissions":true,
+        "write_permissions":false,
+        "sources":["webCELEX"]
+    },
+    "SQLite3":{
+        "datatypes":["NULL","INTEGER","REAL","TEXT","BLOB"],
+        "affinities":["TEXT","NUMERIC","INTEGER","REAL","NONE"]
+    },
+    "dataLoader":{
+        "databaseContext":"wordformsDB"
+    }
+}
