@@ -1,6 +1,8 @@
 from SQLiteClient import SQLiteClient
 from contextlib import closing
 
+# TODO: implement getWordSubset to support testing and training set construction
+
 class SQLQueryService(SQLiteClient):
 
     # returns "" if word is not in the database
@@ -18,14 +20,44 @@ class SQLQueryService(SQLiteClient):
         wordsString = ', '.join(map(str, wordList))
         places = ','.join(['?'] * len(wordList))
         words = tuple(wordList)
-        SQL = """SELECT Word, %s FROM pronunciations WHERE Word IN ({})""" % self._getAlphabetColumn("Phon")
+        columnName = self._getAlphabetColumn("Phon")
+        SQL = """SELECT Word, %s FROM pronunciations WHERE Word IN ({})""" % columnName
 
         with closing(self.connection.cursor()) as cursor:
             cursor.execute(SQL.format(places), words)
             pronunciations = dict(cursor.fetchall())
             return { str(key):str(value) for key,value in pronunciations.items() }
 
+    # returns "" if word is not in the database
+    def getSingleSyllabification(self, word):
+        SQL = """SELECT %s FROM syllabifications WHERE Word= ?""" % self._getAlphabetColumn("PhonSyl")
+        with closing(self.connection.cursor()) as cursor:
+            cursor.execute(SQL, (word,))
+            syllabification = cursor.fetchone()
+            return syllabification[0] if syllabification else ""
 
+    # wordList: list of strings
+    # returns dictionary of {word:syllabification}
+    # if the word does not exist in the database, entry is not returned
+    def getManySyllabifications(self, wordList):
+        wordsString = ', '.join(map(str, wordList))
+        places = ','.join(['?'] * len(wordList))
+        words = tuple(wordList)
+        columnName = self._getAlphabetColumn("PhonSyl")
+        SQL = """SELECT Word, %s FROM syllabifications WHERE Word IN ({})""" % columnName
+
+        with closing(self.connection.cursor()) as cursor:
+            cursor.execute(SQL.format(places), words)
+            syllabifications = dict(cursor.fetchall())
+            return { str(key):str(value) for key,value in syllabifications.items() }
+
+    # numberOfWords: integer
+    # wordBlacklist: list of strings
+    #
+    def getWordSubset(self, numberOfWords, wordBlacklist=[]):
+        if numberOfWords + len(wordBlacklist) > self._getCountOfWordEntries:
+            raise IndexException("numberOfWords exceeds potential entries in 'words' table")
+        pass
 
     #----------------#
     #   "Private"    #
@@ -35,11 +67,11 @@ class SQLQueryService(SQLiteClient):
         return prefix + self.config[self._databaseContext]["default_alphabet"]
 
 
-if(__name__ == "__main__"):
-    "Running Query Test..."
-    qs = SQLQueryService("wordformsDB")
-    print "Query on getManyPronunciations:", qs.getManyPronunciations(["words","are","neat"])
-    print "Empty query on getManyPronunciations:", qs.getManyPronunciations([])
+    def _getCountOfWordEntries(self):
+        with closing(self.connection.cursor()) as cursor:
+            cursor.execute("SELECT COUNT (*) FROM words")
+            return cursor.fetchone()[0]
 
-    print "Empty query on getSinglePronunciation:", qs.getSinglePronunciation("")
-    print "'spaghetti' query on getSinglePronunciation:", qs.getSinglePronunciation("spaghetti")
+
+class IndexException(Exception):
+    pass
