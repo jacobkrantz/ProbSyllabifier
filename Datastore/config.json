@@ -1,9 +1,9 @@
 {
     "wordformsDB":{
-        "path":"wordforms.db",
+        "path":"../../wordforms/wordforms.db",
         "check_same_thread":false,
         "execute_parameters":"PRAGMA journal_mode = WAL",
-        "default_alphabet":"CLA",
+        "default_alphabet":"DISC",
         "read_permissions":true,
         "write_permissions":false,
         "sources":["webCELEX"]
