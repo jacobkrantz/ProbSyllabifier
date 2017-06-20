@@ -25,3 +25,6 @@ print "\nTest fixture on 'getManySyllabifications'"
 print "Query:\t\t", qs.getManySyllabifications(["Saturday","is","splendid"])
 print "Bad query:\t", qs.getManySyllabifications(["asdfdgf",""])
 print "Empty query:\t", qs.getManySyllabifications([])
+
+print "\nTest fixture on 'getWordSubset'"
+print "10 random words:", qs.getWordSubset(10)
