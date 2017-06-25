@@ -60,7 +60,7 @@ class Utils:
     # corresponds to the type of boundary.
     def getAllBigramTups(self, lang):
         sylParser = SyllabParser()
-        if lang == 0:
+        if lang == 1:
             return sylParser.makePhonemeLst()
         else:
             return

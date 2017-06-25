@@ -38,8 +38,8 @@ class ProbSyllabifier:
     # new file name.
     # param 1: phoneme file in
     # param 2: fileName for syllabification out
-    def syllabifyFile(self, fileIN, fileOUT,lang):
-        self.sTools = SyllabInfo(lang)
+    def syllabifyFile(self, fileIN, fileOUT,comparator):
+        self.sTools = SyllabInfo(comparator)
         self.sTools.inFile = fileIN
         self.sTools.outFile = fileOUT
         self.getExceptionLst # for reset

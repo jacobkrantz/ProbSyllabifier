@@ -19,7 +19,7 @@ from subprocess import check_output
 
 class SyllabInfo:
 
-    def __init__(self,lang):
+    def __init__(self,comparator):
         self.NIST = NIST()
         self.CMUDict = cmudict.dict()
         self.wordLst = []
@@ -27,7 +27,7 @@ class SyllabInfo:
         self.IPADict = {}
         self.outFile = ""
         self.inFile = ""
-        self.lang = lang
+        self.comparator = comparator
 
     # given an input file, will syllabify all the words within.
     # Outputs as a syllabification dictionary to specified
@@ -36,7 +36,7 @@ class SyllabInfo:
         self.inFile = inputFile
         self.outFile = outputFile
         self.readWords()
-        if(self.lang == 1):
+        if(self.comparator == "NIST"):
             self.buildArpabet()
             syllabDict = self.__getSyllabDict()
 
@@ -47,7 +47,7 @@ class SyllabInfo:
         self.printDictToFile(syllabDict)
 
         print ("File successfully syllabified to: " + self.outFile)
-        self.__init__(self.lang)
+        self.__init__(self.comparator)
 
 
     # ------------------------------------------------------
@@ -118,7 +118,7 @@ class SyllabInfo:
 
     def __getSyllabDict(self):
         syllabDict = {}
-        if(self.lang == 1):
+        if(self.comparator == "NIST"):
             for key in self.ArpabetDict:
 
                 syllabif = self.__getSyllabificationCMU(self.ArpabetDict[key])

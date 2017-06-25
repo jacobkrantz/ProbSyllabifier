@@ -23,7 +23,7 @@ class color:
     END = '\033[0m'
 
 
-def runDatabase(lang):
+def buildSets(comparator):
     inFile = "./corpusFiles/brown_words.txt" #/editorial_words.txt
     outFile = "./HMMFiles/SyllabDict.txt"
     freqFile = "./corpusFiles/freqWords.txt"
@@ -31,11 +31,11 @@ def runDatabase(lang):
     inTest = "./corpusFiles/testSet.txt"
     outTest = "./HMMFiles/NISTtest.txt"
 
-    if(lang ==1):
-        nistSyllab = SyllabInfo(lang)
+    if(comparator == "NIST"):
+        nistSyllab = SyllabInfo(comparator)
     #will be for celex database at some point
     else:
-        celexSyllab = SyllabInfo(lang)
+        celexSyllab = SyllabInfo(comparator)
     print ("current input file: " + inFile)
     print ("current output file: " + outFile)
 
@@ -47,7 +47,7 @@ def runDatabase(lang):
     generateWords(inFile, inTest)
 
     try:
-        if(lang == 1):
+        if(comparator == "NIST"):
             nistSyllab.syllabifyFile(freqFile,outFile)
             nistSyllab.syllabifyFile(inTest,outTest)
         else:
@@ -73,7 +73,8 @@ def generateWords(fileIn, testFileIn):
 
 # build A and B matrices. Makes files to be used in the Viterbi
 # decoding algorithm.
-def trainHMM(lang):
+def trainHMM(comparator):
+    lang = 1 if comparator == "NIST" else 2 # HACK get rid of lang
     hmm = HMM(lang)
 
     hmm.buildMatrixA() # "./HMMFiles/MatrixA.txt"
@@ -83,7 +84,7 @@ def trainHMM(lang):
 
 # this currently doesn't work
 # runs the probabilistic syllabifier for either a phoneme or file.
-def runS(lang):
+def runS(comparator):
     ps = ProbSyllabifier()
     obs = " "
 
@@ -96,21 +97,21 @@ def runS(lang):
         if("." in obs):
             #for some reason the output file wasn't here so I created
             #one to be used in order for the function to work
-            ps.syllabifyFile(obs,"HMMFiles/outfile.txt",lang)
+            ps.syllabifyFile(obs,"HMMFiles/outfile.txt",comparator)
         elif(obs != ''):
             syl = ps.syllabify(obs.lower())
             print("Syllabification: " + syl)
 
 
 # compares the results of ProbS to that of NIST
-def testSyllabifier(lang):
+def testSyllabifier(comparator):
 
-    if(lang == 1):
+    if(comparator == "NIST"):
         cNIST = CompareNIST()
         ps = ProbSyllabifier()
         testIN = "./corpusFiles/testSet.txt"
         testOUT = "./HMMFiles/probSyllabs.txt"
-        ps.syllabifyFile(testIN, testOUT,lang)
+        ps.syllabifyFile(testIN, testOUT,comparator)
 
         NISTname = "./HMMFiles/NISTtest.txt"
         probName = "./HMMFiles/probSyllabs.txt"
@@ -129,90 +130,68 @@ def help():
     print "     To return to the main menu, hit enter with no input."
 
 #gets the type of syllabifaction that the user wants to do
-def getState():
-    state = 0
-    while state != 1 and state != 2:
+def getComparator():
+    comparatorId = 0
+    while comparatorId not in [1,2]:
         print("\n" + color.BOLD + "Main Menu" + color.END)
-        print "Choose an option:"
-        print "1. Arpabet"
-        print "2. IPA"
-        state = input("")
-    return state
+        print "Choose a Comparator:"
+        print "1. NIST (with Arpabet)"
+        print "2. CELEX (with DISC)"
+        try:
+            comparatorId = int(input())
+        except:
+            comparatorId = 0
+    return "NIST" if comparatorId == 1 else "CELEX"
 
-#Ensures that IPA is not being mixed with arpabet and vice versa
-def getCheck(state1,state2,state3,state4,curState,choice):
-    #return True
-    #checks the train hmm option
-    if(curState == state2 and choice == 2):
-        if(curState == state1):
-            return True
-        else:
-            print "Please enter the information in either Arpabet or IPA."
-            return False
-
-    #checks the run syllabifer option
-    if(curState == state2 and curState == state1 and curState == state3 and choice == 3):
+#Ensures that alphabets
+def isLegalSelection(curComparator, trainedComparator, selection):
+    if (selection in [1,4,5,6]) or (curComparator == trainedComparator):
         return True
-
-    #checks the test results option
-    if(curState == state1 and curState == state2 and curState == state4 and choice == 4):
-        return True
-
-    print "Please enter the information in either Arpabet or IPA."
-    return False
+    print "HMM trained in other Comparator. Try retraining"
 
 def main():
-    choice = ""
-    state1= state2= state3=state4 = 0
     print "----------------------------------------"
     print "Welcome to the Probabilistic Syllabifier"
     print "----------------------------------------"
 
-    state = getState()
-    while(choice != 7):
-        if(state == 1):
-            displayState = "Arpabet"
-        else:
-            displayState = "IPA"
-
+    comparator = getComparator()
+    trainedComparator = ""
+    choice = 0
+    while(choice != 6):
         print("\n" + color.BOLD + "Main Menu"+ color.END)
-        print("Mode: " +color.YELLOW + displayState+ color.END)
-        print "Choose an option:"
-        print "1. Build sets"
-        print "2. Train the HMM"
-        print "3. Run the Syllabifier"
-        print "4. Test Results"
-        print "5. Switch Phonetic Languages"
-        print "6. Help"
+        print("Comparator: " +color.YELLOW + comparator + color.END)
+        optionSelect = """
+Choose an option:
+1. Train the HMM
+2. Run the Syllabifier
+3. Test Results
+4. Switch Phonetic Languages
+5. Help
+6. Quit\n"""
 
         try:
-            choice = input("7. Quit\n")
-        except:
-            choice = 8 # just loop again
+            choice = int(input(optionSelect))
+        except ValueError:
+            choice = 0 # loop again
+        finally:
+            if not isLegalSelection(comparator,trainedComparator,choice):
+                choice = 0
 
         if(choice == 1):
-            state1 = state
-            runDatabase(state)
+            buildSets(comparator)
+            trainHMM(comparator)
+            trainedComparator = comparator
 
         elif(choice == 2):
-            state2 = state
-            if(getCheck(state1,state2,state3,state4,state,choice)):
-                trainHMM(state)
+            runS(comparator)
 
         elif(choice == 3):
-            state3 = state
-            if(getCheck(state1,state2,state3,state4,state,choice)):
-                runS(state)
+            testSyllabifier(comparator)
 
         elif(choice == 4):
-            state4 = state
-            if(getCheck(state1,state2,state3,state4,state,choice)):
-                testSyllabifier(state)
+            comparator = getComparator()
 
         elif(choice == 5):
-            state = getState()
-        elif(choice == 6):
             help()
-
 
 main()
