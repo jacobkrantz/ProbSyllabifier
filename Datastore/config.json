@@ -7,6 +7,7 @@
         "read_permissions":true,
         "write_permissions":false,
         "sources":["webCELEX"]
+        "protected_tables":["words","pronunciations","syllabifications"]
     },
     "SQLite3":{
         "datatypes":["NULL","INTEGER","REAL","TEXT","BLOB"],

@@ -75,26 +75,43 @@ class SQLQueryService(SQLiteClient):
             syllabifications = dict(cursor.fetchall())
             return { str(key):str(value) for key,value in syllabifications.items() }
 
+    # returns total number of words in the 'words' table: integer
+    def getTotalWordCount(self):
+        self._checkPermissions("read_permissions")
+        query = """
+            SELECT Count(Word)
+            FROM words
+            """
+        with closing(self.connection.cursor()) as cursor:
+            cursor.execute(query)
+            return cursor.fetchone()[0]
+
     # numberOfWords: integer
     # wordBlacklist: list of strings
-    # returns list of words in ASCII encoding
-    def getWordSubset(self, numberOfWords, wordBlacklist=[]):
+    # returns set of words in ASCII encoding
+    def getWordSubset(self, numberOfWords, wordBlacklist=set()):
+        # this implementation makes me sad, but it works.
         self._checkPermissions("read_permissions")
         if numberOfWords + len(wordBlacklist) > self._getCountOfWordEntries:
             raise IndexException("numberOfWords exceeds potential entries in 'words' table")
 
-        places = ','.join(['?'] * len(wordBlacklist))
         query = """
             SELECT Word
             FROM words
-            WHERE Word NOT IN ({})
             ORDER BY Random()
-            LIMIT %s
-            """ % numberOfWords
-
+            """
         with closing(self.connection.cursor()) as cursor:
-            cursor.execute(query.format(places), tuple(wordBlacklist))
-            return map(str, list(sum(cursor.fetchall(), ())))
+            cursor.execute(query)
+            allWordsSet = set(cursor.fetchall())
+            wordSubSet = set()
+
+            while len(wordSubSet) < numberOfWords:
+                word = allWordsSet.pop()
+                if word not in wordBlacklist:
+                    wordSubSet.add(word)
+
+        assert(len(wordSubSet.intersection(wordBlacklist)) == 0)
+        return wordSubSet
 
     #----------------#
     #   "Private"    #

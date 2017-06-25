@@ -31,8 +31,18 @@ class SQLiteClient:
             self.connection.commit()
 
     # string tableName: Table must exist
+    def truncateTable(self, tableName):
+        self._checkPermissions("write_permissions")
+        self._checkProtected(tableName)
+        SQL = """ DELETE FROM %s """ % self._scrubParameter(tableName)
+        with closing(self.connection.cursor()) as cursor:
+            cursor.execute(SQL)
+            self.connection.commit()
+
+    # string tableName: Table must exist
     def dropTable(self, tableName):
         self._checkPermissions("write_permissions")
+        self._checkProtected(tableName)
         SQL = """ DROP TABLE IF EXISTS %s """ % self._scrubParameter(tableName)
         with closing(self.connection.cursor()) as cursor:
             cursor.execute(SQL)
@@ -63,6 +73,12 @@ class SQLiteClient:
     def _checkPermissions(self, whichPermission):
         if(not self.config[self._databaseContext][whichPermission]):
             raise PermissionsException("User does not have permission: " + whichPermission)
+        else:
+            return True
+
+    def _checkProtected(self, tableName):
+        if tableName in self.config[self._databaseContext]["protected_tables"]:
+            raise PermissionsException("Cannot execute: %s is a protected table" % tableName)
         else:
             return True
 

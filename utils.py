@@ -58,10 +58,12 @@ class Utils:
     # uses SyllabParser to generate a list of lists.
     # allBigramTups: [[(phone,phone,int),(...),],[...],] where int
     # corresponds to the type of boundary.
-    def getAllBigramTups(self):
+    def getAllBigramTups(self, lang):
         sylParser = SyllabParser()
-
-        return sylParser.makePhonemeLst()
+        if lang == 0:
+            return sylParser.makePhonemeLst()
+        else:
+            return
 
 
     # generates the tag dictionary by iterating though the bigram tuples and
@@ -111,7 +113,7 @@ class Utils:
         if(lang == 1):
             inFile = open("./HMMFiles/phoneCategoriesArp.txt",'r')
         else:
-            inFile = open("./HMMFiles/phoneCategoriesIPA.txt",'r')
+            inFile = open("./HMMFiles/phoneCategoriesDISC.txt",'r')
         tags = []
 
         for line in inFile:

@@ -133,7 +133,7 @@ class HMM:
     def __loadFiles(self, mode):
         if(mode == 'shared'):
 
-            self.allBigramTups = self.utils.getAllBigramTups()
+            self.allBigramTups = self.utils.getAllBigramTups(self.lang)
             self.tagDict, self.tagLookup = self.utils.getTagLookup(self.allBigramTups,self.lang)
             self.allBigramTups = self.utils.expandTags(self.allBigramTups,self.lang)
 

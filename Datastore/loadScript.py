@@ -1,16 +1,16 @@
 from collections import OrderedDict
-sc = SQLiteClient()
+dl = DataLoader("wordformsDB")
 # these commands were run in other locations. Pooled together for history.
 
 # 1st on 6/17
 colsAndTypes = OrderedDict([("Word","TEXT"),("PhonCLX","TEXT"),("PhonCPA","TEXT"),("PhonDISC","TEXT"),("PhonSAM","TEXT"),("PronCnt","INTEGER")])
-sc.createTable("pronunciations", colsAndTypes)
+dl.createTable("pronunciations", colsAndTypes)
 # 2nd on 6/17
 colsAndTypes = OrderedDict([("Word","TEXT"),("WordCnt","INTEGER")])
-sc.createTable("words", colsAndTypes)
+dl.createTable("words", colsAndTypes)
 # 3rd on 6/17
 colsAndTypes = OrderedDict([("Word","TEXT"),("PhonSylCLX","TEXT"),("PhonSylCPA","TEXT"),("PhonSylDISC","TEXT"),("PhonSylSAM","TEXT"),("SylCnt","INTEGER"),("WordSyl","TEXT")])
-sc.createTable("syllabifications", colsAndTypes)
+dl.createTable("syllabifications", colsAndTypes)
 
 #-------------------------------
 
@@ -53,3 +53,7 @@ dl.loadTableFromFile("syllabifications", "C:\Users\Jacob\Desktop\wordforms\sylla
 print "5 done"
 
 #-------------------------------
+
+# 6/23
+colsAndTypes = OrderedDict([("Word","TEXT"),("ProbSyl","TEXT"),("CSyl","TEXT"),("Same","INTEGER")])
+dl.createTable("workingresults", colsAndTypes)

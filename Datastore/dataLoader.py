@@ -1,4 +1,5 @@
 from SQLiteClient import SQLiteClient
+from collections import OrderedDict
 class DataLoader(SQLiteClient):
 
     # columns delimited with '\'    ex: 'wrong\r.Q.N.\r.Q.N.\rQN\r.Q.N.\1'
@@ -23,4 +24,4 @@ class DataLoader(SQLiteClient):
 
 if(__name__ == "__main__"):
     dl = DataLoader("wordformsDB")
-    # run load scripts here
+    dl.truncateTable("workingresults")
