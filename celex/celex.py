@@ -45,8 +45,8 @@ class CELEX(AbstractSyllabRunner):
         trainingSize = int(input("enter number of words to train on:"))
         testingSize = int(input("enter number of words to test on:"))
 
-        self._trainingSet = getWordSubset(trainingSize)
-        self._testingSet = getWordSubset(testingSize, self._trainingSet)
+        self._trainingSet = SQLQueryService.getWordSubset(trainingSize)
+        self._testingSet = SQLQueryService.getWordSubset(testingSize, self._trainingSet)
 
     # returns dictionary of {testWord:syllabification} for both ProbSyl and CELEX
     def _syllabifyTesting(self):
