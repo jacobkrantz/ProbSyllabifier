@@ -5,9 +5,9 @@ Currently training from NIST and testing on NIST with Arpabet.
 In the next beta it be able to be trained from CELEX on IPA
 
 ---
-###Syllabification
+### Syllabification
 
-####Programs:
+#### Programs:
 
 *NIST.py*  
 Interfaces directly with the NIST Syllabifier.  
@@ -24,7 +24,7 @@ This is the main file to run on:
 Run this file to use the Syllabifier. Used for building the sets for the syllabifier, training the matrices, running the syllabifier and testing the syllabifier. T
 
 
-###Tokenization
+### Tokenization
 
 *brownTokenizer.py*  
 tokenizes a corpus  
@@ -34,7 +34,7 @@ generates a file containing the 1000 most frequent words given a tokenized corpu
 follows FreqLst.py. generates a random subset of words given a tokenized grouping of words
 
 
-####HMM Files:
+#### HMM Files:
 *MatrixA.txt*  
 Holds the information from Matrix A  
 *MatrixB.txt*  
@@ -47,7 +47,7 @@ Holds the categories for the Arpabet phones
 Holds the temporary categories for the IPA phones
 
 
-####Corpus Files:
+#### Corpus Files:
 
 *brown_words.txt*  
 All tokenized words in the Brown corpus  
@@ -62,3 +62,8 @@ random selection of 20 words from freq_words.txt
 
 
 *Note: attempt0 stores our first attempt at doing this with the HMM's*
+
+#### Observations and Future Ideas
+What if we built a support vector machine from this?
+We could test if the word is so many phones then it should have 1,2,3... syllables in it.
+some of the problems
