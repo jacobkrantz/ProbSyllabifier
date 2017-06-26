@@ -1,6 +1,6 @@
-from SyllabParser import SyllabParser
-import sys
+from syllabParser import SyllabParser
 import numpy as np
+import sys
 
 '''
 fileName:       utils.py
@@ -18,8 +18,7 @@ Common utilies needed for building matrices with a HMM
 - getNumBounds
 - getBigramLookup
 '''
-
-class Utils:
+class HMMUtils:
 
     # intialize a matrix using numpy with provided size: (X,Y)
     # returns matrix
@@ -32,13 +31,13 @@ class Utils:
     def outputMatrix(self, matrix, which):
         if(which == "A"):
 
-            np.savetxt("./HMMFiles/MatrixA.txt",matrix, newline = '\n',header = "matrixA", fmt = '%.5f')
-            print ("Matrix A outputted to: ./HMMFiles/MatrixA.txt")
+            np.savetxt("HMMFiles/MatrixA.txt",matrix, newline = '\n',header = "matrixA", fmt = '%.5f')
+            print ("Matrix A outputted to: HMMFiles/MatrixA.txt")
 
         elif(which == "B"):
 
-            np.savetxt("./HMMFiles/MatrixB.txt",matrix, newline = '\n',header = "matrixB", fmt = '%.5f')
-            print ("Matrix B outputted to: ./HMMFiles/MatrixB.txt")
+            np.savetxt("HMMFiles/MatrixB.txt",matrix, newline = '\n',header = "matrixB", fmt = '%.5f')
+            print ("Matrix B outputted to: HMMFiles/MatrixB.txt")
 
         else:
             print ("'" + which + "'' does not match any option.")
@@ -111,9 +110,9 @@ class Utils:
         # returns as a list of lists.
     def getTagNames(self,lang):
         if(lang == 1):
-            inFile = open("./HMMFiles/phoneCategoriesArp.txt",'r')
+            inFile = open("HMMFiles/phoneCategoriesArp.txt",'r')
         else:
-            inFile = open("./HMMFiles/phoneCategoriesDISC.txt",'r')
+            inFile = open("HMMFiles/phoneCategoriesDISC.txt",'r')
         tags = []
 
         for line in inFile:
@@ -276,7 +275,7 @@ class Utils:
     # generates a dictionary of hiddenState: probability
     def makeHiddenProb(self, hiddenLst):
         hiddenProb = self.__makeHiddenProbHelper(hiddenLst)
-        File = open("./HMMFiles/hiddenProb.txt",'w')
+        File = open("HMMFiles/hiddenProb.txt",'w')
 
         for state in hiddenProb:
 

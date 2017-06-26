@@ -13,9 +13,9 @@ def getWords():
     if(len(sys.argv) == 2):
         fileName = sys.argv[1]
     else:
-        fileName = 'freqEditWords.txt'
+        fileName = '../corpusFiles/freqEditWords.txt'
 
-    wordFile = open(fileName,'r') 
+    wordFile = open(fileName,'r')
 
     words = ""
     for line in wordFile:
@@ -36,7 +36,7 @@ def getRandomLst(wordLst,numWords):
         word = wordLst[randSpot]
         if(word not in randomLst):
             randomLst.append(word)
-            count += 1 
+            count += 1
 
     return randomLst
 
@@ -52,6 +52,6 @@ def main():
 
     wordLst = getWords()
     randomLst = getRandomLst(wordLst,numWords)
-    printLst(randomLst,"random20.txt")
+    printLst(randomLst,"../corpusFiles/random20.txt")
 
 main()

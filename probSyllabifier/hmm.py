@@ -1,6 +1,6 @@
-from utils import Utils
-import sys
+from utils import HMMUtils
 import numpy as np
+import sys
 
 '''
 fileName:       HMM.py
@@ -18,12 +18,11 @@ Date Modified:  3/3/17
     - makeViterbiFiles()
     - getTrainingSize()
 '''
-
 class HMM:
 
     #takes in 1 for Arpabet and 2 for IPA
     def __init__(self,lang):
-        self.utils = Utils()
+        self.utils = HMMUtils()
         self.lang = lang
         self.boundCount = 0
         self.allBigramTups = []

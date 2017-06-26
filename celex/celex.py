@@ -1,18 +1,16 @@
-#from Datastore/SQLQueryService import SQLQueryService.SQLQueryService
-from Datastore import SQLQueryService
-from abstractSyllabRunner import AbstractSyllabRunner
-from Datastore import SQLiteClient
-#from ProbSyllabifier import ProbSyllabifier
+from probSyllabifier import ProbSyllabifier
+from utils import AbstractSyllabRunner
+from datastore import SQLQueryService
+from datastore import SQLiteClient
 
 # TODO assert against total word count in `buildSets`
 # TODO figure out if it is worth training HMM off database or conform to files
 # TODO implement compareResults
-# TODO figure out python's crappy way of doing 'packages'
 
-class Celex(AbstractSyllabRunner):
+class CELEX(AbstractSyllabRunner):
 
     def __init__(self):
-        self.SQLQueryService = SQLQueryService(SQLiteClient)
+        self.SQLQueryService = SQLQueryService()
         self._trainingSize = 0
         self._testingSize = 0
         self._trainingSet = set()

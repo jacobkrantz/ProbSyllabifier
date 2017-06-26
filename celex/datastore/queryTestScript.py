@@ -1,4 +1,4 @@
-from SQLQueryService import SQLQueryService
+from sqlQueryService import SQLQueryService
 import time
 # this is just thrown together to
 # 1) give an idea as to how to use it and

@@ -1,12 +1,12 @@
-## module for running the NIST Syllabifier
-## assumes tsylb2 file exists in directory '~/NIST/tsylb2-1.1/'
-
 from subprocess import Popen, PIPE, STDOUT
 import subprocess
 import shlex
 import re
 
-
+'''
+module for running the NIST Syllabifier
+assumes tsylb2 file exists in directory '~/NIST/tsylb2-1.1/'
+'''
 class NIST:
 
     ## uses NIST to find syllabification of a word in arpabet

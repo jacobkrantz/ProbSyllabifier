@@ -13,6 +13,7 @@ class SQLiteClient:
 
     def __init__(self, databaseContext):
         self._databaseContext = databaseContext
+        print self._databaseContext
         self.config = self._loadConfiguration()
         self.connection = sqlite3.connect(self.config[databaseContext]["path"])
 
@@ -65,7 +66,7 @@ class SQLiteClient:
     #----------------#
 
     def _loadConfiguration(self):
-        with open('Datastore/config.json') as json_data_file:
+        with open('celex/datastore/config.json') as json_data_file:
             data = json.load(json_data_file)
         return data
 

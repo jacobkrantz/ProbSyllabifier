@@ -1,4 +1,4 @@
-from SQLiteClient import SQLiteClient
+from sqliteClient import SQLiteClient
 from collections import OrderedDict
 class DataLoader(SQLiteClient):
 

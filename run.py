@@ -1,10 +1,8 @@
-from SyllabInfo import SyllabInfo
-from freqLst import FrequentWords as FW
-from HMM import HMM
-from ProbSyllabifier import ProbSyllabifier
-from testing import CompareNIST
-from testing import CompareCELEX
+from nist import SyllabInfo, CompareNIST
+from utils import FrequentWords as FW
+from probSyllabifier import HMM, ProbSyllabifier
 import sys
+from celex import CELEX
 
 '''
 fileName:       run.py
@@ -16,7 +14,6 @@ Date Modified:  3/14/17
 - trians HMM
 - runs syllabifier
 '''
-
 class color:
     YELLOW = '\033[93m'
     BOLD = '\033[1m'
@@ -121,7 +118,6 @@ def testSyllabifier(comparator):
         if(viewDif == 'y'):
             cNIST.viewDifferences()
     else:
-        cCelex = CompareCELEX()
         print "Run on Celex. Next version will have this feature"
 
 def help():
@@ -155,7 +151,7 @@ def main():
     print "----------------------------------------"
 
     comparator = getComparator()
-    trainedComparator = ""
+    trainedComparator = "NIST" # assumes NIST (bad)
     choice = 0
     while(choice != 6):
         print("\n" + color.BOLD + "Main Menu"+ color.END)
@@ -194,4 +190,5 @@ Choose an option:
         elif(choice == 5):
             help()
 
-main()
+# main()
+c = CELEX()

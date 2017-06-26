@@ -1,4 +1,4 @@
-from SyllabParser import SyllabParser
+from utils import SyllabParser
 
 '''
 fileName:       testing.py
@@ -9,9 +9,7 @@ Contains classes for testing the perfomance of Sylabifiers.
 - CompareNIST
     * compare
     * viewDifferences
-
 '''
-
 class CompareNIST:
 
     def __init__(self):
@@ -20,12 +18,10 @@ class CompareNIST:
         self.__nSyllabs  = []
         self.__cSyllabs = []
 
-
     # compares the syllabifications of compFile to those done by NIST.
     # Printed percentage is how accurate compFile is to NISTfile.
     # Both compFile and NISTfile must be in specific formats.
     def compare(self, NISTfile, compFile):
-
         self.__nSyllabs = self.__importFile(NISTfile)
         self.__cSyllabs = self.__importFile(compFile)
 
@@ -35,7 +31,6 @@ class CompareNIST:
 
     # prints the differences between NIST and the compared file
     def viewDifferences(self):
-
         for i in range(1, len(self.__difLst), 2):
             #This should also print the word; but this would require
             #the datatype to change from a list into a dictionary
@@ -58,7 +53,6 @@ class CompareNIST:
     # Parses file with SyllabParser and returns result (list of lists).
     def __importFile(self, fileName):
         return self.sParser.makePhonemeLst(fileName)
-
 
     # assumes that the ordering of nSyllabs is the same as cSyllabs.
     # iterates through both datasets. For each that are the same, adds
@@ -89,7 +83,6 @@ class CompareNIST:
 
         return (sameCount / float(end) * 100)
 
-
     # checks if both phonemes to be compared are the same. Loops through
     # checking each bigram contents. Continues until they are the same.
     # returns the adjusted index for nSyllabs.
@@ -107,12 +100,6 @@ class CompareNIST:
 
         return nSylIndex # the same
 
-
     # prints the percentage to the commandline
     def __outputResults(self, percentSim):
         print("File is " + str(percentSim) + "% similar to NIST.")
-
-#This is the start of the comparing process for our syllabification to Celex
-#Could be in a different file, if need be
-class CompareCELEX:
-    pass

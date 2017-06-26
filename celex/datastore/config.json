@@ -1,12 +1,12 @@
 {
     "wordformsDB":{
-        "path":"../../wordforms/wordforms.db",
+        "path":"~/Desktop/wordforms.db",
         "check_same_thread":false,
         "execute_parameters":"PRAGMA journal_mode = WAL",
         "default_alphabet":"DISC",
         "read_permissions":true,
         "write_permissions":false,
-        "sources":["webCELEX"]
+        "sources":["webCELEX"],
         "protected_tables":["words","pronunciations","syllabifications"]
     },
     "SQLite3":{

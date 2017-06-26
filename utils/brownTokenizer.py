@@ -1,13 +1,13 @@
-# Tokenization process:
-# -all words converted lowercase
-# -rid of all digits and orthographic text except for hyphens and 
-#   apostrophes. Contractions and hyphenated words are maintained
-# -hand corrections to find patterns we want to keep/remove
-
 from nltk.corpus import brown
 import re
 import sys
-
+'''
+Tokenization process:
+    - all words converted lowercase
+    - rid of all digits and orthographic text except for hyphens and
+        apostrophes. Contractions and hyphenated words are maintained
+    - hand corrections to find patterns we want to keep/remove
+'''
 
 # only gathers editorial content with -e flag
 def getWords():
@@ -18,7 +18,7 @@ def getWords():
             getEditorials = True
         else:
             print("Unknown command")
-    
+
     raw = brown.words()
     editorials = brown.words(categories='editorial')
 

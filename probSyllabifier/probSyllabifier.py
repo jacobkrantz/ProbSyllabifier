@@ -1,4 +1,4 @@
-from SyllabInfo import SyllabInfo
+from nist import SyllabInfo
 import numpy as np
 import sys
 from ast import literal_eval

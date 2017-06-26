@@ -1,5 +1,5 @@
-import sys
 from nltk.corpus import cmudict
+import sys
 
 '''
 fileName:       run.py
@@ -11,7 +11,6 @@ Adds word and # of occurrances to a dictionary
 outputs top 1000 words and their probability
 Note: all top 1000 words must exist in CMU pronouncing dictionary
 '''
-
 class FrequentWords:
 
     def __init__(self):

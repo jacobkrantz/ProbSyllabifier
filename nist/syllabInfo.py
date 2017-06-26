@@ -1,5 +1,10 @@
+from nist import NIST
+from nltk.corpus import cmudict
+from subprocess import check_output
+import sys
+
 '''
-fileName:       NISTSyllab.py
+fileName:       syllabInfo.py
 Authors:        Jacob Krantz
 Date Modified:  3/14/17
 
@@ -10,13 +15,8 @@ Date Modified:  3/14/17
     by spaces. Creates dictionary of word:syllabification.
     This is outputted as a text file with one dictionary
     entry per line.
-- Output file: './HMMFiles/SyllabDict.txt'
+- Output file: 'HMMFiles/SyllabDict.txt'
 '''
-import sys
-from nltk.corpus import cmudict
-from NIST import NIST
-from subprocess import check_output
-
 class SyllabInfo:
 
     def __init__(self,comparator):
