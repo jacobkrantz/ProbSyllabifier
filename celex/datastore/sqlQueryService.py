@@ -5,7 +5,7 @@ class SQLQueryService(SQLiteClient):
 
     def __init__(self):
         pass
-        
+
     # returns "" if word is not in the database
     def getSinglePronunciation(self, word):
         self._checkPermissions("read_permissions")
@@ -84,6 +84,16 @@ class SQLQueryService(SQLiteClient):
         query = """
             SELECT Count(Word)
             FROM words
+            """
+        with closing(self.connection.cursor()) as cursor:
+            cursor.execute(query)
+            return cursor.fetchone()[0]
+
+    def getIsSameSyllabificationCount(self):
+        self._checkPermissions("read_permissions")
+        query = """
+            SELECT Count(Same)
+            FROM workingresults
             """
         with closing(self.connection.cursor()) as cursor:
             cursor.execute(query)

@@ -1,4 +1,3 @@
-from nist import NIST
 from nltk.corpus import cmudict
 from subprocess import check_output
 import sys
@@ -17,10 +16,9 @@ Date Modified:  3/14/17
     entry per line.
 - Output file: 'HMMFiles/SyllabDict.txt'
 '''
-class SyllabInfo:
+class SyllabTools:
 
     def __init__(self,comparator):
-        self.NIST = NIST()
         self.CMUDict = cmudict.dict()
         self.wordLst = []
         self.ArpabetDict = {}
@@ -28,32 +26,6 @@ class SyllabInfo:
         self.outFile = ""
         self.inFile = ""
         self.comparator = comparator
-
-    # given an input file, will syllabify all the words within.
-    # Outputs as a syllabification dictionary to specified
-    # output file. Parsing of this file shown in 'utils.py'.
-    def syllabifyFile(self, inputFile, outputFile):
-        self.inFile = inputFile
-        self.outFile = outputFile
-        self.readWords()
-        if(self.comparator == "NIST"):
-            self.buildArpabet()
-            syllabDict = self.__getSyllabDict()
-
-        else:
-            self.buildIPA()
-            syllabDict = self.__getSyllabDict()
-
-        self.printDictToFile(syllabDict)
-
-        print ("File successfully syllabified to: " + self.outFile)
-        self.__init__(self.comparator)
-
-
-    # ------------------------------------------------------
-    # Helper functions below
-    # ------------------------------------------------------
-
 
     ## needs textfile of words to exist in specified directory
     ## imports words from file as list of words.
@@ -63,14 +35,10 @@ class SyllabInfo:
 
         wordFile = open(self.inFile,'r')
         words = ""
-
         for line in wordFile:
             words = words + ' ' + line
 
-        words = words.split()
-
-        for i in words:
-            self.wordLst.append(i)
+        self.wordLst += words.split()
 
 
     ## looks up each word in cmudict and adds the word and pronunciation
@@ -168,7 +136,7 @@ class SyllabInfo:
             ArpString = ArpString + aPhoneme + " "
 
         ## ArpString ready for NIST
-        finalSyllab = self.NIST.syllabify(ArpString)
+        finalSyllab = self.NISTClient.syllabify(ArpString)
         return finalSyllab
 
 

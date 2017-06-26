@@ -1,79 +1,87 @@
-from subprocess import Popen, PIPE, STDOUT
-import subprocess
-import shlex
-import re
+from probSyllabifier import HMM, ProbSyllabifier
+from nistClient import NISTClient
+from testing import CompareNIST
+from utils import AbstractSyllabRunner, FrequentWords as FW
 
-'''
-module for running the NIST Syllabifier
-assumes tsylb2 file exists in directory '~/NIST/tsylb2-1.1/'
-'''
-class NIST:
+class NIST(AbstractSyllabRunner):
 
-    ## uses NIST to find syllabification of a word in arpabet
-    ## ArpString must have no stress
-    ## returns list of syllabifications
-    def syllabify(self, ArpString):
-        syllabs = []
+    def __init__(self):
+        self.NISTClient = NISTClient()
+        self.cNIST = CompareNIST()
+        self.ps = ProbSyllabifier()
+        self._lang = 1 # 1 == NIST, needed for HMM. outdated.
 
+    def trainHMM(self):
+        self._buildSets()
+        self._trainHMM()
+
+    def testHMM(self):
+        testIN = "./corpusFiles/testSet.txt"
+        testOUT = "./HMMFiles/probSyllabs.txt"
+        self.ps.syllabifyFile(testIN, testOUT,"NIST")
+
+        NISTname = "./HMMFiles/NISTtest.txt"
+        probName = "./HMMFiles/probSyllabs.txt"
+        self.cNIST.compare(NISTname, probName)
+
+        viewDif = raw_input("view differences (y): ")
+        if(viewDif == 'y'):
+            self.cNIST.viewDifferences()
+
+    # returns string of syllabified observation
+    def syllabify(self, observation):
+        return self.ps.syllabify(observation)
+
+    def syllabifyFile(self, fileIN, fileOUT, comparator="NIST"):
+        self.ps.syllabifyFile(fileIN, fileOUT, comparator)
+
+    #----------------#
+    #   "Private"    #
+    #----------------#
+
+    def _buildSets(self):
+        inFile = "./corpusFiles/brown_words.txt" #/editorial_words.txt
+        outFile = "./HMMFiles/SyllabDict.txt"
+        freqFile = "./corpusFiles/freqWords.txt"
+
+        inTest = "./corpusFiles/testSet.txt"
+        outTest = "./HMMFiles/NISTtest.txt"
+
+        print ("current input file: " + inFile)
+        print ("current output file: " + outFile)
+
+        user_in = raw_input("Press enter to continue, or 'c' to change: ")
+        if(user_in == 'c'):
+            inFile = raw_input("choose input file: ")
+            outFIle = raw_input("choose output file: ")
+
+        self._generateWords(inFile, inTest)
         try:
+            self.NISTClient.syllabifyFile(freqFile,outFile)
+            self.NISTClient.syllabifyFile(inTest,outTest)
 
-            ArpString = ArpString.lower()
-            data      = self.__runNIST(ArpString)
-            syllabs   = self.__parseNISTData(data, ArpString)
+        except IOError as err:
+            print err
 
-        except:
+    # build A and B matrices. Makes files to be used in the Viterbi
+    # decoding algorithm.
+    def _trainHMM(self):
+        hmm = HMM(self._lang)
 
-            print("Arpabet String Input Error.")
+        hmm.buildMatrixA() # "./HMMFiles/MatrixA.txt"
+        hmm.buildMatrixB() # "./HMMFiles/MatrixB.txt"
+        hmm.makeViterbiFiles()
+        print("Items in training set: " + str(hmm.getTrainingSize()))
 
-        return syllabs
+    # builds word set files to be used in NIST syllabification
+    def _generateWords(self, fileIn, testFileIn):
+        fw = FW()
+        numWords = int(raw_input("Enter number of words to syllabify: "))
+        numTestWords = int(raw_input("Enter number of words to test on: "))
 
+        # pulling from entire corpus or editorials
+        fileIn = "./corpusFiles/brown_words.txt" #/editorial_words.txt
+        fwOut = "./corpusFiles/freqWords.txt"
 
-
-    ## ------------------------------
-    ##            PRIVATE
-    ## ------------------------------
-
-
-
-    ## takes in a phonetic pronounciation and runs them through NIST
-    ## returns the proper syllabification(s) in a list
-    # Param 1: An arpabet string
-    def __runNIST(self,ArpString):
-        sylbLst = []
-
-        p = subprocess.Popen("cd ~/NIST/tsylb2-1.1/ && ./tsylb2 -n phon1ax.pcd", shell = True,stdin = PIPE,stdout = PIPE,stderr = PIPE, bufsize = 1)
-
-        data = p.communicate(input = ArpString + "\n")[0] # data = output
-
-        return data
-
-
-    ## takes in the raw output of NIST
-    ## parses for pronounciations and returns all in a list
-    # Param 1: ????
-    # Param 2: ???
-    def __parseNISTData(self, data, ArpString):
-        pattern   = '\/.*?\/'
-        pattern2 = '[^0-9]'
-        error     = 'ERR'
-        returnLst = []
-        proLst    = []
-
-        data = str(data)
-
-        if(len(re.findall(error, data))):
-            print("Error. No syllabification found for: " + ArpString)
-
-        proLst = re.findall(pattern, data)
-        proLst = proLst[1:]
-
-        for item in proLst:
-            tmp = item.strip('/# ')
-            tmp = tmp.strip('#')
-            newString = ""
-            for i in range(len(tmp)):
-                if(tmp[i] !='0' and tmp[i] != '1' and tmp[i] != '2' and tmp[i] !="'"):
-                    newString += tmp[i]
-            returnLst.append(newString)
-
-        return returnLst
+        fw.generateMostFreq(fileIn, fwOut, numWords)
+        fw.generateTesting(fileIn, testFileIn, numTestWords) # testFileIn is outfile

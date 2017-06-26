@@ -5,19 +5,19 @@ from datastore import SQLiteClient
 
 # TODO assert against total word count in `buildSets`
 # TODO figure out if it is worth training HMM off database or conform to files
-# TODO implement compareResults
 
 class CELEX(AbstractSyllabRunner):
 
     def __init__(self):
         self.SQLQueryService = SQLQueryService()
+        self.ps = ProbSyllabifier()
         self._trainingSize = 0
         self._testingSize = 0
         self._trainingSet = set()
         self._testingSet = set()
 
     def trainHMM(self):
-        buildSets()
+        self._buildSets()
         hmm = HMM(lang)
 
         hmm.buildMatrixA() # "./HMMFiles/MatrixA.txt"
@@ -28,10 +28,14 @@ class CELEX(AbstractSyllabRunner):
         PSylResultsDict, CSylResultsDict = self._syllabifyTesting()
         testResultsList = self._combineResults(PSylResultsDict, CSylResultsDict)
         self._fillResultsTable(testResultsList)
+        self._compareResults()
 
-    # prints out general results comparison gathered from "workingresults" table
-    def compareResults(self):
-        pass
+    # returns string of syllabified observation
+    def syllabify(self, observation):
+        return self.ps.syllabify(observation)
+
+    def syllabifyFile(self, fileIN, fileOUT, comparator):
+        self.ps.syllabifyFile(fileIN, fileOUT, comparator)
 
     #----------------#
     #   "Private"    #
@@ -46,13 +50,12 @@ class CELEX(AbstractSyllabRunner):
 
     # returns dictionary of {testWord:syllabification} for both ProbSyl and CELEX
     def _syllabifyTesting(self):
-        ps = ProbSyllabifier()
         pronunciationsDict = getManyPronunciations(self._testingSet)
         CELEXSylDict = getManySyllabifications(self._testingSet)
 
         for wordKey in pronunciationsDict:
              pronunciation = pronunciationsDict[wordKey]
-             ProbSylDict[wordKey] = ps.syllabify(pronunciation)
+             ProbSylDict[wordKey] = self.ps.syllabify(pronunciation)
         return ProbSylDict, CELEXSylDict
 
     # returns a list of dictionaries containing
@@ -67,8 +70,12 @@ class CELEX(AbstractSyllabRunner):
         return testResultsList
 
     def _fillResultsTable(self, testResultsList):
-        truncateTable("workingresults")
-        lambda resultLine: insertIntoTable("workingresults", resultLine), testResultsList
+        self.SQLQueryService.truncateTable("workingresults")
+        lambda resultLine: self.SQLQueryService.insertIntoTable("workingresults", resultLine), testResultsList
 
-if(__name__ == "__main__"):
-    c = Celex()
+    # prints out general results comparison from "workingresults" table
+    def _compareResults(self):
+        wordCount = self.SQLQueryService.getTotalWordCount()
+        sameSyllabCount = self.SQLQueryService.getIsSameSyllabificationCount()
+        percentSame = "{0:.2f}".format(sameSyllabCount / float(wordCount))
+        print "ProbSyllabifier is " + percentSame + "similar to CELEX."

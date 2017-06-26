@@ -1,124 +1,43 @@
-from nist import SyllabInfo, CompareNIST
-from utils import FrequentWords as FW
-from probSyllabifier import HMM, ProbSyllabifier
-import sys
 from celex import CELEX
+from nist import NIST
+import sys
 
 '''
 fileName:       run.py
 Authors:        Jacob Krantz, Max Dulin
 Date Modified:  3/14/17
 
-- main file to train and run the Probabilsitic Syllabifier
+- main file to run entire program
 - Syllabifies a file using NIST
-- trians HMM
-- runs syllabifier
+- capable of running full suite of tools with NIST
+- CELEX soon to be operational
 '''
 class color:
     YELLOW = '\033[93m'
     BOLD = '\033[1m'
     END = '\033[0m'
 
-
-def buildSets(comparator):
-    inFile = "./corpusFiles/brown_words.txt" #/editorial_words.txt
-    outFile = "./HMMFiles/SyllabDict.txt"
-    freqFile = "./corpusFiles/freqWords.txt"
-
-    inTest = "./corpusFiles/testSet.txt"
-    outTest = "./HMMFiles/NISTtest.txt"
-
-    if(comparator == "NIST"):
-        nistSyllab = SyllabInfo(comparator)
-    #will be for celex database at some point
-    else:
-        celexSyllab = SyllabInfo(comparator)
-    print ("current input file: " + inFile)
-    print ("current output file: " + outFile)
-
-    user_in = raw_input("Press enter to continue, or 'c' to change: ")
-    if(user_in == 'c'):
-        inFile = raw_input("choose input file: ")
-        outFIle = raw_input("choose output file: ")
-
-    generateWords(inFile, inTest)
-
-    try:
-        if(comparator == "NIST"):
-            nistSyllab.syllabifyFile(freqFile,outFile)
-            nistSyllab.syllabifyFile(inTest,outTest)
-        else:
-            celexSyllab.syllabifyFile(freqFile,outFile)
-            celexSyllab.syllabifyFile(inTest, outTest)
-    except IOError as err:
-        print err
-
-
-# builds word set files to be used in NIST syllabification
-def generateWords(fileIn, testFileIn):
-    fw = FW()
-    numWords = int(raw_input("Enter number of words to syllabify: "))
-    numTestWords = int(raw_input("Enter number of words to test on: "))
-
-    # pulling from entire corpus or editorials
-    fileIn = "./corpusFiles/brown_words.txt" #/editorial_words.txt
-    fwOut = "./corpusFiles/freqWords.txt"
-
-    fw.generateMostFreq(fileIn, fwOut, numWords)
-    fw.generateTesting(fileIn, testFileIn, numTestWords) # testFileIn is outfile
-
-
-# build A and B matrices. Makes files to be used in the Viterbi
-# decoding algorithm.
-def trainHMM(comparator):
-    lang = 1 if comparator == "NIST" else 2 # HACK get rid of lang
-    hmm = HMM(lang)
-
-    hmm.buildMatrixA() # "./HMMFiles/MatrixA.txt"
-    hmm.buildMatrixB() # "./HMMFiles/MatrixB.txt"
-    hmm.makeViterbiFiles()
-    print("Items in training set: " + str(hmm.getTrainingSize()))
-
 # this currently doesn't work
 # runs the probabilistic syllabifier for either a phoneme or file.
-def runS(comparator):
-    ps = ProbSyllabifier()
+def runS(NIST, CELEX, comparator):
     obs = " "
 
     while(obs != ''):
-
         obs = raw_input("Enter filename or phoneme: ")
-
         syl = ""
-
         if("." in obs):
             #for some reason the output file wasn't here so I created
             #one to be used in order for the function to work
-            ps.syllabifyFile(obs,"HMMFiles/outfile.txt",comparator)
+            if comparator == "NIST":
+                NIST.syllabifyFile(obs,"HMMFiles/outfile.txt",comparator)
+            else:
+                CELEX.syllabifyFile(obs,"HMMFiles/outfile.txt",comparator)
         elif(obs != ''):
-            syl = ps.syllabify(obs.lower())
+            if comparator == "NIST":
+                syl = NIST.syllabify(obs.lower())
+            else:
+                syl = CELEX.syllabify(obs.lower())
             print("Syllabification: " + syl)
-
-
-# compares the results of ProbS to that of NIST
-def testSyllabifier(comparator):
-
-    if(comparator == "NIST"):
-        cNIST = CompareNIST()
-        ps = ProbSyllabifier()
-        testIN = "./corpusFiles/testSet.txt"
-        testOUT = "./HMMFiles/probSyllabs.txt"
-        ps.syllabifyFile(testIN, testOUT,comparator)
-
-        NISTname = "./HMMFiles/NISTtest.txt"
-        probName = "./HMMFiles/probSyllabs.txt"
-        cNIST.compare(NISTname, probName)
-
-        viewDif = raw_input("view differences (y): ")
-        if(viewDif == 'y'):
-            cNIST.viewDifferences()
-    else:
-        print "Run on Celex. Next version will have this feature"
 
 def help():
     print "Running the Syllabifier:"
@@ -146,6 +65,8 @@ def isLegalSelection(curComparator, trainedComparator, selection):
     print "HMM trained in other Comparator. Try retraining"
 
 def main():
+    nist = NIST()
+    celex = CELEX()
     print "----------------------------------------"
     print "Welcome to the Probabilistic Syllabifier"
     print "----------------------------------------"
@@ -174,15 +95,13 @@ Choose an option:
                 choice = 0
 
         if(choice == 1):
-            buildSets(comparator)
-            trainHMM(comparator)
-            trainedComparator = comparator
+            nist.trainHMM() if comparator == "NIST" else celex.trainHMM()
 
         elif(choice == 2):
-            runS(comparator)
+            runS(nist, celex, comparator)
 
         elif(choice == 3):
-            testSyllabifier(comparator)
+            nist.testHMM() if comparator == "NIST" else celex.testHMM()
 
         elif(choice == 4):
             comparator = getComparator()
@@ -190,5 +109,4 @@ Choose an option:
         elif(choice == 5):
             help()
 
-# main()
-c = CELEX()
+main()

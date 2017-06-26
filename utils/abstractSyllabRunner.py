@@ -17,5 +17,9 @@ class AbstractSyllabRunner(object):
         pass
 
     @abstractmethod
-    def compareResults(self):
+    def syllabify(self, observation):
+        pass
+
+    @abstractmethod
+    def syllabifyFile(self, fileIN, fileOUT,comparator):
         pass

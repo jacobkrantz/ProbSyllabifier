@@ -1,4 +1,4 @@
-from nist import SyllabInfo
+from utils import SyllabTools
 import numpy as np
 import sys
 from ast import literal_eval
@@ -39,7 +39,7 @@ class ProbSyllabifier:
     # param 1: phoneme file in
     # param 2: fileName for syllabification out
     def syllabifyFile(self, fileIN, fileOUT,comparator):
-        self.sTools = SyllabInfo(comparator)
+        self.sTools = SyllabTools(comparator)
         self.sTools.inFile = fileIN
         self.sTools.outFile = fileOUT
         self.getExceptionLst # for reset
