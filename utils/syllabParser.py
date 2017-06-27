@@ -16,12 +16,8 @@ Date Modified:  3/15/17
 class SyllabParser:
 
     def __init__(self):
-
-        self.fileName = "./HMMFiles/SyllabDict.txt"
         #spot on the line
         self.spot = 0
-        #the amount of lines in the text file of syllbabifactions inputted
-        self.countLines = 0
         #where the lines are stored in the beginning
         self.initialList = []
         #the list where the list of bigram lists per word is stroed
@@ -33,32 +29,49 @@ class SyllabParser:
     # Creates a list of phonemes. Phonemes consist of bigrams of the
     # form: [['d', 'aa', 0], ['aa', 'l', 1], ['l', 'er', 0]]
     # filename param defaults to ./HMMFiles./SyllabDict.txt
-    def makePhonemeLst(self, fileName="./HMMFiles/SyllabDict.txt"):
+    def makeNistPhonemeLst(self, fileName="./HMMFiles/SyllabDict.txt"):
+        with open(fileName) as f:
+            for line in f:
+                self.initialList.append(line)
 
-        self.fileName = fileName
-        self.__bringInFile()
-
-        for i in range(self.countLines):
+        for i in range(len(self.initialList)):
             self.__makeParseWord(i)
 
         bigs = self.bigramLst
         self.__init__()
         return bigs
 
+    # Creates a list of phonemes. Phonemes consist of bigrams of the
+    # form: [['d', 'aa', 0], ['aa', 'l', 1], ['l', 'er', 0]]
+    def parseCelexTrainingSet(self, trainingSet):
+        trainingSet = map(lambda x: x.encode('utf-8'), trainingSet)
+        return map(lambda word: self._parseCelexWord(word), trainingSet)
 
     ## ------------------------------
     ##            PRIVATE
     ## ------------------------------
 
-    ##brings in the contents of the file
-    ##Puts them into initialList, a class variable
-    def __bringInFile(self):
-
-        with open(self.fileName) as f:
-            for line in f:
-                self.initialList.append(line)
-                self.countLines+=1
-
+    # assumtions: a boundary cannot start or end a word
+    #   a boundary cannot follow a boundary
+    def _parseCelexWord(self, word):
+        word = word.split()[0]
+        phonemeBigramList = []
+        wasBoundary = False
+        if word[0] == '-' or word[-1] == '-':
+            raise SyntaxError("CELEX word '" + word + "' broke syllab rule.")
+        for i in range(1,len(word)):
+            if not wasBoundary:
+                if word[i] == '-':
+                    wasBoundary = True
+                    phonemeBigramList.append([word[i-1],word[i+1],1])
+                else:
+                    phonemeBigramList.append([word[i-1],word[i],0])
+                    wasBoundary = False
+            else:
+                wasBoundary = False
+                if word[i] == '-':
+                    raise SyntaxError("CELEX word '" + word + "' broke syllab rule.")
+        return phonemeBigramList
 
     #Parses a word into bigrams and whether there was a boundary between them.
     #In the format (firstPhone,secondPhone,boundary)
@@ -87,30 +100,20 @@ class SyllabParser:
                 break
             else:
                 phoneLst.append([oldPhone,phone,value])
-                #self.bigramLst.append([oldPhone,phone,value])
             oldPhone = phone
 
-
-
     #takes in a line that has been cropped out
-    #returns true if a boundary is found between the two phone
-    #and false otherwise
+    #returns 1 if a boundary is found between the two phone
+    #and 0 otherwise
     def __boundaryFound(self,phone,oldPhone):
-
-        setString = '' #string
+        setString = ''
         for i in range (2,len(self.line)):
             if(self.line[self.spot-i] != oldPhone[0]):
                 setString = self.line[self.spot-i]+setString
             else:
                 break
         #checks to see if there is a left bracket inside of it.
-        if('[' in setString):
-            #if there's a boundary
-            return 1;
-        else:
-            #if there's no boundary
-            return 0;
-
+        return 1 if '[' in setString else 0
 
     #Takes in a line that has been cropped down
     #to find the next phone in the line and the number in the line.
@@ -126,7 +129,5 @@ class SyllabParser:
 
             self.spot +=1
 
-        #resets the value of spot to be used later.
         self.spot = 0
-        #used to end the loop in makeParseWord
-        return '\0'
+        return '\0' # end the loop in makeParseWord

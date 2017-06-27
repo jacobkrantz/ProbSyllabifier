@@ -3,9 +3,6 @@ from contextlib import closing
 
 class SQLQueryService(SQLiteClient):
 
-    def __init__(self):
-        pass
-
     # returns "" if word is not in the database
     def getSinglePronunciation(self, word):
         self._checkPermissions("read_permissions")

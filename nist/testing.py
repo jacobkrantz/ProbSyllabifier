@@ -52,7 +52,7 @@ class CompareNIST:
     # Imports a file that is formatted like 'SyllabDict.txt'.
     # Parses file with SyllabParser and returns result (list of lists).
     def __importFile(self, fileName):
-        return self.sParser.makePhonemeLst(fileName)
+        return self.sParser.makeNistPhonemeLst(fileName)
 
     # assumes that the ordering of nSyllabs is the same as cSyllabs.
     # iterates through both datasets. For each that are the same, adds

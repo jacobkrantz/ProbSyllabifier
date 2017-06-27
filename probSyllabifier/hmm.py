@@ -21,15 +21,14 @@ Date Modified:  3/3/17
 class HMM:
 
     #takes in 1 for Arpabet and 2 for IPA
-    def __init__(self,lang):
+    def __init__(self,lang, trainingSet=[]):
         self.utils = HMMUtils()
         self.lang = lang
+        self.allBigramTups = self._loadTrainingData(trainingSet)
         self.boundCount = 0
-        self.allBigramTups = []
         self.boundFreqDict = {}
         self.boundLst = []
         self.tagBigrams = []
-        self.allBigramTups = []
 
         self.numBigrams = 0
         self.numYesBounds = 0
@@ -114,6 +113,12 @@ class HMM:
     # helper functions below
     # ------------------------------------------------------
 
+    def _loadTrainingData(self, trainingSet):
+        if len(trainingSet) == 0:   # from nist
+            return self.utils.getNistBigramTups()
+        return self.utils.parseCelexTrainingSet(trainingSet)
+
+
 
     # loads values into necessary data structures for building the HMM
     # if mode == 'shared', loads data necessary for both matrices
@@ -131,18 +136,14 @@ class HMM:
     #       - bigramFreqDict
     def __loadFiles(self, mode):
         if(mode == 'shared'):
-
-            self.allBigramTups = self.utils.getAllBigramTups(self.lang)
             self.tagDict, self.tagLookup = self.utils.getTagLookup(self.allBigramTups,self.lang)
             self.allBigramTups = self.utils.expandTags(self.allBigramTups,self.lang)
 
         elif(mode == 'A'):
-
             self.boundCount = self.utils.getBoundCount(self.allBigramTups)
             print("Files loaded for A matrix.")
 
         elif(mode == 'B'):
-
             self.bigramLookup = self.utils.getBigramLookup(self.allBigramTups)
             self.numBigrams = len(self.bigramLookup)
             self.bigramFreqDict = self.utils.getBigramFreqDict(self.allBigramTups, self.numBigrams)

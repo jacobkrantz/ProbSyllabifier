@@ -20,6 +20,9 @@ Common utilies needed for building matrices with a HMM
 '''
 class HMMUtils:
 
+    def __init__(self):
+        self.sylParser = SyllabParser()
+
     # intialize a matrix using numpy with provided size: (X,Y)
     # returns matrix
     def initMatrix(self, X, Y):
@@ -57,13 +60,14 @@ class HMMUtils:
     # uses SyllabParser to generate a list of lists.
     # allBigramTups: [[(phone,phone,int),(...),],[...],] where int
     # corresponds to the type of boundary.
-    def getAllBigramTups(self, lang):
-        sylParser = SyllabParser()
-        if lang == 1:
-            return sylParser.makePhonemeLst()
-        else:
-            return
+    def getNistBigramTups(self):
+        return self.sylParser.makeNistPhonemeLst()
 
+    # uses SyllabParser to generate a list of lists.
+    # allBigramTups: [[(phone,phone,int),(...),],[...],] where int
+    # corresponds to the type of boundary.
+    def parseCelexTrainingSet(self, trainingSet):
+        return self.sylParser.parseCelexTrainingSet(trainingSet)
 
     # generates the tag dictionary by iterating though the bigram tuples and
     # looking up what type of consonant or vowel each phone belongs to.

@@ -1,6 +1,6 @@
 {
     "wordformsDB":{
-        "path":"~/Desktop/wordforms.db",
+        "path":"../wordforms.db",
         "check_same_thread":false,
         "execute_parameters":"PRAGMA journal_mode = WAL",
         "default_alphabet":"DISC",

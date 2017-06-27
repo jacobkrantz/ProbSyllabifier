@@ -13,9 +13,9 @@ class SQLiteClient:
 
     def __init__(self, databaseContext):
         self._databaseContext = databaseContext
-        print self._databaseContext
         self.config = self._loadConfiguration()
-        self.connection = sqlite3.connect(self.config[databaseContext]["path"])
+        print self.config[self._databaseContext]["path"]
+        self.connection = sqlite3.connect(self.config[self._databaseContext]["path"])
 
     # string tableName
     # OrderedDict columnsAndTypes: column_name:column_datatype
