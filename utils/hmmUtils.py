@@ -7,16 +7,7 @@ fileName:       utils.py
 Authors:        Jacob Krantz
 Date Modified:  2/26/17
 
-Common utilies needed for building matrices with a HMM
-- initMatrix
-- outputMatrix
-- importMatrix
-- getAllBigramTups
-- getBoundLst
-- getBoundCount
-- getBoundBigrams
-- getNumBounds
-- getBigramLookup
+Common utilities needed for building matrices with a HMM
 '''
 class HMMUtils:
 
@@ -51,7 +42,7 @@ class HMMUtils:
     def importMatrix(self, fileName):
         try:
             matrix = np.loadtxt(fileName, dtype = 'float')
-        except:
+        except IOError:
             print(fileName +" does not exist or is corrupt.")
             sys.exit(0)
         return matrix
@@ -74,26 +65,23 @@ class HMMUtils:
     # returns a dictionary of [tag]: [number of occurances]
     # also returns a lookup list for matrix indices.
     def getTagLookup(self, allBigramTups,lang):
-        spot = ''
-        spot1 = ''
-        spot2 = ''
+        category1 = ''
+        category2 = ''
         tagDict = {}
-        tagLst = []
+        tagLookup = set()
 
         for phoneme in allBigramTups:
             for tup in phoneme:
-
-                spot = self.getCategory(tup[0],lang)
-                spot1 = str(tup[2])
-                spot2 = self.getCategory(tup[1],lang)
-                tagString = spot + spot1 + spot2
-                tagLst.append(tagString)
+                category1 = self.getCategory(tup[0],lang)
+                category2 = self.getCategory(tup[1],lang)
+                tagString = category1 + str(tup[2]) + category2
+                tagLookup.add(tagString)
                 if tagString in tagDict:
                     tagDict[tagString] += 1
                 else:
                     tagDict[tagString] = 1
 
-        return tagDict, list(set(tagLst))
+        return tagDict, list(tagLookup)
 
 
     # returns the category that the phone belongs to
@@ -106,8 +94,8 @@ class HMMUtils:
             if phone in category:
                 cat = category[0]
                 return cat[0] # remove trailing unique ID
-        print "not found in tagset."
-        return ""
+        raise LookupError(phone + " not found in tagset.")
+
 
 
         # imports the tags from a specific file.
@@ -257,38 +245,31 @@ class HMMUtils:
 
 
     # nornamlize the bigramFreqDict to (countBigram / countAllBigrams)
-    def __normBigramFreqDict(self, bigramFreqDict, numBigrams):
-        for bigram in bigramFreqDict:
-            bigramFreqDict[bigram] = bigramFreqDict[bigram] / float(numBigrams)
+    def __normBigramFreqDict(self, bfDict, numBigrams):
+        #for bigram in bigramFreqDict:
+        #    bigramFreqDict[bigram] = bigramFreqDict[bigram] / float(numBigrams)
 
-        return bigramFreqDict
+        return dict(map(lambda (k,v): (k, v/float(numBigrams)), bfDict.iteritems()))
 
     # ------------------------------------------------------
     # File outputs for Viterbi
     # ------------------------------------------------------
 
-    # outputs a list to a file. Entries separated by newline char
+    # outputs a list to a file. Entries are newline delimited
     def makeLookup(self, lookup, fileName):
-        File = open(fileName,'w')
-        for item in lookup:
-            File.write(str(item))
-            File.write('\n')
-        File.close()
+        with open(fileName,'w') as File:
+            map(lambda item:File.write(str(item)+'\n'), lookup)
 
 
     # generates a dictionary of hiddenState: probability
     def makeHiddenProb(self, hiddenLst):
         hiddenProb = self.__makeHiddenProbHelper(hiddenLst)
-        File = open("HMMFiles/hiddenProb.txt",'w')
-
-        for state in hiddenProb:
-
-            File.write(str(state))
-            File.write(' ')
-            File.write(str(hiddenProb[state]))
-            File.write('\n')
-
-        File.close()
+        with open("HMMFiles/hiddenProb.txt",'w') as File:
+            for state in hiddenProb:
+                File.write(str(state))
+                File.write(' ')
+                File.write(str(hiddenProb[state]))
+                File.write('\n')
 
 
     #returns a dictionary of the probability of a hidden state

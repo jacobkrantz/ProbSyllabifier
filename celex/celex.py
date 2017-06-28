@@ -3,7 +3,6 @@ from probSyllabifier import ProbSyllabifier, HMM
 from utils import AbstractSyllabRunner
 
 # TODO assert against total word count in `buildSets`
-# TODO figure out if it is worth training HMM off database or conform to files
 
 class CELEX(AbstractSyllabRunner):
 
@@ -54,8 +53,8 @@ class CELEX(AbstractSyllabRunner):
     # returns dictionary of {testWord:syllabification} for both ProbSyl and CELEX
     def _syllabifyTesting(self):
         if len(self._CSylResultsDict) == 0:
-            self._CSylResultsDict = getManySyllabifications(self._testingSet)
-        pronunciationsDict = getManyPronunciations(self._testingSet)
+            self._CSylResultsDict = self.SQLQueryService.getManySyllabifications(self._testingSet)
+        pronunciationsDict = self.SQLQueryService.getManyPronunciations(self._testingSet)
 
         for wordKey in pronunciationsDict:
              pronunciation = pronunciationsDict[wordKey]
