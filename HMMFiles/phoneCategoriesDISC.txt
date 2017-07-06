@@ -1,9 +1,10 @@
-monophthongs ɔ ɑ i u ɛ ɪ ʊ ʌ ə æ
-diphthongs eɪ aɪ oʊ aʊ ɔɪ
-r-colored vowels ɝ ɚ
-stops p b t d k g
-affricates tʃ dʒ
-fricatives f v θ ð s z ʃ ʒ h
-nasals m m̩ n n̩ ŋ ŋ̍
-liquids ɫ ɫ̩ r ɹ ɾ ɾ̃
-semivowels j w ʍ
+Plosive p b t d k g
+Nasal m n N C F H
+Drill r
+Fricative f v T D s z S Z x h J
+Approximant j P R
+Top i u 6 7
+Loose I U c
+Close @ 1 4 5 9 0
+Mid E { V $ 3 8 q
+Open Q # 2 ~
