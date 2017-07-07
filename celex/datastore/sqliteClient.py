@@ -14,7 +14,6 @@ class SQLiteClient:
     def __init__(self, databaseContext):
         self._databaseContext = databaseContext
         self.config = self._loadConfiguration()
-        print self.config[self._databaseContext]["path"]
         self.connection = sqlite3.connect(self.config[self._databaseContext]["path"])
 
     # string tableName
@@ -26,7 +25,6 @@ class SQLiteClient:
         for columnAndTypeTuple in columnsAndTypes.items():
             columnInserts += columnAndTypeTuple[0] + " " + columnAndTypeTuple[1] + ", "
         SQL = """ CREATE TABLE %s (%s) """ % (self._scrubParameter(tableName),columnInserts.strip(', '))
-        print SQL
         with closing(self.connection.cursor()) as cursor:
             cursor.execute(SQL)
             self.connection.commit()

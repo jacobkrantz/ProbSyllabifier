@@ -72,7 +72,7 @@ def main():
     print "----------------------------------------"
 
     comparator = getComparator()
-    trainedComparator = "NIST" # assumes NIST (bad)
+    trainedComparator = "CELEX" # assumes CELEX (bad- should be in config file)
     choice = 0
     while(choice != 6):
         print("\n" + color.BOLD + "Main Menu"+ color.END)
@@ -96,6 +96,7 @@ Choose an option:
 
         if(choice == 1):
             nist.trainHMM() if comparator == "NIST" else celex.trainHMM()
+            trainedComparator = comparator
 
         elif(choice == 2):
             runS(nist, celex, comparator)

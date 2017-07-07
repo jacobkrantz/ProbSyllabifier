@@ -1,6 +1,7 @@
 from sqliteClient import SQLiteClient
 from contextlib import closing
 
+# does not currently support multithreading, even within batch functions.
 class SQLQueryService(SQLiteClient):
 
     # returns "" if word is not in the database
@@ -26,12 +27,12 @@ class SQLQueryService(SQLiteClient):
         batchSize = 10
         batchLst = []
         manyPros = []
-        for word in wordLst:
+        for word in wordList:
             batchLst.append(word)
             if len(batchLst) >= batchSize:
-                manyPros = dict(manyPros, self._getBatchPronunciations(batchLst))
+                manyPros = dict(manyPros, **self._getBatchPronunciations(batchLst))
                 batchLst = []
-        return dict(manyPros, self._getBatchPronunciations(batchLst))
+        return dict(manyPros, **self._getBatchPronunciations(batchLst))
 
     # returns "" if word is not in the database
     def getSingleSyllabification(self, word):

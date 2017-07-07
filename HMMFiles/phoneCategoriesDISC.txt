@@ -1,10 +1,10 @@
 Plosive p b t d k g
 Nasal m n N C F H
 Drill r
-Fricative f v T D s z S Z x h J
-Approximant j P R
+Fricative f v T D s z S Z x h J _
+Approximant j P R l w
 Top i u 6 7
 Loose I U c
 Close @ 1 4 5 9 0
 Mid E { V $ 3 8 q
-Open Q # 2 ~
+Open Q # 2 ~ "

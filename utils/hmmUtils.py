@@ -88,7 +88,8 @@ class HMMUtils:
     def getCategory(self, phone,lang):
         cat = ""
         tagNames = self.getTagNames(lang)
-        phone = phone.upper()
+        if lang == 1:
+            phone = phone.upper()
 
         for category in tagNames:
             if phone in category:

@@ -14,6 +14,7 @@ class CELEX(AbstractSyllabRunner):
         self._trainingSet = set()
         self._testingSet = set()
         self._CSylResultsDict = dict()
+        self._PSylResultsDict = dict()
 
     def trainHMM(self):
         self._buildSets()
@@ -27,8 +28,8 @@ class CELEX(AbstractSyllabRunner):
         hmm.makeViterbiFiles()
 
     def testHMM(self):
-        PSylResultsDict = self._syllabifyTesting()
-        testResultsList = self._combineResults(PSylResultsDict, CSylResultsDict)
+        self._syllabifyTesting()
+        testResultsList = self._combineResults(self._PSylResultsDict, self._CSylResultsDict)
         self._fillResultsTable(testResultsList)
         self._compareResults()
 
@@ -50,7 +51,8 @@ class CELEX(AbstractSyllabRunner):
         self._trainingSet = self._toASCII(self.SQLQueryService.getWordSubset(trainingSize))
         self._testingSet = self._toASCII(self.SQLQueryService.getWordSubset(testingSize, self._trainingSet))
 
-    # returns dictionary of {testWord:syllabification} for both ProbSyl and CELEX
+    # builds dictionary of {testWord:syllabification}
+    # for self._PSylResultsDict and self._CSylResultsDict
     def _syllabifyTesting(self):
         if len(self._CSylResultsDict) == 0:
             self._CSylResultsDict = self.SQLQueryService.getManySyllabifications(self._testingSet)
@@ -58,8 +60,8 @@ class CELEX(AbstractSyllabRunner):
 
         for wordKey in pronunciationsDict:
              pronunciation = pronunciationsDict[wordKey]
-             ProbSylDict[wordKey] = self.ps.syllabify(pronunciation)
-        return ProbSylDict, CELEXSylDict
+             self._PSylResultsDict[wordKey] = self.ps.syllabify(pronunciation)
+             print wordKey, self._PSylResultsDict[wordKey]
 
     # returns a list of dictionaries containing
     # definitions for the "workingresults" table
@@ -81,7 +83,7 @@ class CELEX(AbstractSyllabRunner):
         wordCount = self.SQLQueryService.getTotalWordCount()
         sameSyllabCount = self.SQLQueryService.getIsSameSyllabificationCount()
         percentSame = "{0:.2f}".format(sameSyllabCount / float(wordCount))
-        print "ProbSyllabifier is " + percentSame + "similar to CELEX."
+        print "ProbSyllabifier is " + percentSame + "% similar to CELEX."
 
     def _toASCII(self, wordLst):
         return map(lambda x: x[0].encode('utf-8'), wordLst)

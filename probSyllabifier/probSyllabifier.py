@@ -55,7 +55,7 @@ class ProbSyllabifier:
 
 
     # given an observation string, generates the most likely hidden state.
-    def syllabify(self, observation):
+    def syllabify(self, observation, comparator="NIST"):
         obsLst = self.__makeObsLst(observation)
         if(not (len(obsLst) - 1)): # early return for single phone obs
             return obsLst[0]
@@ -66,7 +66,7 @@ class ProbSyllabifier:
         if(isValid):
             matrixV, matrixP = self.__buildMatrixV(obsLst)
             outputLst = self.__decodeMatrix(matrixV, matrixP, obsLst)
-            finalStr = self.__makeFinalStr(obsLst, outputLst)
+            finalStr = self.__makeFinalStr(obsLst, outputLst, comparator)
 
         else:
             badBigram = problemObs[0] +  " " + problemObs[1]
@@ -273,7 +273,7 @@ class ProbSyllabifier:
 
     # combines the hidden list with the observation list.
     # returns the final string, formed nicely.
-    def __makeFinalStr(self, obsLst, outputLst):
+    def __makeFinalStr(self, obsLst, outputLst, comparator):
         finalStr = ""
         isTruncated = False
 
@@ -284,10 +284,12 @@ class ProbSyllabifier:
             if(outputLst[i][1] == '0' or isTruncated):
                 finalStr += " "
             else:
-                finalStr += " | "
+                if comparator == "NIST":
+                    finalStr += " | "
+                else:
+                    finalStr += "-"
 
-        finalStr += obsLst[len(obsLst) - 1][1]
-        return finalStr
+        return finalStr + obsLst[len(obsLst) - 1][1]
 
 
     # given a list of phonemes, syllabifies all of them.

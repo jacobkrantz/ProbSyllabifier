@@ -5,7 +5,7 @@
         "execute_parameters":"PRAGMA journal_mode = WAL",
         "default_alphabet":"DISC",
         "read_permissions":true,
-        "write_permissions":false,
+        "write_permissions":true,
         "sources":["webCELEX"],
         "protected_tables":["words","pronunciations","syllabifications"]
     },
