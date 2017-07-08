@@ -64,13 +64,13 @@ class SQLQueryService(SQLiteClient):
                 batchLst = []
         return dict(manySyls, **self._syllabifyBatch(batchLst))
 
-    # returns total number of words in the 'words' table: integer
-    def getTotalWordCount(self):
+    # returns total number of words in a given table: integer
+    def getEntryCount(self, tableName):
         self._checkPermissions("read_permissions")
         query = """
-            SELECT Count(Word)
-            FROM words
-            """
+            SELECT COUNT(Word)
+            FROM %s
+            """ % self._scrubParameter(tableName)
         with closing(self.connection.cursor()) as cursor:
             cursor.execute(query)
             return cursor.fetchone()[0]
@@ -78,8 +78,9 @@ class SQLQueryService(SQLiteClient):
     def getIsSameSyllabificationCount(self):
         self._checkPermissions("read_permissions")
         query = """
-            SELECT Count(Same)
+            SELECT COUNT(Word)
             FROM workingresults
+            WHERE Same = 1
             """
         with closing(self.connection.cursor()) as cursor:
             cursor.execute(query)
@@ -97,6 +98,7 @@ class SQLQueryService(SQLiteClient):
         query = """
             SELECT Word
             FROM words
+            WHERE Word NOT LIKE '% %'
             ORDER BY Random()
             """
         with closing(self.connection.cursor()) as cursor:
@@ -118,7 +120,11 @@ class SQLQueryService(SQLiteClient):
 
     def _getCountOfWordEntries(self):
         with closing(self.connection.cursor()) as cursor:
-            cursor.execute("SELECT COUNT (*) FROM words")
+            cursor.execute("""
+                SELECT COUNT (*)
+                FROM words
+                WHERE Word NOT LIKE '% %'
+                """)
             return cursor.fetchone()[0]
 
     def _getBatchPronunciations(self, wordList):

@@ -29,6 +29,7 @@ class ProbSyllabifier:
         self.__hiddenProb = {}
         self.__iMax = 0
         self.__jMax = 0
+        self.__comparator = "NIST"
 
         self.__loadStructures()
 
@@ -38,8 +39,9 @@ class ProbSyllabifier:
     # new file name.
     # param 1: phoneme file in
     # param 2: fileName for syllabification out
-    def syllabifyFile(self, fileIN, fileOUT,comparator):
-        self.sTools = SyllabTools(comparator)
+    def syllabifyFile(self, fileIN, fileOUT,comparator="NIST"):
+        self.__comparator = comparator
+        self.sTools = SyllabTools(self.__comparator)
         self.sTools.inFile = fileIN
         self.sTools.outFile = fileOUT
         self.getExceptionLst # for reset
@@ -56,8 +58,10 @@ class ProbSyllabifier:
 
     # given an observation string, generates the most likely hidden state.
     def syllabify(self, observation, comparator="NIST"):
+        self.__comparator = comparator
         obsLst = self.__makeObsLst(observation)
-        if(not (len(obsLst) - 1)): # early return for single phone obs
+
+        if len(obsLst) == 1: # early return for single phone obs
             return obsLst[0]
 
         obsLst = self.__convertToBigrams(obsLst)
@@ -66,7 +70,7 @@ class ProbSyllabifier:
         if(isValid):
             matrixV, matrixP = self.__buildMatrixV(obsLst)
             outputLst = self.__decodeMatrix(matrixV, matrixP, obsLst)
-            finalStr = self.__makeFinalStr(obsLst, outputLst, comparator)
+            finalStr = self.__makeFinalStr(obsLst, outputLst)
 
         else:
             badBigram = problemObs[0] +  " " + problemObs[1]
@@ -159,19 +163,15 @@ class ProbSyllabifier:
     # given an observation string, appends each phone to a new
     # obersvation list. returns list.
     def __makeObsLst(self, observation):
+        if self.__comparator == "CELEX":
+            return list(observation)
+
         obsLst = []
-        obs = observation.split(' ')
-
-        for phone in obs:
-            if phone[0] == '"':     # *****for removing ' or " at start.
+        for phone in observation.split(' '):
+            if phone[0] in ['"',"'"]:     # remove ' or " at start.
                 phone = phone[1:]
-            elif phone[0] == "'":
-                phone = phone[1:]
-            if phone[-1] == '"':    # for removing from end.
+            if phone[-1] in ['"',"'"]:    # for removing from end.
                 phone = phone[:-1]
-            elif phone[-1] == "'":
-                phone = phone[:-1]
-
             obsLst.append(phone)
 
         return obsLst
@@ -273,7 +273,7 @@ class ProbSyllabifier:
 
     # combines the hidden list with the observation list.
     # returns the final string, formed nicely.
-    def __makeFinalStr(self, obsLst, outputLst, comparator):
+    def __makeFinalStr(self, obsLst, outputLst):
         finalStr = ""
         isTruncated = False
 
@@ -282,9 +282,10 @@ class ProbSyllabifier:
             isTruncated = (i == len(obsLst) - 1)
             finalStr += obsLst[i][0]
             if(outputLst[i][1] == '0' or isTruncated):
-                finalStr += " "
+                if self.__comparator == "NIST":
+                    finalStr += " "
             else:
-                if comparator == "NIST":
+                if self.__comparator == "NIST":
                     finalStr += " | "
                 else:
                     finalStr += "-"

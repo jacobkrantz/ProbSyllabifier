@@ -54,9 +54,9 @@ class SQLiteClient:
         places = ','.join(['?'] * len(dataDict))
         keys = ','.join(dataDict.iterkeys())
         values = tuple(dataDict.itervalues())
-        SQL = """ INSERT INTO %s({}) VALUES ({}) """ % self._scrubParameter(tableName)
+        SQL = """ INSERT INTO %s (%s) VALUES %s """ % (self._scrubParameter(tableName),keys,values)
         with closing(self.connection.cursor()) as cursor:
-            cursor.execute(SQL.format(keys, places), values)
+            cursor.execute(SQL)
             self.connection.commit()
 
     #----------------#

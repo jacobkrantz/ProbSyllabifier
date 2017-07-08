@@ -9,8 +9,6 @@ class CELEX(AbstractSyllabRunner):
     def __init__(self):
         self.SQLQueryService = SQLQueryService("wordformsDB")
         self.ps = ProbSyllabifier()
-        self._trainingSize = 0
-        self._testingSize = 0
         self._trainingSet = set()
         self._testingSet = set()
         self._CSylResultsDict = dict()
@@ -32,21 +30,23 @@ class CELEX(AbstractSyllabRunner):
         testResultsList = self._combineResults(self._PSylResultsDict, self._CSylResultsDict)
         self._fillResultsTable(testResultsList)
         self._compareResults()
+        self._CSylResultsDict = dict()
+        self._PSylResultsDict = dict()
 
     # returns string of syllabified observation
     def syllabify(self, observation):
-        return self.ps.syllabify(observation)
+        return self.ps.syllabify(observation, "CELEX")
 
-    def syllabifyFile(self, fileIN, fileOUT, comparator):
-        self.ps.syllabifyFile(fileIN, fileOUT, comparator)
+    def syllabifyFile(self, fileIN, fileOUT):
+        self.ps.syllabifyFile(fileIN, fileOUT, "CELEX")
 
     #----------------#
     #   "Private"    #
     #----------------#
 
     def _buildSets(self):
-        trainingSize = int(input("enter number of words to train on:"))
-        testingSize = int(input("enter number of words to test on:"))
+        trainingSize = int(input("enter number of words to train on: "))
+        testingSize = int(input("enter number of words to test on: "))
 
         self._trainingSet = self._toASCII(self.SQLQueryService.getWordSubset(trainingSize))
         self._testingSet = self._toASCII(self.SQLQueryService.getWordSubset(testingSize, self._trainingSet))
@@ -54,35 +54,35 @@ class CELEX(AbstractSyllabRunner):
     # builds dictionary of {testWord:syllabification}
     # for self._PSylResultsDict and self._CSylResultsDict
     def _syllabifyTesting(self):
-        if len(self._CSylResultsDict) == 0:
-            self._CSylResultsDict = self.SQLQueryService.getManySyllabifications(self._testingSet)
+        self._CSylResultsDict = self.SQLQueryService.getManySyllabifications(self._testingSet)
         pronunciationsDict = self.SQLQueryService.getManyPronunciations(self._testingSet)
 
-        for wordKey in pronunciationsDict:
-             pronunciation = pronunciationsDict[wordKey]
-             self._PSylResultsDict[wordKey] = self.ps.syllabify(pronunciation)
-             print wordKey, self._PSylResultsDict[wordKey]
+        for word, pronunciation in pronunciationsDict.iteritems():
+             self._PSylResultsDict[word] = self.ps.syllabify(pronunciation, "CELEX")
 
     # returns a list of dictionaries containing
     # definitions for the "workingresults" table
     def _combineResults(self, PResultsDict, CResultsDict):
         testResultsList = []
         for word,PSyllab in PResultsDict.iteritems():
+            if not PSyllab:
+                PSyllab = ""
             CSyllab = CResultsDict[word]
-            isSame = (CSyllab == PSyllab)
+            isSame = int(CSyllab == PSyllab)
             testResultsLine = { "Word":word, "ProbSyl":PSyllab, "CSyl":CSyllab, "Same":isSame }
             testResultsList.append(testResultsLine)
         return testResultsList
 
     def _fillResultsTable(self, testResultsList):
         self.SQLQueryService.truncateTable("workingresults")
-        lambda resultLine: self.SQLQueryService.insertIntoTable("workingresults", resultLine), testResultsList
+        for resultLine in testResultsList:
+            self.SQLQueryService.insertIntoTable("workingresults", resultLine)
 
     # prints out general results comparison from "workingresults" table
     def _compareResults(self):
-        wordCount = self.SQLQueryService.getTotalWordCount()
+        wordCount = self.SQLQueryService.getEntryCount("workingresults")
         sameSyllabCount = self.SQLQueryService.getIsSameSyllabificationCount()
-        percentSame = "{0:.2f}".format(sameSyllabCount / float(wordCount))
+        percentSame = "{0:.2f}".format(100 * sameSyllabCount / float(wordCount))
         print "ProbSyllabifier is " + percentSame + "% similar to CELEX."
 
     def _toASCII(self, wordLst):
