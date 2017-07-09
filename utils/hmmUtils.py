@@ -173,10 +173,10 @@ class HMMUtils:
         for phoneme in phonemeLst:
             for tup in phoneme:
 
-                spot = self.getCategory(tup[0],lang)
-                spot1 = str(tup[2])
-                spot2 = self.getCategory(tup[1],lang)
-                tagString = spot + spot1 + spot2
+                tup[0] = self.getCategory(tup[0],lang)
+                isBoundary = str(tup[2])
+                tup[1] = self.getCategory(tup[1],lang)
+                tagString = tup[0] + isBoundary + tup[1]
                 tup[2] = tagString
 
         return phonemeLst

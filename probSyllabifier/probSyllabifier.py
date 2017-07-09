@@ -1,4 +1,4 @@
-from utils import SyllabTools
+from utils import SyllabTools, HMMUtils
 import numpy as np
 import sys
 from ast import literal_eval
@@ -23,6 +23,7 @@ class ProbSyllabifier:
     # to syllabify a phoneme or a file.
     def __init__(self):
         log.basicConfig(format='%(asctime)s %(levelname)s:%(message)s', datefmt='%X', level=log.INFO)
+        self.hmmUtils = HMMUtils()
         self.__matrixA = self.__loadMatrix('A')
         self.__matrixB = self.__loadMatrix('B')
         self.__exceptionLst = []
@@ -65,14 +66,16 @@ class ProbSyllabifier:
         if len(obsLst) == 1: # early return for single phone obs
             return obsLst[0]
 
+        transcribedObs = self.__transcribePhones(obsLst)
+        transcribedObs = self.__convertToBigrams(transcribedObs)
         obsLst = self.__convertToBigrams(obsLst)
-        isValid, problemObs = self.__isValidObs(obsLst)
+
+        isValid, problemObs = self.__isValidObs(transcribedObs)
 
         if(isValid):
-            matrixV, matrixP = self.__buildMatrixV(obsLst)
-            outputLst = self.__decodeMatrix(matrixV, matrixP, obsLst)
+            matrixV, matrixP = self.__buildMatrixV(transcribedObs)
+            outputLst = self.__decodeMatrix(matrixV, matrixP, transcribedObs)
             finalStr = self.__makeFinalStr(obsLst, outputLst)
-
         else:
             badBigram = problemObs[0] +  " " + problemObs[1]
             log.warning("(%s) does not exist in training set.", badBigram)
@@ -108,7 +111,6 @@ class ProbSyllabifier:
         self.__obsLookup = self.__loadLookup('./HMMFiles/obsLookup.txt')
         self.__obsLookup = self.__fixObsLookup()
         self.__hiddenLookup =self.__loadLookup('./HMMFiles/hiddenLookup.txt')
-
 
     # given a fileName, loads the list that exists inside of it.
     # each line of the file corresponds to a list entry.
@@ -146,9 +148,15 @@ class ProbSyllabifier:
             if phone[-1] in ['"',"'"]:    # for removing from end.
                 phone = phone[:-1]
             obsLst.append(phone)
-
         return obsLst
 
+
+    def __transcribePhones(self, obsLst):
+        if self.__comparator == "NIST":
+            lang = 1
+        else:
+            lang = 2
+        return list(map(lambda x:self.hmmUtils.getCategory(x, lang), obsLst))
 
     # convert obsLst to its bigrams
     def __convertToBigrams(self,obsLst):
