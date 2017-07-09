@@ -120,24 +120,11 @@ class HMMUtils:
     # returns a list of all
     def getBoundLst(self, phonemeLst):
         boundLst = []
-
         for phoneme in phonemeLst:
             for tup in phoneme:
                 boundLst.append(tup[2])
 
         return boundLst
-
-
-    # allBigramTups: [[(phone,phone,int),(...),],[...],]
-    # counts up every tuple in the list of lists. Returns this count
-    def getBoundCount(self, allBigramTups):
-        boundCount = 0
-
-        for phoneme in allBigramTups:
-            for tup in phoneme:
-                boundCount += 1
-
-        return boundCount
 
     #Puts the tagDict into a list
     #This is the label for each of the matrix spots

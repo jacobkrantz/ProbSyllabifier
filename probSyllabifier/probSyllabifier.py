@@ -26,7 +26,6 @@ class ProbSyllabifier:
         self.__exceptionLst = []
         self.__obsLookup = []
         self.__hiddenLookup = []
-        self.__hiddenProb = {}
         self.__iMax = 0
         self.__jMax = 0
         self.__comparator = "NIST"
@@ -118,7 +117,6 @@ class ProbSyllabifier:
         self.__obsLookup = self.__loadLookup('./HMMFiles/obsLookup.txt')
         self.__obsLookup = self.__fixObsLookup()
         self.__hiddenLookup =self.__loadLookup('./HMMFiles/hiddenLookup.txt')
-        self.hiddenProb = self.__loadDictFile('./HMMFiles/hiddenProb.txt')
 
 
     # given a fileName, loads the list that exists inside of it.
@@ -142,22 +140,6 @@ class ProbSyllabifier:
         for obs in self.__obsLookup:
             tmpLst.append(literal_eval(obs))
         return tmpLst
-
-
-    # given a filename, loads the dictionary that exists inside of it.
-    # each line of the file contains the key followed by a space then the
-    # value.
-    def __loadDictFile(self, fileName):
-        tagProb = {}
-        try:
-            tagFile = open(fileName,'r')
-            for line in tagFile:
-                newLine = line.split(' ')
-                tagProb[newLine[0]] = float(newLine[1])
-        except IOError:
-            print(fileName + " does not exist or is corrupt.")
-            sys.exit(0)
-        return tagProb
 
 
     # given an observation string, appends each phone to a new

@@ -84,6 +84,7 @@ class CELEX(AbstractSyllabRunner):
         sameSyllabCount = self.SQLQueryService.getIsSameSyllabificationCount()
         percentSame = "{0:.2f}".format(100 * sameSyllabCount / float(wordCount))
         print "ProbSyllabifier is " + percentSame + "% similar to CELEX."
+        print "To view results, query the 'workingresults' table in 'wordformsDB'."
 
     def _toASCII(self, wordLst):
         return map(lambda x: x[0].encode('utf-8'), wordLst)
