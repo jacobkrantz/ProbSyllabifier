@@ -1,29 +1,32 @@
 from datastore import SQLQueryService
 from probSyllabifier import ProbSyllabifier, HMM
 from utils import AbstractSyllabRunner
+from itertools import islice
 import logging as log
+import threading
 
-# TODO assert against total word count in `buildSets`
+# TODO figure out how to run ProbSyllabifier in multiple threads.
 
 class CELEX(AbstractSyllabRunner):
 
     def __init__(self):
         log.basicConfig(format='%(asctime)s %(levelname)s:%(message)s', datefmt='%X', level=log.INFO)
         self.SQLQueryService = SQLQueryService("wordformsDB")
-        self.ps = ProbSyllabifier()
         self._trainingSet = set()
         self._testingSet = set()
         self._CSylResultsDict = dict()
         self._PSylResultsDict = dict()
 
     def trainHMM(self):
-        self._buildSets()
-        self._CSylResultsDict = self.SQLQueryService.getManySyllabifications(self._trainingSet)
-        syllabifiedList = self._CSylResultsDict.values()
+        trainingSize = int(input("enter number of words to train on: "))
+        testingSize = int(input("enter number of words to test on: "))
+        log.info("Starting step: Building sets.")
+        syllabifiedLst = self._buildSets(trainingSize, testingSize)
+        log.info("Finished step: Building sets.")
 
         log.info("Starting step: Initialize training structures")
-        hmm = HMM(2, syllabifiedList) # lang hack: 2 is celex
-        self._trainingSet = set() # clear memory
+        hmm = HMM(2, syllabifiedLst) # lang hack: 2 is celex
+        self._trainingSet = set()     # clear set from memory
         log.info("Finished step: Initialize training structures")
 
         log.info("Starting step: Train HMM Model")
@@ -51,12 +54,14 @@ class CELEX(AbstractSyllabRunner):
     #   "Private"    #
     #----------------#
 
-    def _buildSets(self):
-        trainingSize = int(input("enter number of words to train on: "))
-        testingSize = int(input("enter number of words to test on: "))
-
+    # Populates testing and training sets.
+    # Computes CELEX syllabification results.
+    # Returns the phonetic syllabifications in a set.
+    def _buildSets(self, trainingSize, testingSize):
         self._trainingSet = self._toASCII(self.SQLQueryService.getWordSubset(trainingSize))
         self._testingSet = self._toASCII(self.SQLQueryService.getWordSubset(testingSize, self._trainingSet))
+        self._CSylResultsDict = self.SQLQueryService.getManySyllabifications(self._trainingSet)
+        return self._CSylResultsDict.values()
 
     # builds dictionary of {testWord:syllabification}
     # for self._PSylResultsDict and self._CSylResultsDict
@@ -68,9 +73,36 @@ class CELEX(AbstractSyllabRunner):
         pronunciationsDict = self.SQLQueryService.getManyPronunciations(self._testingSet)
 
         log.info("Starting step: Syllabify ProbSyllabifier")
+        self.ps = ProbSyllabifier()
+        for word, pronunciation in pronunciationsDict.iteritems():
+            self._PSylResultsDict[word] = self.ps.syllabify(pronunciation, "CELEX")
+        # self._PSylResultsDict = self._asyncProbSyllab(pronunciationsDict, 3)
+        log.info("Finished step: Syllabify ProbSyllabifier")
+
+    '''
+    def _asyncProbSyllab(self, pronunciationsDict, threadCount):
+        threads = []
+        self.resultsDictList = []
+        for i in range(threadCount):
+            self.resultsDictList.append(dict())
+
+        for subDict in splitDict(pronunciationsDict, len(pronunciationsDict)/threadCount):
+            t = threading.Thread(target=self._syllabifyTask, args=(subDict,))
+            threads.append(t)
+            t.start()
+
+    def _syllabifyTask(self, pronunciationsDict):
+        log.info("running a task")
         for word, pronunciation in pronunciationsDict.iteritems():
              self._PSylResultsDict[word] = self.ps.syllabify(pronunciation, "CELEX")
-        log.info("Finished step: Syllabify ProbSyllabifier")
+
+    # generator for splitting a dictionary into multiple dictionaries of
+    # max size SIZE.
+    def splitDict(self, data, SIZE=2500):
+        it = iter(data)
+        for i in xrange(0,len(data), SIZE):
+            yield {k:data[k] for k in islice(it, SIZE)}
+    '''
 
     # returns a list of dictionaries containing
     # definitions for the "workingresults" table

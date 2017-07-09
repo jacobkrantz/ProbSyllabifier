@@ -8,7 +8,6 @@ class NIST(AbstractSyllabRunner):
     def __init__(self):
         self.NISTClient = NISTClient()
         self.cNIST = CompareNIST()
-        self.ps = ProbSyllabifier()
         self._lang = 1 # 1 == NIST, needed for HMM. outdated.
 
     def trainHMM(self):
@@ -16,6 +15,7 @@ class NIST(AbstractSyllabRunner):
         self._trainHMM()
 
     def testHMM(self):
+        self.ps = ProbSyllabifier()
         testIN = "./corpusFiles/testSet.txt"
         testOUT = "./HMMFiles/probSyllabs.txt"
         self.ps.syllabifyFile(testIN, testOUT,"NIST")
@@ -30,10 +30,18 @@ class NIST(AbstractSyllabRunner):
 
     # returns string of syllabified observation
     def syllabify(self, observation):
-        return self.ps.syllabify(observation)
+        try:
+            return self.ps.syllabify(observation)
+        except:
+            self.ps = ProbSyllabifier()
+            return self.ps.syllabify(observation)
 
     def syllabifyFile(self, fileIN, fileOUT, comparator="NIST"):
-        self.ps.syllabifyFile(fileIN, fileOUT, comparator)
+        try:
+            self.ps.syllabifyFile(fileIN, fileOUT, comparator)
+        except:
+            self.ps = ProbSyllabifier()
+            self.ps.syllabifyFile(fileIN, fileOUT, comparator)
 
     #----------------#
     #   "Private"    #

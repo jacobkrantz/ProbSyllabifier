@@ -99,7 +99,8 @@ class HMMUtils:
         if(lang == 1):
             inFile = open("HMMFiles/phoneCategoriesArp.txt",'r')
         else:
-            inFile = open("HMMFiles/phoneCategoriesDISC.txt",'r')
+            # inFile = open("HMMFiles/phoneCategoriesDISC.txt",'r')
+            inFile = open("HMMFiles/phoneTranscriptionsDISC.txt",'r')
         tags = []
 
         for line in inFile:
