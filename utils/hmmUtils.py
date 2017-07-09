@@ -24,17 +24,11 @@ class HMMUtils:
     # to a txt file under the provided name.
     def outputMatrix(self, matrix, which):
         if(which == "A"):
-
             np.savetxt("HMMFiles/MatrixA.txt",matrix, newline = '\n',header = "matrixA", fmt = '%.5f')
-            print ("Matrix A outputted to: HMMFiles/MatrixA.txt")
-
         elif(which == "B"):
-
             np.savetxt("HMMFiles/MatrixB.txt",matrix, newline = '\n',header = "matrixB", fmt = '%.5f')
-            print ("Matrix B outputted to: HMMFiles/MatrixB.txt")
-
         else:
-            print ("'" + which + "'' does not match any option.")
+            raise TypeError("'" + which + "'' does not match any option.")
 
 
     # given the name of a file, imports a matrix using the numpy tool.

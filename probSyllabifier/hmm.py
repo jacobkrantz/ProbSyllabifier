@@ -113,8 +113,6 @@ class HMM:
         self.numBigrams = len(self.bigramLookup)
         self.bigramFreqDict = self.utils.getBigramFreqDict(self.allBigramTups, self.numBigrams)
         self._filesDidLoad()
-        print "Files loaded for matrix construction."
-
 
     # inserts the count of a tag given the previous tag
     # populates matrixA with these values after normalizing the

@@ -75,12 +75,25 @@ class SQLQueryService(SQLiteClient):
             cursor.execute(query)
             return cursor.fetchone()[0]
 
-    def getIsSameSyllabificationCount(self):
+    def getIsSameSyllabificationCount(self, ignoreSkipped=False):
         self._checkPermissions("read_permissions")
+        whereProbSylNotEmpty = 'AND ProbSyl != ""' if ignoreSkipped else ""
         query = """
             SELECT COUNT(Word)
             FROM workingresults
             WHERE Same = 1
+            """
+        with closing(self.connection.cursor()) as cursor:
+            cursor.execute(query)
+            return cursor.fetchone()[0]
+
+    def getSkippedProbSylCount(self):
+        self._checkPermissions("read_permissions")
+        query = """
+            SELECT COUNT(Word)
+            FROM workingresults
+            WHERE Same = 0
+                AND ProbSyl = ""
             """
         with closing(self.connection.cursor()) as cursor:
             cursor.execute(query)

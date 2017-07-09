@@ -1,12 +1,14 @@
 from datastore import SQLQueryService
 from probSyllabifier import ProbSyllabifier, HMM
 from utils import AbstractSyllabRunner
+import logging as log
 
 # TODO assert against total word count in `buildSets`
 
 class CELEX(AbstractSyllabRunner):
 
     def __init__(self):
+        log.basicConfig(format='%(asctime)s %(levelname)s:%(message)s', datefmt='%X', level=log.INFO)
         self.SQLQueryService = SQLQueryService("wordformsDB")
         self.ps = ProbSyllabifier()
         self._trainingSet = set()
@@ -18,12 +20,17 @@ class CELEX(AbstractSyllabRunner):
         self._buildSets()
         self._CSylResultsDict = self.SQLQueryService.getManySyllabifications(self._trainingSet)
         syllabifiedList = self._CSylResultsDict.values()
+
+        log.info("Starting step: Initialize training structures")
         hmm = HMM(2, syllabifiedList) # lang hack: 2 is celex
         self._trainingSet = set() # clear memory
+        log.info("Finished step: Initialize training structures")
 
+        log.info("Starting step: Train HMM Model")
         hmm.buildMatrixA() # "./HMMFiles/MatrixA.txt"
         hmm.buildMatrixB() # "./HMMFiles/MatrixB.txt"
         hmm.makeViterbiFiles()
+        log.info("Finished step: Train HMM Model")
 
     def testHMM(self):
         self._syllabifyTesting()
@@ -54,11 +61,16 @@ class CELEX(AbstractSyllabRunner):
     # builds dictionary of {testWord:syllabification}
     # for self._PSylResultsDict and self._CSylResultsDict
     def _syllabifyTesting(self):
+        log.info("Starting step: Syllabify CELEX")
         self._CSylResultsDict = self.SQLQueryService.getManySyllabifications(self._testingSet)
+        log.info("Finished step: Syllabify CELEX")
+
         pronunciationsDict = self.SQLQueryService.getManyPronunciations(self._testingSet)
 
+        log.info("Starting step: Syllabify ProbSyllabifier")
         for word, pronunciation in pronunciationsDict.iteritems():
              self._PSylResultsDict[word] = self.ps.syllabify(pronunciation, "CELEX")
+        log.info("Finished step: Syllabify ProbSyllabifier")
 
     # returns a list of dictionaries containing
     # definitions for the "workingresults" table
@@ -82,9 +94,15 @@ class CELEX(AbstractSyllabRunner):
     def _compareResults(self):
         wordCount = self.SQLQueryService.getEntryCount("workingresults")
         sameSyllabCount = self.SQLQueryService.getIsSameSyllabificationCount()
+        skippedSyllabCount = self.SQLQueryService.getSkippedProbSylCount()
         percentSame = "{0:.2f}".format(100 * sameSyllabCount / float(wordCount))
+        ignoredPercentSame = "{0:.2f}".format(100 * sameSyllabCount / float(wordCount - skippedSyllabCount))
+
+        print "\n----------------------------------------"
         print "ProbSyllabifier is " + percentSame + "% similar to CELEX."
+        print "Ignoring",skippedSyllabCount,"skips:",ignoredPercentSame,"%"
         print "To view results, query the 'workingresults' table in 'wordformsDB'."
+        print "----------------------------------------"
 
     def _toASCII(self, wordLst):
         return map(lambda x: x[0].encode('utf-8'), wordLst)

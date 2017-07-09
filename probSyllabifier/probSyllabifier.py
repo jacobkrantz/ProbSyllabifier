@@ -2,6 +2,7 @@ from utils import SyllabTools
 import numpy as np
 import sys
 from ast import literal_eval
+import logging as log
 
 '''
 fileName:       ProbSyllabifier.py
@@ -21,6 +22,7 @@ class ProbSyllabifier:
     # initializes all data structures necessary
     # to syllabify a phoneme or a file.
     def __init__(self):
+        log.basicConfig(format='%(asctime)s %(levelname)s:%(message)s', datefmt='%X', level=log.INFO)
         self.__matrixA = self.__loadMatrix('A')
         self.__matrixB = self.__loadMatrix('B')
         self.__exceptionLst = []
@@ -73,21 +75,10 @@ class ProbSyllabifier:
 
         else:
             badBigram = problemObs[0] +  " " + problemObs[1]
-            #print("Error: '" + badBigram + "' does not exist in training set.")
-            self.__exceptionLst.append(badBigram)
+            log.warning("(%s) does not exist in training set.", badBigram)
             return []
 
         return finalStr
-
-
-    # returns a list containing all bigrams that were not present in the
-    # training set. Also resets the exception list.
-    def getExceptionLst(self):
-        allExceptions = list(self.__exceptionLst)
-        self.__exceptionLst= []
-
-        return allExceptions
-
 
     # ------------------------------------------------------
     # helper functions below
