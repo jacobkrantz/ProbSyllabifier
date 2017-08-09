@@ -1,6 +1,7 @@
 from celex import CELEX
 from nist import NIST
 import sys
+import json
 
 '''
 fileName:       run.py
@@ -45,7 +46,7 @@ def help():
     print "     To return to the main menu, hit enter with no input."
 
 #gets the type of syllabifaction that the user wants to do
-def getComparator():
+def getComparator(config):
     comparatorId = 0
     while comparatorId not in [1,2]:
         print("\n" + color.BOLD + "Main Menu" + color.END)
@@ -56,7 +57,12 @@ def getComparator():
             comparatorId = int(input())
         except:
             comparatorId = 0
-    return "NIST" if comparatorId == 1 else "CELEX"
+
+    comparator = "NIST" if comparatorId == 1 else "CELEX"
+    config["comparator"] = comparator
+    with open('config.json','w') as outfile:
+        json.dump(config, outfile, sort_keys = True, indent = 4)
+    return comparator
 
 #Ensures that alphabets
 def isLegalSelection(curComparator, trainedComparator, selection):
@@ -64,15 +70,21 @@ def isLegalSelection(curComparator, trainedComparator, selection):
         return True
     print "HMM trained in other Comparator. Try retraining"
 
+def loadConfiguration():
+    with open('config.json') as json_data_file:
+        data = json.load(json_data_file)
+    return data
+
 def main():
     nist = NIST()
     celex = CELEX()
+    config = loadConfiguration()
     print "----------------------------------------"
     print "Welcome to the Probabilistic Syllabifier"
     print "----------------------------------------"
 
-    comparator = getComparator()
-    trainedComparator = "CELEX" # assumes CELEX (bad- should be in config file)
+    comparator = config["comparator"]
+    trainedComparator = config["comparator"]
     choice = 0
     while(choice != 6):
         print("\n" + color.BOLD + "Main Menu"+ color.END)
@@ -105,7 +117,7 @@ Choose an option:
             nist.testHMM() if comparator == "NIST" else celex.testHMM()
 
         elif(choice == 4):
-            comparator = getComparator()
+            comparator = getComparator(config)
 
         elif(choice == 5):
             help()
