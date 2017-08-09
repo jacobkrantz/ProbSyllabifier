@@ -1,8 +1,7 @@
 # ProbSyllabifier
 Probabilistic syllabifier of English language using HMM.
-Word sets generated using Brown Corpus with custom tokenization
-Currently training from NIST and testing on NIST with Arpabet.
-In the next beta it be able to be trained from CELEX on IPA
+Trains and tests against the CELEX dataset using DISC, a phonetic transcription similar to IPA.
+Also trains and tests against NIST with Arpabet. Word sets for NIST are generated using the Brown Corpus with custom tokenization.
 
 ---
 ### Syllabification
@@ -59,9 +58,6 @@ every untokenized word in the Editorials category of the Brown corpus
 1000 most frequently used words in the brown corpus  
 *randomWords.txt*  
 random selection of 20 words from freq_words.txt  
-
-
-*Note: attempt0 stores our first attempt at doing this with the HMM's*
 
 #### Observations and Future Ideas
 What if we built a support vector machine from this?
