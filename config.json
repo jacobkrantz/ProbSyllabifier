@@ -1,38 +1,40 @@
 {
     "SQLite3": {
         "affinities": [
-            "TEXT", 
-            "NUMERIC", 
-            "INTEGER", 
-            "REAL", 
+            "TEXT",
+            "NUMERIC",
+            "INTEGER",
+            "REAL",
             "NONE"
-        ], 
+        ],
         "datatypes": [
-            "NULL", 
-            "INTEGER", 
-            "REAL", 
-            "TEXT", 
+            "NULL",
+            "INTEGER",
+            "REAL",
+            "TEXT",
             "BLOB"
         ]
-    }, 
-    "comparator": "CELEX", 
+    },
+    "comparator": "CELEX",
     "dataLoader": {
         "databaseContext": "wordformsDB"
-    }, 
+    },
+    "CelexTranscriptionFile":"HMMFiles/phoneTranscriptionsDISC2.txt",
+    "NistTranscriptionFile":"HMMFiles/phoneCategoriesArp.txt",
     "wordformsDB": {
-        "check_same_thread": false, 
-        "default_alphabet": "DISC", 
-        "execute_parameters": "PRAGMA journal_mode = WAL", 
-        "path": "../wordforms.db", 
+        "check_same_thread": false,
+        "default_alphabet": "DISC",
+        "execute_parameters": "PRAGMA journal_mode = WAL",
+        "path": "../wordforms.db",
         "protected_tables": [
-            "words", 
-            "pronunciations", 
+            "words",
+            "pronunciations",
             "syllabifications"
-        ], 
-        "read_permissions": true, 
+        ],
+        "read_permissions": true,
         "sources": [
             "webCELEX"
-        ], 
+        ],
         "write_permissions": true
     }
 }
