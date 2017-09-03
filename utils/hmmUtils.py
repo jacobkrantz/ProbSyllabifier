@@ -1,4 +1,5 @@
 from syllabParser import SyllabParser
+import json
 import numpy as np
 import sys
 
@@ -13,6 +14,8 @@ class HMMUtils:
 
     def __init__(self):
         self.sylParser = SyllabParser()
+        with open('config.json') as json_data_file:
+            self.config = json.load(json_data_file)
 
     # intialize a matrix using numpy with provided size: (X,Y)
     # returns matrix
@@ -97,11 +100,9 @@ class HMMUtils:
         # returns as a list of lists.
     def getTagNames(self,lang):
         if(lang == 1):
-            inFile = open("HMMFiles/phoneCategoriesArp.txt",'r')
+            inFile = open(self.config["NistTranscriptionFile"], 'r')
         else:
-            #inFile = open("HMMFiles/phoneCategoriesDISC.txt",'r')
-            #inFile = open("HMMFiles/phoneTranscriptionsDISC.txt",'r')
-            inFile = open("HMMFiles/phoneTranscriptionsDISC2.txt",'r')
+            inFile = open(self.config["CelexTranscriptionFile"], 'r')
         tags = []
 
         for line in inFile:
