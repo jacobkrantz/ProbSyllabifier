@@ -1,4 +1,6 @@
 {
+    "CelexTranscriptionFile": "HMMFiles/DISC4.txt",
+    "NistTranscriptionFile": "HMMFiles/phoneCategoriesArp.txt",
     "SQLite3": {
         "affinities": [
             "TEXT",
@@ -19,8 +21,6 @@
     "dataLoader": {
         "databaseContext": "wordformsDB"
     },
-    "CelexTranscriptionFile":"HMMFiles/phoneTranscriptionsDISC2.txt",
-    "NistTranscriptionFile":"HMMFiles/phoneCategoriesArp.txt",
     "wordformsDB": {
         "check_same_thread": false,
         "default_alphabet": "DISC",
