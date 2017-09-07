@@ -36,5 +36,23 @@
             "webCELEX"
         ],
         "write_permissions": true
+    },
+    "GeneticAlgorithm": {
+      "InitialPopulationSize": 60,
+      "PopulationSize": 30,
+      "MutationFactor": 0.05,
+      "NumEvolutions": 100,
+      "NumCategories": 12,
+      "GeneList": [ "m", "F", "n", "N", "C",
+                    "H", "p", "b", "t", "d",
+                    "k", "g", "J", "_", "f",
+                    "v", "T", "D", "s", "z",
+                    "S", "Z", "x", "h", "j",
+                    "w", "r", "R", "l", "P",
+                    "6", "7", "i", "u", "I",
+                    "U", "1", "5", "@", "E",
+                    "3", "V", "$", "9", "4",
+                    "8", "{", "c", "#", "Q",
+                    "2", "q", "0", "~"]
     }
 }
