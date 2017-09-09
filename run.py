@@ -6,12 +6,10 @@ import json
 '''
 fileName:       run.py
 Authors:        Jacob Krantz, Max Dulin
-Date Modified:  3/14/17
+Date Modified:  8/17
 
-- main file to run entire program
-- Syllabifies a file using NIST
-- capable of running full suite of tools with NIST
-- CELEX soon to be operational
+- main file to run entire machine
+- Syllabifies a file using NIST or CELEX
 '''
 class color:
     YELLOW = '\033[93m'
