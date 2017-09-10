@@ -25,4 +25,5 @@ def optimize():
     ga.initializePopulation()
     ga.evolve()
 
+
 optimize()

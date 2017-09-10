@@ -68,7 +68,7 @@ class GeneticAlgorithm:
             self.__mutate()
             self.__computeFitness()
             self.__sort()
-            self.__saveMostFitChromosome(evolutionCount)
+            #self.__saveMostFitChromosome(evolutionCount)
             self.__displayPopulation(evolutionCount)
             evolutionCount += 1
 

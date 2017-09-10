@@ -15,7 +15,7 @@ class Chromosome:
     # structure of chromosome is still in flux
     def __init__(self, numCategories):
         self.genes = self.initGenes(numCategories)
-        self.fitness = 0.00
+        self.fitness = float(0.00)
 
     # for sorting a collection of chromosomes. Pythonic beauty.
     def __lt__(self, other):
@@ -31,10 +31,10 @@ class Chromosome:
         return self.genes
 
     def getFitness(self):
-        return self.fitness
+        return float(self.fitness)
 
     def setFitness(self, newFitness):
-        self.fitness = newFitness
+        self.fitness = float(newFitness)
 
     # inserts a gene into a specified category.
     # removes gene from previous category it was in.
@@ -54,3 +54,12 @@ class Chromosome:
                     self.genes[i].remove(gene)
                     return True
         return False
+
+    #gets the location, starting from 0, of the phone in the category scheme
+    def getCategory(self,phone):
+        count = 0
+        for category in self.genes:
+            if(phone in category):
+                return count
+            else:
+                count = count + 1
