@@ -61,7 +61,7 @@ class HMMUtils:
     # looking up what type of consonant or vowel each phone belongs to.
     # returns a dictionary of [tag]: [number of occurances]
     # also returns a lookup list for matrix indices.
-    def getTagLookup(self, allBigramTups,lang):
+    def getTagLookup(self, allBigramTups, lang, transciptionScheme=[]):
         category1 = ''
         category2 = ''
         tagDict = {}
@@ -69,8 +69,8 @@ class HMMUtils:
 
         for phoneme in allBigramTups:
             for tup in phoneme:
-                category1 = self.getCategory(tup[0],lang)
-                category2 = self.getCategory(tup[1],lang)
+                category1 = self.getCategory(tup[0], lang, transciptionScheme)
+                category2 = self.getCategory(tup[1], lang, transciptionScheme)
                 tagString = category1 + str(tup[2]) + category2
                 tagLookup.add(tagString)
                 if tagString in tagDict:
@@ -81,8 +81,16 @@ class HMMUtils:
         return tagDict, list(tagLookup)
 
 
-    # returns the category that the phone belongs to
-    def getCategory(self, phone,lang):
+    # returns the category that the phone belongs to.
+    # transciptionScheme is for CELEX used in GA
+    def getCategory(self, phone,lang, transciptionScheme=[]):
+        if transciptionScheme:
+            for category in transciptionScheme:
+                if phone in category:
+                    # return an ascii character starting at 'a'
+                    return chr(transciptionScheme.index(category) + 97)
+            raise LookupError(phone + " not found in tagset.")
+
         cat = ""
         tagNames = self.getTagNames(lang)
         if lang == 1:
@@ -167,17 +175,17 @@ class HMMUtils:
     # expands the tagset to have vowel/consonant
     # knowledge in place of boundary 1 or 0.
     # returns the adjusted phoneme list
-    def expandTags(self, phonemeLst,lang):
+    def expandTags(self, phonemeLst,lang, transciptionScheme=[]):
         spot = ''
         spot1 = ''
         spot2 = ''
 
         for phoneme in phonemeLst:
             for tup in phoneme:
-
-                tup[0] = self.getCategory(tup[0],lang)
+                #print tup[0], tup[1]
+                tup[0] = self.getCategory(tup[0],lang,transciptionScheme)
                 isBoundary = str(tup[2])
-                tup[1] = self.getCategory(tup[1],lang)
+                tup[1] = self.getCategory(tup[1],lang,transciptionScheme)
                 tagString = tup[0] + isBoundary + tup[1]
                 tup[2] = tagString
 

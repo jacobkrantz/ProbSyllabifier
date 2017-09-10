@@ -10,5 +10,11 @@ Contains the workings for mating together the population.
 - returns the new population, the same size as passed in. Unordered.
 '''
 
-class Mate:
-    pass
+class Mating:
+
+    def __init__(self, config):
+        self.config = config
+
+    # performs as specified in above header
+    def crossover(self, population):
+        return population

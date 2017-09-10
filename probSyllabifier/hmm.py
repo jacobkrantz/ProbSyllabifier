@@ -16,10 +16,12 @@ class HMM:
 
     # lang = 1 for NIST.
     # lang = 2 for CELEX. `trainingSet` must be populated for CELEX.
-    def __init__(self,lang, trainingSet=[]):
+    # transciptionScheme should be [] if not used.
+    def __init__(self,lang, transciptionScheme, trainingSet=[]):
         self.utils = HMMUtils()
         self.lang = lang
         self.allBigramTups = self._loadTrainingData(trainingSet)
+        self.transciptionScheme = transciptionScheme
         self.boundFreqDict = {}
         self.tagDict       = {}
         self.bigramLookup  = []
@@ -107,8 +109,9 @@ class HMM:
     def __loadFiles(self):
         if len(self.tagDict) != 0:
             assert(False)
-        self.tagDict, self.tagLookup = self.utils.getTagLookup(self.allBigramTups,self.lang)
-        self.allBigramTups = self.utils.expandTags(self.allBigramTups,self.lang)
+        self.tagDict, self.tagLookup = self.utils.getTagLookup(self.allBigramTups,self.lang, self.transciptionScheme)
+        self.allBigramTups = self.utils.expandTags(self.allBigramTups,self.lang,self.transciptionScheme)
+        #print self.allBigramTups
         self.bigramLookup = self.utils.getBigramLookup(self.allBigramTups)
         self.numBigrams = len(self.bigramLookup)
         self.bigramFreqDict = self.utils.getBigramFreqDict(self.allBigramTups, self.numBigrams)
@@ -177,6 +180,8 @@ class HMM:
                 MatrixB[i,j] = MatrixB[i,j] / float(bigramProb)
 
         return MatrixB
+
+
 
 
     # called to ensure class structures are all loaded. Fail fast.

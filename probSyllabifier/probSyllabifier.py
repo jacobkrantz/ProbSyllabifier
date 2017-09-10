@@ -21,7 +21,7 @@ class ProbSyllabifier:
 
     # initializes all data structures necessary
     # to syllabify a phoneme or a file.
-    def __init__(self):
+    def __init__(self, transciptionScheme=[]):
         log.basicConfig(format='%(asctime)s %(levelname)s:%(message)s', datefmt='%X', level=log.INFO)
         self.hmmUtils = HMMUtils()
         self.__matrixA = self.__loadMatrix('A')
@@ -32,6 +32,7 @@ class ProbSyllabifier:
         self.__iMax = 0
         self.__jMax = 0
         self.__comparator = "NIST"
+        self.transciptionScheme = transciptionScheme
 
         self.__loadStructures()
 
@@ -156,7 +157,7 @@ class ProbSyllabifier:
             lang = 1
         else:
             lang = 2
-        return list(map(lambda x:self.hmmUtils.getCategory(x, lang), obsLst))
+        return list(map(lambda x:self.hmmUtils.getCategory(x, lang, self.transciptionScheme), obsLst))
 
     # convert obsLst to its bigrams
     def __convertToBigrams(self,obsLst):
