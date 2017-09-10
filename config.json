@@ -38,11 +38,13 @@
         "write_permissions": true
     },
     "GeneticAlgorithm": {
-      "InitialPopulationSize": 60,
-      "PopulationSize": 30,
+      "InitialPopulationSize": 20,
+      "PopulationSize": 10,
       "MutationFactor": 0.05,
       "NumEvolutions": 100,
       "NumCategories": 12,
+      "TrainingSizeHMM": 500,
+      "TestingSizeHMM" : 20,
       "GeneList": [ "m", "F", "n", "N", "C",
                     "H", "p", "b", "t", "d",
                     "k", "g", "J", "_", "f",

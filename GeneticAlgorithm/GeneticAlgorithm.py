@@ -1,3 +1,4 @@
+from celex import CELEX
 from Chromosome import Chromosome
 from Mating import Mate
 from random import randint
@@ -16,6 +17,7 @@ class GeneticAlgorithm:
         # population will hold a list of chromosomes
         self.population = []
         self.config = config
+        self.celex = CELEX()
 
     # displays all GeneticAlgorithm parameters to the console
     def displayParameters(self):
@@ -62,9 +64,14 @@ class GeneticAlgorithm:
     # compute the fitness of all chromosomes in the population by
     #   running the ProbSyllabifier.
     # sets Chromosome.fitness equal to syllabification accuracy.
-    # should this be calculated here or in Chromosome?
     def computeFitness(self):
-        pass
+        trainSize = self.config["TrainingSizeHMM"]
+        testSize = self.config["TestingSizeHMM"]
+        for i in range(len(self.population)):
+            genes = self.population[i].getGenes()
+            self.celex.trainHMM(trainSize, testSize, genes)
+            fitness = self.celex.testHMM(genes)
+            self.population[i].setFitness(fitness)
 
     # sort self.population by fitness (syllabification accurracy)
     # ordering: highest (self.population[0]) -> lowest

@@ -30,16 +30,17 @@ class Chromosome:
     def getGenes(self):
         return self.genes
 
+    def getFitness(self):
+        return self.fitness
+
+    def setFitness(self, newFitness):
+        self.fitness = newFitness
+
     # inserts a gene into a specified category.
     # removes gene from previous category it was in.
     def insertIntoCategory(self, categoryNumber, gene):
         self.removeGene(gene)
         self.genes[categoryNumber].append(gene)
-
-    # should the individual chromosome fitness be calculated
-    # here or in GeneticAlgorithm?
-    def comuteFitness(self):
-        pass
 
     #----------------#
     #   "Private"    #

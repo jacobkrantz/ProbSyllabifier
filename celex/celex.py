@@ -17,15 +17,18 @@ class CELEX(AbstractSyllabRunner):
         self._CSylResultsDict = dict()
         self._PSylResultsDict = dict()
 
-    def trainHMM(self):
+    def InputTrainHMM(self):
         trainingSize = int(input("enter number of words to train on: "))
         testingSize = int(input("enter number of words to test on: "))
+        self.trainHMM(trainingSize, testingSize)
+
+    def trainHMM(self, trainingSize, testingSize, transciptionScheme=[]):
         log.info("Starting step: Building sets.")
         syllabifiedLst = self._buildSets(trainingSize, testingSize)
         log.info("Finished step: Building sets.")
 
         log.info("Starting step: Initialize training structures")
-        hmm = HMM(2, syllabifiedLst) # lang hack: 2 is celex
+        hmm = HMM(2, transciptionScheme, syllabifiedLst) # lang hack: 2 is celex
         self._trainingSet = set()     # clear set from memory
         log.info("Finished step: Initialize training structures")
 
@@ -35,13 +38,14 @@ class CELEX(AbstractSyllabRunner):
         hmm.makeViterbiFiles()
         log.info("Finished step: Train HMM Model")
 
-    def testHMM(self):
-        self._syllabifyTesting()
+    def testHMM(self, transciptionScheme=[]):
+        self._syllabifyTesting(transciptionScheme)
         testResultsList = self._combineResults(self._PSylResultsDict, self._CSylResultsDict)
         self._fillResultsTable(testResultsList)
-        self._compareResults()
+        percentAccuracy = self._compareResults()
         self._CSylResultsDict = dict()
         self._PSylResultsDict = dict()
+        return percentAccuracy
 
     # returns string of syllabified observation
     def syllabify(self, observation):
@@ -65,7 +69,7 @@ class CELEX(AbstractSyllabRunner):
 
     # builds dictionary of {testWord:syllabification}
     # for self._PSylResultsDict and self._CSylResultsDict
-    def _syllabifyTesting(self):
+    def _syllabifyTesting(self,transciptionScheme=[]):
         log.info("Starting step: Syllabify CELEX")
         self._CSylResultsDict = self.SQLQueryService.getManySyllabifications(self._testingSet)
         log.info("Finished step: Syllabify CELEX")
@@ -73,36 +77,10 @@ class CELEX(AbstractSyllabRunner):
         pronunciationsDict = self.SQLQueryService.getManyPronunciations(self._testingSet)
 
         log.info("Starting step: Syllabify ProbSyllabifier")
-        self.ps = ProbSyllabifier()
+        self.ps = ProbSyllabifier(transciptionScheme)
         for word, pronunciation in pronunciationsDict.iteritems():
             self._PSylResultsDict[word] = self.ps.syllabify(pronunciation, "CELEX")
-        # self._PSylResultsDict = self._asyncProbSyllab(pronunciationsDict, 3)
         log.info("Finished step: Syllabify ProbSyllabifier")
-
-    '''
-    def _asyncProbSyllab(self, pronunciationsDict, threadCount):
-        threads = []
-        self.resultsDictList = []
-        for i in range(threadCount):
-            self.resultsDictList.append(dict())
-
-        for subDict in splitDict(pronunciationsDict, len(pronunciationsDict)/threadCount):
-            t = threading.Thread(target=self._syllabifyTask, args=(subDict,))
-            threads.append(t)
-            t.start()
-
-    def _syllabifyTask(self, pronunciationsDict):
-        log.info("running a task")
-        for word, pronunciation in pronunciationsDict.iteritems():
-             self._PSylResultsDict[word] = self.ps.syllabify(pronunciation, "CELEX")
-
-    # generator for splitting a dictionary into multiple dictionaries of
-    # max size SIZE.
-    def splitDict(self, data, SIZE=2500):
-        it = iter(data)
-        for i in xrange(0,len(data), SIZE):
-            yield {k:data[k] for k in islice(it, SIZE)}
-    '''
 
     # returns a list of dictionaries containing
     # definitions for the "workingresults" table
@@ -123,6 +101,7 @@ class CELEX(AbstractSyllabRunner):
             self.SQLQueryService.insertIntoTable("workingresults", resultLine)
 
     # prints out general results comparison from "workingresults" table
+    # returns percent accuracy.
     def _compareResults(self):
         wordCount = self.SQLQueryService.getEntryCount("workingresults")
         sameSyllabCount = self.SQLQueryService.getIsSameSyllabificationCount()
@@ -135,6 +114,7 @@ class CELEX(AbstractSyllabRunner):
         print "Ignoring",skippedSyllabCount,"skips:",ignoredPercentSame,"%"
         print "To view results, query the 'workingresults' table in 'wordformsDB'."
         print "----------------------------------------"
+        return percentSame
 
     def _toASCII(self, wordLst):
         return map(lambda x: x[0].encode('utf-8'), wordLst)

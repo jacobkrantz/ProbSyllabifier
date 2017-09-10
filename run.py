@@ -105,7 +105,7 @@ Choose an option:
                 choice = 0
 
         if(choice == 1):
-            nist.trainHMM() if comparator == "NIST" else celex.trainHMM()
+            nist.trainHMM() if comparator == "NIST" else celex.InputTrainHMM()
             trainedComparator = comparator
 
         elif(choice == 2):
