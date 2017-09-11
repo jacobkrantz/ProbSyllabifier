@@ -28,8 +28,9 @@ class Mating:
     #selects the population to continue on living
     def selection(self,population):
         amount = len(population)/2
+        print(len(population)),"Len of pop"
+        print amount, "Value of amount"
         temporaryPopulation = len(population)
-
 
         for i in range(self.config["NumMatingPairs"]):
 
@@ -61,9 +62,6 @@ class Mating:
             self.newPopulation.append(self.matePair(mother,father))
             self.newPopulation.append(self.matePair(mother,father))
 
-
-
-            #this is -1 and not -2 because the amount is cut in half in the beginnning
             amount = amount - 2
         return
 
