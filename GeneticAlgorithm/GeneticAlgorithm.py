@@ -2,11 +2,13 @@ from celex import CELEX
 from Chromosome import Chromosome
 from Mating import Mating
 from random import randint
+import shutil
+import os
 import copy
 '''
 fileName:       GeneticAlgorithm.py
-Authors:        Jacob Krantz
-Date Modified:  9/7/17
+Authors:        Jacob Krantz,Maxwell Dulin
+Date Modified:  9/10/17
 
 Library for all Genetic Algorithm functionality.
 This should be the only class referenced outside this module
@@ -15,7 +17,7 @@ This should be the only class referenced outside this module
 class GeneticAlgorithm:
 
     def __init__(self, config):
-        # population will hold a list of chromosomes
+        # population holds a list of chromosomes
         self.population = []
         self.config = config
         self.celex = CELEX()
@@ -54,26 +56,57 @@ class GeneticAlgorithm:
             for gene in self.config["GeneList"]:
                 randomCategory = randint(0, self.config["NumCategories"] - 1)
                 newChromosome.insertIntoCategory(randomCategory, gene)
-                newChromosome.setFitness(0)
+
             self.population.append(newChromosome)
         self.__computeFitness()
         self.__sort()
 
-        self.__displayPopulation(0)
+    # pulls an existing population from an evolution log file.
+    def importPopulation(self, resumeFrom):
+        location = self.config["LogFileLocation"]
+        fileName = location + "evo" + str(resumeFrom) + ".log"
+
+        with open(fileName, 'r') as inFile:
+            for line in inFile:
+                genes = line.split('\t')
+                newChromosome = Chromosome(self.config["NumCategories"])
+                for i in range(len(genes) - 1):
+                    for gene in genes[i]:
+                        newChromosome.insertIntoCategory(i, gene)
+                self.population.append(newChromosome)
+
+        self.__computeFitness()
+        self.__displayPopulation(resumeFrom)
+
+    # Move current logs to the archive.
+    # Each run is kept under unique folder.
+    # Creates directories when necessary.
+    def archiveLogs(self):
+        source = self.config["LogFileLocation"]
+        destination = source + "Archive/"
+
+        if not os.path.exists(source):
+            os.makedirs(source)
+        if not os.path.exists(destination):
+            os.makedirs(destination)
+
+        if len(os.listdir(source)) > 1:
+            specificFolder = destination + str(len(os.listdir(destination))) + '/'
+            os.makedirs(specificFolder)
+            for f in os.listdir(source):
+                if ".log" in f:
+                    shutil.move(source + f, specificFolder)
 
     # 1 evolution: mate the population, mutates them, computes their accuracy,
     # sort by accuracy, and save the best to the file.
     # Repeat evolutions as specified in config.json.
-    def evolve(self):
-        evolutionCount = 0
+    def evolve(self, evolutionCount = 0):
         while evolutionCount < self.config["NumEvolutions"]:
-            self.__displayPopulation(evolutionCount)
-            self.population = self.mating.crossover(copy.deepcopy(self.population))
-            #self.__mutate()
-            self.__displayPopulation(evolutionCount)
+            self.population = self.mating.crossover(self.population)
+            self.__mutate()
             self.__computeFitness()
             self.__sort()
-            #self.__saveMostFitChromosome(evolutionCount)
+            self.__saveAllChromosomes(evolutionCount)
             self.__displayPopulation(evolutionCount)
             evolutionCount += 1
 
@@ -105,20 +138,27 @@ class GeneticAlgorithm:
     def __mutate(self):
         pass
 
-    # Best chromosome saved in "GeneticAlgorithm/EvolutionLogs".
-    # Each line is a category.
-    def __saveMostFitChromosome(self, curEvolution):
-        bestChromosome = self.population[0]
-        location = "GeneticAlgorithm/EvolutionLogs/"
-        prefix = "evo" + str(curEvolution) + "-"
-        fitness = str(bestChromosome.getFitness())
-        fileName = location + prefix + fitness + ".log"
+    # outputs all chromosomes to a log file cooresponding to a given evolution.
+    def __saveAllChromosomes(self, curEvolution):
+        map(lambda x: self.__saveChromosomeAtIndex(x, curEvolution), range(len(self.population)))
 
-        with open(fileName, 'w') as outFile:
-            for category in bestChromosome.getGenes():
-                outFile.write(' '.join(category) + '\n')
+    # chromosome 'self.population[index]' saved in "GeneticAlgorithm/EvolutionLogs".
+    # truncates the file if inserting from index 0.
+    # Each line is a chromosome.
+    # Categories are tab-delimited.
+    # Genes have no spaces between them.
+    def __saveChromosomeAtIndex(self, index, curEvolution):
+        location = self.config["LogFileLocation"]
+        name = "evo" + str(curEvolution) + ".log"
+        fileName = location + name
 
-    def __displayPopulation(self, evolutionNumber):
+        howToOpen = 'w' if index == 0 else 'a'
+        with open(fileName, howToOpen) as outFile:
+            for category in self.population[index].getGenes():
+                outFile.write(''.join(category) + '\t')
+            outFile.write('\n')
+
+    def __displayPopulation(self, evolutionNumber = 0):
         print("Population after evolution #" + str(evolutionNumber))
         for i in range(len(self.population)):
             print("chrom" + str(i) + "\t" + str(self.population[i].getFitness()))

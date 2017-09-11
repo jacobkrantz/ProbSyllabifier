@@ -12,7 +12,6 @@ Contains
 
 class Chromosome:
 
-    # structure of chromosome is still in flux
     def __init__(self, numCategories):
         self.genes = self.initGenes(numCategories)
         self.fitness = float(0.00)
@@ -21,10 +20,11 @@ class Chromosome:
     def __lt__(self, other):
         return self.fitness < other.fitness
 
+    # categories are implemented as sets
     def initGenes(self, numCategories):
         genes = []
         for i in range(numCategories):
-            genes.append([])
+            genes.append(set())
         return genes
 
     def getGenes(self):
@@ -40,7 +40,7 @@ class Chromosome:
     # removes gene from previous category it was in.
     def insertIntoCategory(self, categoryNumber, gene):
         self.removeGene(gene)
-        self.genes[categoryNumber].append(gene)
+        self.genes[categoryNumber].add(gene)
 
     #----------------#
     #   "Private"    #
