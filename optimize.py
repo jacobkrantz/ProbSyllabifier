@@ -27,6 +27,7 @@ def optimize():
     ga = GeneticAlgorithm(config)
     ga.displayParameters()
 
+    assert(config["PopulationSize"]/4 == config["NumMatingPairs"])
     evolutionNumber = 0
     if len(sys.argv) > 1:
         evolutionNumber = int(sys.argv[1])

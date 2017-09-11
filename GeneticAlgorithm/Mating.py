@@ -28,8 +28,6 @@ class Mating:
     #selects the population to continue on living
     def selection(self,population):
         amount = len(population)/2
-        print(len(population)),"Len of pop"
-        print amount, "Value of amount"
         temporaryPopulation = len(population)
 
         for i in range(self.config["NumMatingPairs"]):
@@ -69,11 +67,6 @@ class Mating:
     #Pre: Given the mother and father chromosomes
     #Post: Returns a child chromosome
     def matePair(self,mother,father):
-        #print "Father Fit",father.getFitness()
-        #print "mother fit",mother.getFitness()
-        #the chromosome with a higher fitness has a slightly higher
-        #chance of being selected; reenforcing the good genes
-
 
         #possibly need to get the count of the evolution
         if(mother.getFitness() == 0 or father.getFitness() == 0):
@@ -83,28 +76,20 @@ class Mating:
             else:
                 fatherRange = 30
                 motherRange = 70
-
         else:
             whole = father.getFitness() + mother.getFitness()
-            #percentage = father.getFitness()/float(mother.getFitness())
             fatherRange = father.getFitness()/float(whole) * 100
             motherRange = mother.getFitness()/float(whole) * 100
 
         fatherRange = 50
         motherRange = 50
-        #print "Fatherrange",fatherRange
-        #print "motherRange",motherRange
-        #print motherRange + fatherRange
         child1 = copy.deepcopy(father)
         child1.setFitness(0)
-        #print father.getGenes()
-        #print mother.getGenes()
-        #print father.getCategory('F')
+
         #exchanging the phones into their new, mated categories
         for phone in self.config["GeneList"]:
 
             randNum = randint(0,100)
-            #print phone,randNum
             #father
             if(randNum >= 0 and randNum <= fatherRange):
                 pass

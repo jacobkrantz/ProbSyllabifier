@@ -2,16 +2,18 @@ from celex import CELEX
 from Chromosome import Chromosome
 from Mating import Mating
 from random import randint
+<<<<<<< HEAD
+import copy
+=======
 import shutil
 import os
-import copy
+>>>>>>> 3540344d084262b9adaeaa923e0317413314a7a7
 '''
 fileName:       GeneticAlgorithm.py
-Authors:        Jacob Krantz,Maxwell Dulin
+Authors:        Jacob Krantz
 Date Modified:  9/10/17
 
 Library for all Genetic Algorithm functionality.
-This should be the only class referenced outside this module
 '''
 
 class GeneticAlgorithm:
@@ -56,10 +58,15 @@ class GeneticAlgorithm:
             for gene in self.config["GeneList"]:
                 randomCategory = randint(0, self.config["NumCategories"] - 1)
                 newChromosome.insertIntoCategory(randomCategory, gene)
-
+                newChromosome.setFitness(0)
             self.population.append(newChromosome)
         self.__computeFitness()
+<<<<<<< HEAD
         self.__sort()
+
+        self.__displayPopulation(0)
+=======
+        self.__displayPopulation()
 
     # pulls an existing population from an evolution log file.
     def importPopulation(self, resumeFrom):
@@ -96,15 +103,24 @@ class GeneticAlgorithm:
             for f in os.listdir(source):
                 if ".log" in f:
                     shutil.move(source + f, specificFolder)
+>>>>>>> 3540344d084262b9adaeaa923e0317413314a7a7
 
     # 1 evolution: mate the population, mutates them, computes their accuracy,
     # sort by accuracy, and save the best to the file.
     # Repeat evolutions as specified in config.json.
     def evolve(self, evolutionCount = 0):
         while evolutionCount < self.config["NumEvolutions"]:
-            self.population = self.mating.crossover(self.population)
-            self.__mutate()
+<<<<<<< HEAD
+            self.__displayPopulation(evolutionCount)
+            self.population = self.mating.crossover(copy.deepcopy(self.population))
+            #self.__mutate()
+            self.__displayPopulation(evolutionCount)
             self.__computeFitness()
+=======
+            #self.population = self.mating.crossover(self.population)
+            self.__mutate()
+            #self.__computeFitness()
+>>>>>>> 3540344d084262b9adaeaa923e0317413314a7a7
             self.__sort()
             self.__saveAllChromosomes(evolutionCount)
             self.__displayPopulation(evolutionCount)
@@ -136,29 +152,7 @@ class GeneticAlgorithm:
     # keeps the population from getting stagnant by moving around genes
     # in the chromosome pseudo-randomly
     def __mutate(self):
-
-        for i in range(1,len(self.population)):
-            chrom = self.population[i]
-            randNum = randint(0,99)
-            percentage = self.config["MutationFactor"] * 100
-            randChrom = randint(0,53)
-
-            if(randNum >= 0 and randNum < self.config["MutationFactor"]):
-
-                print '''
-                Print ***********
-                ***********88
-                (******************
-                **********)'''
-                chrom.printChrom()
-                randChrom = randint(0,53)
-                phone = self.config["GeneList"][randChrom]
-                randomCategory = randint(0,self.config["NumCategories"]-1)
-                chrom.insertIntoCategory(randomCategory,phone)
-                chrom.printChrom()
-
-
-
+        pass
 
     # outputs all chromosomes to a log file cooresponding to a given evolution.
     def __saveAllChromosomes(self, curEvolution):
