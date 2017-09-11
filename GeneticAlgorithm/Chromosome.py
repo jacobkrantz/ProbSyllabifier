@@ -1,6 +1,6 @@
 '''
 fileName:       Chromosome.py
-Authors:        Jacob Krantz
+Authors:        Jacob Krantz,Max Dulin
 Date Modified:  9/7/17
 
 Contains
@@ -63,3 +63,13 @@ class Chromosome:
                 return count
             else:
                 count = count + 1
+
+    #prints the genes out in a nicer manner
+    def printChrom(self):
+        count = 0
+        for category in self.genes:
+            print "Category ",count,": ",
+            for gene in category:
+                print gene,
+            count = count + 1
+            print
