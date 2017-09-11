@@ -1,5 +1,5 @@
 {
-    "CelexTranscriptionFile": "HMMFiles/DISC5.txt",
+    "CelexTranscriptionFile": "HMMFiles/DISC4.txt",
     "NistTranscriptionFile": "HMMFiles/phoneCategoriesArp.txt",
     "SQLite3": {
         "affinities": [
@@ -42,7 +42,7 @@
       "PopulationSize": 4,
       "NumMatingPairs": 4,
       "MutationFactor": 0.07,
-      "NumEvolutions": 2,
+      "NumEvolutions": 3,
       "NumCategories": 10,
       "TrainingSizeHMM": 500,
       "TestingSizeHMM": 20,

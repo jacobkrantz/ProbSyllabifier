@@ -2,19 +2,20 @@ from celex import CELEX
 from Chromosome import Chromosome
 from Mating import Mating
 from random import randint
+import shutil
+import os
 '''
 fileName:       GeneticAlgorithm.py
 Authors:        Jacob Krantz
-Date Modified:  9/7/17
+Date Modified:  9/10/17
 
 Library for all Genetic Algorithm functionality.
-This should be the only class referenced outside this module
 '''
 
 class GeneticAlgorithm:
 
     def __init__(self, config):
-        # population will hold a list of chromosomes
+        # population holds a list of chromosomes
         self.population = []
         self.config = config
         self.celex = CELEX()
@@ -56,13 +57,48 @@ class GeneticAlgorithm:
 
             self.population.append(newChromosome)
         self.__computeFitness()
-        self.__displayPopulation(0)
+        self.__displayPopulation()
+
+    # pulls an existing population from an evolution log file.
+    def importPopulation(self, resumeFrom):
+        location = self.config["LogFileLocation"]
+        fileName = location + "evo" + str(resumeFrom) + ".log"
+
+        with open(fileName, 'r') as inFile:
+            for line in inFile:
+                genes = line.split('\t')
+                newChromosome = Chromosome(self.config["NumCategories"])
+                for i in range(len(genes) - 1):
+                    for gene in genes[i]:
+                        newChromosome.insertIntoCategory(i, gene)
+                self.population.append(newChromosome)
+
+        self.__computeFitness()
+        self.__displayPopulation(resumeFrom)
+
+    # Move current logs to the archive.
+    # Each run is kept under unique folder.
+    # Creates directories when necessary.
+    def archiveLogs(self):
+        source = self.config["LogFileLocation"]
+        destination = source + "Archive/"
+
+        if not os.path.exists(source):
+            os.makedirs(source)
+        if not os.path.exists(destination):
+            os.makedirs(destination)
+
+        if len(os.listdir(source)) > 1:
+            specificFolder = destination + str(len(os.listdir(destination))) + '/'
+            os.makedirs(specificFolder)
+            for f in os.listdir(source):
+                if ".log" in f:
+                    shutil.move(source + f, specificFolder)
 
     # 1 evolution: mate the population, mutates them, computes their accuracy,
     # sort by accuracy, and save the best to the file.
     # Repeat evolutions as specified in config.json.
-    def evolve(self):
-        evolutionCount = 0
+    def evolve(self, evolutionCount = 0):
         while evolutionCount < self.config["NumEvolutions"]:
             #self.population = self.mating.crossover(self.population)
             self.__mutate()
@@ -119,7 +155,7 @@ class GeneticAlgorithm:
                 outFile.write(''.join(category) + '\t')
             outFile.write('\n')
 
-    def __displayPopulation(self, evolutionNumber):
+    def __displayPopulation(self, evolutionNumber = 0):
         print("Population after evolution #" + str(evolutionNumber))
         for i in range(len(self.population)):
             print("chrom" + str(i) + "\t" + str(self.population[i].getFitness()))
