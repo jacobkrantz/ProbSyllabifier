@@ -2,13 +2,12 @@ from celex import CELEX
 from Chromosome import Chromosome
 from Mating import Mating
 from random import randint
-import shutil
 import os
-import copy
+import shutil
 '''
 fileName:       GeneticAlgorithm.py
-Authors:        Jacob Krantz,Maxwell Dulin
-Date Modified:  9/10/17
+Authors:        Jacob Krantz, Maxwell Dulin
+Date Modified:  9/11/17
 
 Library for all Genetic Algorithm functionality.
 This should be the only class referenced outside this module
@@ -68,6 +67,10 @@ class GeneticAlgorithm:
 
         with open(fileName, 'r') as inFile:
             for line in inFile:
+                if(len(line) < len(self.config["GeneList"])):
+                    self.population[-1].setFitness(float(line))
+                    continue
+
                 genes = line.split('\t')
                 newChromosome = Chromosome(self.config["NumCategories"])
                 for i in range(len(genes) - 1):
@@ -75,7 +78,6 @@ class GeneticAlgorithm:
                         newChromosome.insertIntoCategory(i, gene)
                 self.population.append(newChromosome)
 
-        self.__computeFitness()
         self.__displayPopulation(resumeFrom)
 
     # Move current logs to the archive.
@@ -144,7 +146,7 @@ class GeneticAlgorithm:
 
     # chromosome 'self.population[index]' saved in "GeneticAlgorithm/EvolutionLogs".
     # truncates the file if inserting from index 0.
-    # Each line is a chromosome.
+    # Each 2-line group is a chromosome.
     # Categories are tab-delimited.
     # Genes have no spaces between them.
     def __saveChromosomeAtIndex(self, index, curEvolution):
@@ -156,7 +158,7 @@ class GeneticAlgorithm:
         with open(fileName, howToOpen) as outFile:
             for category in self.population[index].getGenes():
                 outFile.write(''.join(category) + '\t')
-            outFile.write('\n')
+            outFile.write('\n' + str(self.population[index].getFitness()) + '\n')
 
     def __displayPopulation(self, evolutionNumber = 0):
         print("Population after evolution #" + str(evolutionNumber))
