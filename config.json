@@ -1,5 +1,5 @@
 {
-    "CelexTranscriptionFile": "HMMFiles/DISC4.txt",
+    "CelexTranscriptionFile": "HMMFiles/DISC5.txt",
     "NistTranscriptionFile": "HMMFiles/phoneCategoriesArp.txt",
     "SQLite3": {
         "affinities": [
@@ -38,14 +38,14 @@
         "write_permissions": true
     },
     "GeneticAlgorithm": {
-      "InitialPopulationSize": 2,
+      "InitialPopulationSize": 4,
       "PopulationSize": 4,
       "NumMatingPairs": 4,
       "MutationFactor": 0.07,
       "NumEvolutions": 2,
       "NumCategories": 10,
-      "TrainingSizeHMM": 10,
-      "TestingSizeHMM" : 57,
+      "TrainingSizeHMM": 500,
+      "TestingSizeHMM": 20,
       "GeneList": [ "m", "F", "n", "N", "C",
                     "H", "p", "b", "t", "d",
                     "k", "g", "J", "_", "f",
@@ -56,6 +56,7 @@
                     "U", "1", "5", "@", "E",
                     "3", "V", "$", "9", "4",
                     "8", "{", "c", "#", "Q",
-                    "2", "q", "0", "~"]
+                    "2", "q", "0", "~"],
+      "LogFileLocation": "GeneticAlgorithm/EvolutionLogs/"
     }
 }

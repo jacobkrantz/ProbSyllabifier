@@ -64,11 +64,11 @@ class GeneticAlgorithm:
     def evolve(self):
         evolutionCount = 0
         while evolutionCount < self.config["NumEvolutions"]:
-            self.population = self.mating.crossover(self.population)
+            #self.population = self.mating.crossover(self.population)
             self.__mutate()
-            self.__computeFitness()
+            #self.__computeFitness()
             self.__sort()
-            #self.__saveMostFitChromosome(evolutionCount)
+            self.__saveAllChromosomes(evolutionCount)
             self.__displayPopulation(evolutionCount)
             evolutionCount += 1
 
@@ -99,18 +99,25 @@ class GeneticAlgorithm:
     def __mutate(self):
         pass
 
-    # Best chromosome saved in "GeneticAlgorithm/EvolutionLogs".
-    # Each line is a category.
-    def __saveMostFitChromosome(self, curEvolution):
-        bestChromosome = self.population[0]
-        location = "GeneticAlgorithm/EvolutionLogs/"
-        prefix = "evo" + str(curEvolution) + "-"
-        fitness = str(bestChromosome.getFitness())
-        fileName = location + prefix + fitness + ".log"
+    # outputs all chromosomes to a log file cooresponding to a given evolution.
+    def __saveAllChromosomes(self, curEvolution):
+        map(lambda x: self.__saveChromosomeAtIndex(x, curEvolution), range(len(self.population)))
 
-        with open(fileName, 'w') as outFile:
-            for category in bestChromosome.getGenes():
-                outFile.write(' '.join(category) + '\n')
+    # chromosome 'self.population[index]' saved in "GeneticAlgorithm/EvolutionLogs".
+    # truncates the file if inserting from index 0.
+    # Each line is a chromosome.
+    # Categories are tab-delimited.
+    # Genes have no spaces between them.
+    def __saveChromosomeAtIndex(self, index, curEvolution):
+        location = self.config["LogFileLocation"]
+        name = "evo" + str(curEvolution) + ".log"
+        fileName = location + name
+
+        howToOpen = 'w' if index == 0 else 'a'
+        with open(fileName, howToOpen) as outFile:
+            for category in self.population[index].getGenes():
+                outFile.write(''.join(category) + '\t')
+            outFile.write('\n')
 
     def __displayPopulation(self, evolutionNumber):
         print("Population after evolution #" + str(evolutionNumber))
