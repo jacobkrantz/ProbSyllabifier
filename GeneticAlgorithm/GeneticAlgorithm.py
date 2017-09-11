@@ -2,6 +2,7 @@ from celex import CELEX
 from Chromosome import Chromosome
 from Mating import Mating
 from random import randint
+import copy
 '''
 fileName:       GeneticAlgorithm.py
 Authors:        Jacob Krantz
@@ -53,9 +54,11 @@ class GeneticAlgorithm:
             for gene in self.config["GeneList"]:
                 randomCategory = randint(0, self.config["NumCategories"] - 1)
                 newChromosome.insertIntoCategory(randomCategory, gene)
-
+                newChromosome.setFitness(0)
             self.population.append(newChromosome)
         self.__computeFitness()
+        self.__sort()
+
         self.__displayPopulation(0)
 
     # 1 evolution: mate the population, mutates them, computes their accuracy,
@@ -64,11 +67,18 @@ class GeneticAlgorithm:
     def evolve(self):
         evolutionCount = 0
         while evolutionCount < self.config["NumEvolutions"]:
-            self.population = self.mating.crossover(self.population)
-            self.__mutate()
+            print "Before Cross over"
+            self.__displayPopulation(evolutionCount)
+            self.population = self.mating.crossover(copy.deepcopy(self.population))
+            #self.__mutate()
+            print "After Crossover!!"
+            self.__displayPopulation(evolutionCount)
+            print "Before computefitness"
             self.__computeFitness()
+            #self.__displayPopulation(evolutionCount)
             self.__sort()
             #self.__saveMostFitChromosome(evolutionCount)
+            print "After compute fitness!"
             self.__displayPopulation(evolutionCount)
             evolutionCount += 1
 
@@ -83,10 +93,11 @@ class GeneticAlgorithm:
         trainSize = self.config["TrainingSizeHMM"]
         testSize = self.config["TestingSizeHMM"]
         for i in range(len(self.population)):
-            genes = self.population[i].getGenes()
-            self.celex.trainHMM(trainSize, testSize, genes)
-            fitness = self.celex.testHMM(genes)
-            self.population[i].setFitness(fitness)
+            if(self.population[i].getFitness() == 0):
+                genes = self.population[i].getGenes()
+                self.celex.trainHMM(trainSize, testSize, genes)
+                fitness = self.celex.testHMM(genes)
+                self.population[i].setFitness(fitness)
 
     # sort self.population by fitness (syllabification accurracy)
     # ordering: highest (self.population[0]) -> lowest
