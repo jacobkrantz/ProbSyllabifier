@@ -67,18 +67,13 @@ class GeneticAlgorithm:
     def evolve(self):
         evolutionCount = 0
         while evolutionCount < self.config["NumEvolutions"]:
-            print "Before Cross over"
             self.__displayPopulation(evolutionCount)
             self.population = self.mating.crossover(copy.deepcopy(self.population))
             #self.__mutate()
-            print "After Crossover!!"
             self.__displayPopulation(evolutionCount)
-            print "Before computefitness"
             self.__computeFitness()
-            #self.__displayPopulation(evolutionCount)
             self.__sort()
             #self.__saveMostFitChromosome(evolutionCount)
-            print "After compute fitness!"
             self.__displayPopulation(evolutionCount)
             evolutionCount += 1
 

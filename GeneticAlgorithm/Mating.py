@@ -39,13 +39,10 @@ class Mating:
             while(spot1 == spot2):
                 spot2 = randint(0,amount-1)
 
-            print spot1,spot2
-
             #setting up the parents chromosomes
             mother = copy.deepcopy(population[spot1])
             father = copy.deepcopy(population[spot2])
 
-            print mother.getGenes()
             #add the parents to the new Population set
             self.newPopulation.append(mother)
             self.newPopulation.append(father)
@@ -63,7 +60,7 @@ class Mating:
             #print self.newPopulation[-1].getGenes()
             self.newPopulation.append(self.matePair(mother,father))
             self.newPopulation.append(self.matePair(mother,father))
-            print mother.getGenes()
+
 
 
             #this is -1 and not -2 because the amount is cut in half in the beginnning
