@@ -7,8 +7,8 @@ import os
 import copy
 '''
 fileName:       GeneticAlgorithm.py
-Authors:        Jacob Krantz,Maxwell Dulin
-Date Modified:  9/10/17
+Authors:        Jacob Krantz, Maxwell Dulin
+Date Modified:  9/14/17
 
 Library for all Genetic Algorithm functionality.
 This should be the only class referenced outside this module
@@ -137,7 +137,6 @@ class GeneticAlgorithm:
     # keeps the population from getting stagnant by moving around genes
     # in the chromosome pseudo-randomly
     def __mutate(self):
-
         for i in range(1,len(self.population)):
             chrom = self.population[i]
             #we need to rebuild the chromosome because it's a list of sets
@@ -169,9 +168,6 @@ class GeneticAlgorithm:
                 chrom.insertIntoCategory(randomCategory,phone)
                 chrom.printChrom()
             '''
-
-
-
 
     # outputs all chromosomes to a log file cooresponding to a given evolution.
     def __saveAllChromosomes(self, curEvolution):
