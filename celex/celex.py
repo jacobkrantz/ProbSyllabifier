@@ -1,9 +1,7 @@
 from datastore import SQLQueryService
 from probSyllabifier import ProbSyllabifier, HMM
 from utils import AbstractSyllabRunner
-from itertools import islice
 import logging as log
-import threading
 
 # TODO figure out how to run ProbSyllabifier in multiple threads.
 
