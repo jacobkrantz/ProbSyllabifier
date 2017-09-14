@@ -1,6 +1,7 @@
 from GeneticAlgorithm import GeneticAlgorithm
 import json
 import sys
+from random import randint
 
 '''
 fileName:       optimize.py
@@ -23,6 +24,8 @@ def loadConfiguration():
 
 # evolutionNumber represents the evolution log file to continue from
 def optimize():
+    #print(randint(0,99)) * 14.285
+
     config = loadConfiguration()
     ga = GeneticAlgorithm(config)
     ga.displayParameters()
@@ -38,5 +41,5 @@ def optimize():
         ga.initializePopulation()
 
     ga.evolve(evolutionNumber)
-
+    
 optimize()

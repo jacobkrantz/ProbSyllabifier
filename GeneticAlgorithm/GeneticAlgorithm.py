@@ -127,6 +127,7 @@ class GeneticAlgorithm:
                 fitness = self.celex.testHMM(genes)
                 self.population[i].setFitness(fitness)
 
+
     # sort self.population by fitness (syllabification accurracy)
     # ordering: highest (self.population[0]) -> lowest
     def __sort(self):
@@ -139,23 +140,35 @@ class GeneticAlgorithm:
 
         for i in range(1,len(self.population)):
             chrom = self.population[i]
-            randNum = randint(0,99)
-            percentage = self.config["MutationFactor"] * 100
-            randChrom = randint(0,53)
+            #we need to rebuild the chromosome because it's a list of sets
+            newChromosome = Chromosome(self.config["NumCategories"])
+            curIter = 0
+            #per gene mutate
+            for category in chrom.getGenes():
+                for gene in category:
+                    percentage = self.config["MutationFactor"] * 100
+                    randNum = randint(0,99)
+                    #cooresponds to the mutation factor
+                    if(randNum >= 0 and randNum <= percentage):
+                        randomCategory = randint(0,self.config["NumCategories"]-1)
+                        #makes sure it cannnot be inserted back into the same category
+                        while(curIter == randomCategory):
+                            randomCategory = randint(0,self.config["NumCategories"]-1)
+                        newChromosome.insertIntoCategory(randomCategory,gene)
+                    else:
+                        newChromosome.insertIntoCategory(curIter,gene)
+                curIter = curIter + 1
+            self.population[i] = newChromosome
 
+            #per chromosomes mutate
+            '''
             if(randNum >= 0 and randNum < self.config["MutationFactor"]):
-
-                print '''
-                Print ***********
-                ***********88
-                (******************
-                **********)'''
                 chrom.printChrom()
-                randChrom = randint(0,53)
                 phone = self.config["GeneList"][randChrom]
                 randomCategory = randint(0,self.config["NumCategories"]-1)
                 chrom.insertIntoCategory(randomCategory,phone)
                 chrom.printChrom()
+            '''
 
 
 
