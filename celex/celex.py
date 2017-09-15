@@ -2,6 +2,8 @@ from datastore import SQLQueryService
 from probSyllabifier import ProbSyllabifier, HMM
 from utils import AbstractSyllabRunner
 import logging as log
+import json
+import uuid
 
 class CELEX(AbstractSyllabRunner):
 
@@ -12,7 +14,9 @@ class CELEX(AbstractSyllabRunner):
         self._testingSet = set()
         self._CSylResultsDict = dict()
         self._PSylResultsDict = dict()
-        self.GUID = "1000"
+        with open('config.json') as json_data_file:
+            self.config = json.load(json_data_file)
+        self.GUID = ""
 
     def InputTrainHMM(self):
         trainingSize = int(input("enter number of words to train on: "))
@@ -20,8 +24,8 @@ class CELEX(AbstractSyllabRunner):
         self.trainHMM(trainingSize, testingSize)
 
     def trainHMM(self, trainingSize, testingSize, transciptionScheme=[]):
-        # set new GUID for training run
-        self.GUID = str(int(self.GUID) + 1)
+        # set new GUID based on host machine and current time
+        self.GUID = str(uuid.uuid1())
 
         log.info("Starting step: Building sets.")
         syllabifiedLst = self._buildSets(trainingSize, testingSize)
@@ -40,14 +44,20 @@ class CELEX(AbstractSyllabRunner):
         log.info("Finished step: Train HMM Model")
 
     def testHMM(self, transciptionScheme=[]):
+        percentAccuracy = 0.00
+        publishResults = False
+
         self._syllabifyTesting(transciptionScheme)
         testResultsList = self._combineResults(self._PSylResultsDict, self._CSylResultsDict)
-        self._fillResultsTable(testResultsList)
-        percentAccuracy = self._compareResults()
+
         self._CSylResultsDict = dict()
         self._PSylResultsDict = dict()
         self.hmm.clean()
-        return percentAccuracy
+
+        if(self.config["write_results_to_DB"]):
+            self._fillResultsTable(testResultsList)
+            return self._compareResults()
+        return self._compareInMemory(testResultsList)
 
     # returns string of syllabified observation
     def syllabify(self, observation):
@@ -116,6 +126,23 @@ class CELEX(AbstractSyllabRunner):
         print "ProbSyllabifier is " + percentSame + "% similar to CELEX."
         print "Ignoring",skippedSyllabCount,"skips:",ignoredPercentSame,"%"
         print "To view results, query the 'workingresults' table in 'wordformsDB'."
+        print "----------------------------------------"
+        return percentSame
+
+    def _compareInMemory(self, testResultsList):
+        totalEntries = float(len(testResultsList))
+        skippedSyllabCount = 0
+        numSame = 0
+        for entry in testResultsList:
+            if(entry["Same"] == 1):
+                numSame += 1
+            elif(entry["ProbSyl"] == ""):
+                skippedSyllabCount += 1
+        percentSame = "{0:.2f}".format(100 * numSame / totalEntries)
+        ignoredPercentSame = "{0:.2f}".format(100 * numSame / totalEntries - float(skippedSyllabCount))
+        print "\n----------------------------------------"
+        print "ProbSyllabifier is " + percentSame + "% similar to CELEX."
+        print "Ignoring", skippedSyllabCount, "skips:", ignoredPercentSame, "%"
         print "----------------------------------------"
         return percentSame
 
