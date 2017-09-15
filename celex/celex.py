@@ -3,8 +3,6 @@ from probSyllabifier import ProbSyllabifier, HMM
 from utils import AbstractSyllabRunner
 import logging as log
 
-# TODO figure out how to run ProbSyllabifier in multiple threads.
-
 class CELEX(AbstractSyllabRunner):
 
     def __init__(self):
@@ -14,6 +12,7 @@ class CELEX(AbstractSyllabRunner):
         self._testingSet = set()
         self._CSylResultsDict = dict()
         self._PSylResultsDict = dict()
+        self.GUID = "1000"
 
     def InputTrainHMM(self):
         trainingSize = int(input("enter number of words to train on: "))
@@ -21,19 +20,23 @@ class CELEX(AbstractSyllabRunner):
         self.trainHMM(trainingSize, testingSize)
 
     def trainHMM(self, trainingSize, testingSize, transciptionScheme=[]):
+        # set new GUID for training run
+        self.GUID = str(int(self.GUID) + 1)
+
         log.info("Starting step: Building sets.")
         syllabifiedLst = self._buildSets(trainingSize, testingSize)
         log.info("Finished step: Building sets.")
 
         log.info("Starting step: Initialize training structures")
-        hmm = HMM(2, transciptionScheme, syllabifiedLst) # lang hack: 2 is celex
+        self.hmm = HMM(2, transciptionScheme, syllabifiedLst) # lang hack: 2 is celex
         self._trainingSet = set()     # clear set from memory
         log.info("Finished step: Initialize training structures")
 
         log.info("Starting step: Train HMM Model")
-        hmm.buildMatrixA() # "./HMMFiles/MatrixA.txt"
-        hmm.buildMatrixB() # "./HMMFiles/MatrixB.txt"
-        hmm.makeViterbiFiles()
+        self.hmm.setGUID(self.GUID)
+        self.hmm.buildMatrixA()
+        self.hmm.buildMatrixB()
+        self.hmm.makeViterbiFiles()
         log.info("Finished step: Train HMM Model")
 
     def testHMM(self, transciptionScheme=[]):
@@ -43,6 +46,7 @@ class CELEX(AbstractSyllabRunner):
         percentAccuracy = self._compareResults()
         self._CSylResultsDict = dict()
         self._PSylResultsDict = dict()
+        self.hmm.clean()
         return percentAccuracy
 
     # returns string of syllabified observation
@@ -76,6 +80,7 @@ class CELEX(AbstractSyllabRunner):
 
         log.info("Starting step: Syllabify ProbSyllabifier")
         self.ps = ProbSyllabifier(transciptionScheme)
+        self.ps.loadStructures(self.GUID)
         for word, pronunciation in pronunciationsDict.iteritems():
             self._PSylResultsDict[word] = self.ps.syllabify(pronunciation, "CELEX")
         log.info("Finished step: Syllabify ProbSyllabifier")

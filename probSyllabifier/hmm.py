@@ -1,4 +1,5 @@
 from utils import HMMUtils
+import os
 
 '''
 fileName:       HMM.py
@@ -17,7 +18,7 @@ class HMM:
     # lang = 1 for NIST.
     # lang = 2 for CELEX. `trainingSet` must be populated for CELEX.
     # transciptionScheme should be [] if not used.
-    def __init__(self,lang, transciptionScheme, trainingSet=[]):
+    def __init__(self, lang, transciptionScheme, trainingSet=[]):
         self.utils = HMMUtils()
         self.lang = lang
         self.allBigramTups = self._loadTrainingData(trainingSet)
@@ -29,9 +30,11 @@ class HMM:
         self.tagLookup     = []
         self.boundCount    = 0
         self.numBigrams    = 0
-
+        self.GUID          = ""
         self.__loadFiles()
 
+    def setGUID(self, GUID):
+        self.GUID = GUID
 
     # goes through process of creating MatrixA for an HMM.
     # MatrixA is the transition probability of going from one
@@ -50,7 +53,7 @@ class HMM:
 
         tagBigramDict = self.utils.buildTagBigramDict(self.tagBigrams)
         matrixA = self.__insertProbA(tagBigramDict)
-        self.utils.outputMatrix(matrixA, "A")
+        self.utils.outputMatrix(matrixA, "MatrixA" + self.GUID, "A")
 
         return matrixA
 
@@ -68,26 +71,38 @@ class HMM:
         MatrixB = self.__insertCountB(MatrixB)
         MatrixB = self.normalizeNaiveB(MatrixB)
 
-        self.utils.outputMatrix(MatrixB, "B")
+        self.utils.outputMatrix(MatrixB, "MatrixB" + self.GUID, "B")
 
 
     # creates files that allow the Viterbi algorithm to use the matrices
     # created. Creates files:
-    # - ./HMMFiles/obsLookup.txt
-    # - ./HMMFiles/hiddenLookup.txt
+    # - ./HMMFiles/obsLookup{GUID}.txt
+    # - ./HMMFiles/hiddenLookup{GUID}.txt
     def makeViterbiFiles(self):
+        obsLookupName = "./HMMFiles/obsLookup" + self.GUID + ".txt"
+        hiddenLookupName = "./HMMFiles/hiddenLookup" + self.GUID + ".txt"
         try:
             self._filesDidLoad()
         except Exception as e:
             print "reload", e
             self.__loadFiles()
         finally:
-            self.utils.makeLookup(self.bigramLookup,"./HMMFiles/obsLookup.txt")
-            self.utils.makeLookup(self.tagDict, "./HMMFiles/hiddenLookup.txt")
+            self.utils.makeLookup(self.bigramLookup, obsLookupName)
+            self.utils.makeLookup(self.tagDict, hiddenLookupName)
 
     # return an integer of the number of items that exist in the training set.
     def getTrainingSize(self):
         return len(self.allBigramTups)
+
+    # remove files containing the GUID
+    def clean(self):
+        if self.GUID == "":
+            return
+
+        source = "./HMMFiles/"
+        for f in os.listdir(source):
+            if self.GUID in f:
+                os.remove(source + f)
 
     # ------------------------------------------------------
     # helper functions below

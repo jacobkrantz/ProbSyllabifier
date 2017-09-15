@@ -24,13 +24,9 @@ class HMMUtils:
 
     # Given a matrix created with numpy, outputMatrix sends the matrix
     # to a txt file under the provided name.
-    def outputMatrix(self, matrix, which):
-        if(which == "A"):
-            np.savetxt("HMMFiles/MatrixA.txt",matrix, newline = '\n',header = "matrixA", fmt = '%.5f')
-        elif(which == "B"):
-            np.savetxt("HMMFiles/MatrixB.txt",matrix, newline = '\n',header = "matrixB", fmt = '%.5f')
-        else:
-            raise TypeError("'" + which + "'' does not match any option.")
+    def outputMatrix(self, matrix, fileName, customHeader):
+        fileName = "HMMFiles/" + fileName + ".txt"
+        np.savetxt(fileName, matrix, newline = '\n',header = customHeader, fmt = '%.5f')
 
     # given the name of a file, imports a matrix using the numpy tool.
     # prints error to console upon failure.
@@ -105,7 +101,7 @@ class HMMUtils:
             inFile = open(self.config["NistTranscriptionFile"], 'r')
         else:
             inFile = open(self.config["CelexTranscriptionFile"], 'r')
-            
+
         tags = []
         for line in inFile:
             tmpLst = line.split(' ')

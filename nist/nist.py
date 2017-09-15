@@ -16,6 +16,7 @@ class NIST(AbstractSyllabRunner):
 
     def testHMM(self):
         self.ps = ProbSyllabifier()
+        self.ps.loadStructures()
         testIN = "./corpusFiles/testSet.txt"
         testOUT = "./HMMFiles/probSyllabs.txt"
         self.ps.syllabifyFile(testIN, testOUT,"NIST")

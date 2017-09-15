@@ -24,8 +24,8 @@ class ProbSyllabifier:
     def __init__(self, transciptionScheme=[]):
         log.basicConfig(format='%(asctime)s %(levelname)s:%(message)s', datefmt='%X', level=log.INFO)
         self.hmmUtils = HMMUtils()
-        self.__matrixA = self.__loadMatrix('A')
-        self.__matrixB = self.__loadMatrix('B')
+        self.__matrixA = []
+        self.__matrixB = []
         self.__exceptionLst = []
         self.__obsLookup = []
         self.__hiddenLookup = []
@@ -34,7 +34,17 @@ class ProbSyllabifier:
         self.__comparator = "NIST"
         self.transciptionScheme = transciptionScheme
 
-        self.__loadStructures()
+    # initializes the necessary data structures by loading them from files
+    # within the /HMMFiles/ directory.
+    def loadStructures(self, GUID=""):
+        obsName = "./HMMFiles/obsLookup" + GUID + ".txt"
+        hiddenName = "./HMMFiles/hiddenLookup" + GUID + ".txt"
+
+        self.__matrixA      = self.__loadMatrix("A", GUID)
+        self.__matrixB      = self.__loadMatrix("B", GUID)
+        self.__obsLookup    = self.__loadLookup(obsName)
+        self.__obsLookup    = self.__fixObsLookup()
+        self.__hiddenLookup = self.__loadLookup(hiddenName)
 
 
     # given a file containing a dict of word: syllab,
@@ -90,13 +100,8 @@ class ProbSyllabifier:
 
 
     # loads either MatrixA (if which == 'A') or MatrixB (if which == 'B')
-    def __loadMatrix(self, which):
-        if(which == 'A'):
-            fileName = "./HMMFiles/MatrixA.txt"
-        elif(which == 'B'):
-            fileName = "./HMMFiles/MatrixB.txt"
-        else:
-            raise Exeption("__loadMatrix bad input")
+    def __loadMatrix(self, which, GUID=""):
+        fileName = "./HMMFiles/Matrix" + which + GUID + ".txt"
 
         try:
             matrix = np.loadtxt(fileName, dtype = 'float')
@@ -104,14 +109,6 @@ class ProbSyllabifier:
             print(fileName +" does not exist or is corrupt.")
             sys.exit(0)
         return matrix
-
-
-    # initializes the necessary data structures by loading them from files
-    # within the /HMMFiles/ directory.
-    def __loadStructures(self):
-        self.__obsLookup = self.__loadLookup('./HMMFiles/obsLookup.txt')
-        self.__obsLookup = self.__fixObsLookup()
-        self.__hiddenLookup =self.__loadLookup('./HMMFiles/hiddenLookup.txt')
 
     # given a fileName, loads the list that exists inside of it.
     # each line of the file corresponds to a list entry.
