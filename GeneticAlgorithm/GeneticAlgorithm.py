@@ -140,11 +140,13 @@ class GeneticAlgorithm:
     # keeps the population from getting stagnant by moving around genes
     # in the chromosome pseudo-randomly
     def __mutate(self):
+
         for i in range(1,len(self.population)):
             chrom = self.population[i]
             #we need to rebuild the chromosome because it's a list of sets
             newChromosome = Chromosome(self.config["NumCategories"])
             curIter = 0
+
             #per gene mutate
             for category in chrom.getGenes():
                 for gene in category:
@@ -160,7 +162,11 @@ class GeneticAlgorithm:
                     else:
                         newChromosome.insertIntoCategory(curIter,gene)
                 curIter = curIter + 1
-            self.population[i] = newChromosome
+
+            #this should fix the first chromosome being altered
+            if(i != 0):
+                self.population[i] = newChromosome
+
 
             #per chromosomes mutate
             '''
