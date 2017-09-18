@@ -1,6 +1,5 @@
 from activePool import ActivePool
 from celex import CELEXSAFE
-# from celexSafe import CELEXSAFE
 from Chromosome import Chromosome
 from Mating import Mating
 from random import randint

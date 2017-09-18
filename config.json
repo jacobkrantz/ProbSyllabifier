@@ -1,7 +1,6 @@
 {
     "CelexTranscriptionFile": "HMMFiles/DISC/DISC4.txt",
     "NistTranscriptionFile": "HMMFiles/phoneCategoriesArp.txt",
-    },
     "comparator": "CELEX",
     "dataLoader": {
         "databaseContext": "wordformsDB"
@@ -19,7 +18,7 @@
         "write_permissions": true
     },
     "GeneticAlgorithm": {
-      "MaxThreadCount": 3,
+      "MaxThreadCount": 5,
       "InitialPopulationSize": 50,
       "PopulationSize": 32,
       "NumMatingPairs": 8,
