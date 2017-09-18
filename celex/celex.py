@@ -10,22 +10,22 @@ class CELEX(AbstractSyllabRunner):
     def __init__(self):
         log.basicConfig(format='%(asctime)s %(levelname)s:%(message)s', datefmt='%X', level=log.INFO)
         self.SQLQueryService = SQLQueryService("wordformsDB")
-        self._trainingSet = set()
         self._testingSet = set()
         self._CSylResultsDict = dict()
         self._PSylResultsDict = dict()
         with open('config.json') as json_data_file:
             self.config = json.load(json_data_file)
-        self.GUID = ""
 
+    # returns GUID for trained HMMFiles
     def InputTrainHMM(self):
         trainingSize = int(input("enter number of words to train on: "))
         testingSize = int(input("enter number of words to test on: "))
-        self.trainHMM(trainingSize, testingSize)
+        return self.trainHMM(trainingSize, testingSize)
 
+    # returns GUID for trained HMMFiles
     def trainHMM(self, trainingSize, testingSize, transciptionScheme=[]):
         # set new GUID based on host machine and current time
-        self.GUID = str(uuid.uuid1())
+        GUID = str(uuid.uuid1())
 
         log.info("Starting step: Building sets.")
         syllabifiedLst = self._buildSets(trainingSize, testingSize)
@@ -33,21 +33,18 @@ class CELEX(AbstractSyllabRunner):
 
         log.info("Starting step: Initialize training structures")
         self.hmm = HMM(2, transciptionScheme, syllabifiedLst) # lang hack: 2 is celex
-        self._trainingSet = set()     # clear set from memory
         log.info("Finished step: Initialize training structures")
 
         log.info("Starting step: Train HMM Model")
-        self.hmm.setGUID(self.GUID)
+        self.hmm.setGUID(GUID)
         self.hmm.buildMatrixA()
         self.hmm.buildMatrixB()
         self.hmm.makeViterbiFiles()
         log.info("Finished step: Train HMM Model")
+        return GUID
 
-    def testHMM(self, transciptionScheme=[]):
-        percentAccuracy = 0.00
-        publishResults = False
-
-        self._syllabifyTesting(transciptionScheme)
+    def testHMM(self, transciptionScheme=[], GUID=""):
+        self._syllabifyTesting(transciptionScheme, GUID)
         testResultsList = self._combineResults(self._PSylResultsDict, self._CSylResultsDict)
 
         self._CSylResultsDict = dict()
@@ -60,7 +57,8 @@ class CELEX(AbstractSyllabRunner):
         return self._compareInMemory(testResultsList)
 
     # returns string of syllabified observation
-    def syllabify(self, observation):
+    def syllabify(self, observation, GUID=""):
+        self.ps.loadStructures(GUID)
         return self.ps.syllabify(observation, "CELEX")
 
     def syllabifyFile(self, fileIN, fileOUT):
@@ -74,14 +72,14 @@ class CELEX(AbstractSyllabRunner):
     # Computes CELEX syllabification results.
     # Returns the phonetic syllabifications in a set.
     def _buildSets(self, trainingSize, testingSize):
-        self._trainingSet = self._toASCII(self.SQLQueryService.getWordSubset(trainingSize))
-        self._testingSet = self._toASCII(self.SQLQueryService.getWordSubset(testingSize, self._trainingSet))
-        self._CSylResultsDict = self.SQLQueryService.getManySyllabifications(self._trainingSet)
+        trainingSet = self._toASCII(self.SQLQueryService.getWordSubset(trainingSize))
+        self._testingSet = self._toASCII(self.SQLQueryService.getWordSubset(testingSize, trainingSet))
+        self._CSylResultsDict = self.SQLQueryService.getManySyllabifications(trainingSet)
         return self._CSylResultsDict.values()
 
     # builds dictionary of {testWord:syllabification}
     # for self._PSylResultsDict and self._CSylResultsDict
-    def _syllabifyTesting(self,transciptionScheme=[]):
+    def _syllabifyTesting(self,transciptionScheme=[], GUID=""):
         log.info("Starting step: Syllabify CELEX")
         self._CSylResultsDict = self.SQLQueryService.getManySyllabifications(self._testingSet)
         log.info("Finished step: Syllabify CELEX")
@@ -90,7 +88,7 @@ class CELEX(AbstractSyllabRunner):
 
         log.info("Starting step: Syllabify ProbSyllabifier")
         self.ps = ProbSyllabifier(transciptionScheme)
-        self.ps.loadStructures(self.GUID)
+        self.ps.loadStructures(GUID)
         for word, pronunciation in pronunciationsDict.iteritems():
             self._PSylResultsDict[word] = self.ps.syllabify(pronunciation, "CELEX")
         log.info("Finished step: Syllabify ProbSyllabifier")

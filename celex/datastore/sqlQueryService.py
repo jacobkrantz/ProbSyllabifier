@@ -1,7 +1,7 @@
 from sqliteClient import SQLiteClient
 from contextlib import closing
 
-# does not currently support multithreading, even within batch functions.
+# does not support multithreading, even within batch functions.
 class SQLQueryService(SQLiteClient):
 
     # returns "" if word is not in the database
@@ -110,7 +110,7 @@ class SQLQueryService(SQLiteClient):
 
         query = """
             SELECT Word
-            FROM words
+            FROM pronunciations
             WHERE Word NOT LIKE '% %'
             ORDER BY Random()
             """
@@ -135,7 +135,7 @@ class SQLQueryService(SQLiteClient):
         with closing(self.connection.cursor()) as cursor:
             cursor.execute("""
                 SELECT COUNT (*)
-                FROM words
+                FROM pronunciations
                 WHERE Word NOT LIKE '% %'
                 """)
             return cursor.fetchone()[0]

@@ -1,21 +1,6 @@
 {
     "CelexTranscriptionFile": "HMMFiles/DISC/DISC4.txt",
     "NistTranscriptionFile": "HMMFiles/phoneCategoriesArp.txt",
-    "SQLite3": {
-        "affinities": [
-            "TEXT",
-            "NUMERIC",
-            "INTEGER",
-            "REAL",
-            "NONE"
-        ],
-        "datatypes": [
-            "NULL",
-            "INTEGER",
-            "REAL",
-            "TEXT",
-            "BLOB"
-        ]
     },
     "comparator": "CELEX",
     "dataLoader": {
@@ -23,9 +8,7 @@
     },
     "write_results_to_DB": false,
     "wordformsDB": {
-        "check_same_thread": false,
         "default_alphabet": "DISC",
-        "execute_parameters": "PRAGMA journal_mode = WAL",
         "path": "../wordforms.db",
         "protected_tables": [
             "words",
@@ -33,19 +16,17 @@
             "syllabifications"
         ],
         "read_permissions": true,
-        "sources": [
-            "webCELEX"
-        ],
         "write_permissions": true
     },
     "GeneticAlgorithm": {
+      "MaxThreadCount": 3,
       "InitialPopulationSize": 50,
       "PopulationSize": 32,
       "NumMatingPairs": 8,
       "MutationFactor": 0.05,
-      "NumEvolutions": 100,
+      "NumEvolutions": 200,
       "NumCategories": 12,
-      "TrainingSizeHMM": 3500,
+      "TrainingSizeHMM": 3000,
       "TestingSizeHMM": 500,
       "GeneList": [ "m", "F", "n", "N", "C",
                     "H", "p", "b", "t", "d",

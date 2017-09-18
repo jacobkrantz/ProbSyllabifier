@@ -1,14 +1,19 @@
-from celex import CELEX
+from activePool import ActivePool
+from celex import CELEXSAFE
+# from celexSafe import CELEXSAFE
 from Chromosome import Chromosome
 from Mating import Mating
 from random import randint
-import shutil
-import os
 import copy
+import multiprocessing
+import os
+import shutil
+import time
+
 '''
 fileName:       GeneticAlgorithm.py
 Authors:        Jacob Krantz, Maxwell Dulin
-Date Modified:  9/14/17
+Date Modified:  9/18/17
 
 Library for all Genetic Algorithm functionality.
 This should be the only class referenced outside this module
@@ -20,7 +25,7 @@ class GeneticAlgorithm:
         # population holds a list of chromosomes
         self.population = []
         self.config = config
-        self.celex = CELEX()
+        self.celex = CELEXSAFE()
         self.mating = Mating(config)
 
     # displays all GeneticAlgorithm parameters to the console
@@ -118,18 +123,38 @@ class GeneticAlgorithm:
     #   "Private"    #
     #----------------#
 
-    # compute the fitness of all chromosomes in the population by
-    #   running the ProbSyllabifier.
-    # sets Chromosome.fitness equal to syllabification accuracy.
+    # compute the fitness of all chromosomes in the population.
     def __computeFitness(self):
-        trainSize = self.config["TrainingSizeHMM"]
-        testSize = self.config["TestingSizeHMM"]
-        for i in range(len(self.population)):
-            if(self.population[i].getFitness() == 0):
-                genes = self.population[i].getGenes()
-                self.celex.trainHMM(trainSize, testSize, genes)
-                fitness = self.celex.testHMM(genes)
-                self.population[i].setFitness(fitness)
+        sizes = (self.config["TrainingSizeHMM"], self.config["TestingSizeHMM"])
+        self.celex.loadSets(sizes[0], sizes[1])
+
+        pool = ActivePool()
+        s = multiprocessing.Semaphore(self.config["MaxThreadCount"])
+        resultsQueue = multiprocessing.Queue()
+        jobs = [
+            multiprocessing.Process(target=self._computeSingleFitness, name=str(i), args=(i, sizes, s, pool, resultsQueue))
+            for i in range(len(self.population))
+        ]
+        for j in jobs:
+            j.start()
+
+        for j in jobs:
+            j.join()
+
+        for result in [resultsQueue.get() for j in jobs]:
+            self.population[result[0]].setFitness(result[1])
+
+    # sets Chromosome.fitness equal to syllabification accuracy.
+    # hmmSizes = [trainingSize, testingSize]
+    def _computeSingleFitness(self, i, hmmSizes, s, pool, resultsQueue):
+        processName = multiprocessing.current_process().name
+        with s:
+            pool.makeActive(processName)
+            genes = self.population[i].getGenes()
+            GUID = self.celex.trainHMM(genes)
+            fitness = self.celex.testHMM(genes, GUID)
+            resultsQueue.put((i, fitness))
+            pool.makeInactive(processName)
 
     # sort self.population by fitness (syllabification accurracy)
     # ordering: highest (self.population[0]) -> lowest
