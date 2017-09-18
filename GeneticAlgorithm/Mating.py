@@ -27,40 +27,36 @@ class Mating:
 
     #selects the population to continue on living
     def selection(self,population):
-        amount = len(population)/2
+        amount = len(population)
         temporaryPopulation = len(population)
+        usedList = []
+
+        #kills the bottom part of the population
+        for count in range(amount/2):
+            del population[len(population)-1]
+            self.newPopulation.append(copy.deepcopy(population[count]))
+        amount = len(population)
+        usedList = []
+
 
         for i in range(self.config["NumMatingPairs"]):
 
             spot1 = randint(0,amount-1)
+            while(spot1 in usedList):
+                spot1 = randint(0,amount-1)
+
             spot2 = randint(0,amount-1)
-            #making sure it's not the same chromosome being used
-            while(spot1 == spot2):
+            while(spot2 in usedList or spot2 == spot1):
                 spot2 = randint(0,amount-1)
 
             #setting up the parents chromosomes
             mother = copy.deepcopy(population[spot1])
             father = copy.deepcopy(population[spot2])
 
-            #add the parents to the new Population set
-            self.newPopulation.append(mother)
-            self.newPopulation.append(father)
-
-            #remove the chromosomes from the first population set
-            if(spot1 > spot2):
-                del population[spot1]
-                del population[spot2]
-
-            else:
-                del population[spot2]
-                del population[spot1]
-
             #add two new children to the population
             #print self.newPopulation[-1].getGenes()
             self.newPopulation.append(self.matePair(mother,father))
             self.newPopulation.append(self.matePair(mother,father))
-
-            amount = amount - 2
         return
 
 
