@@ -124,12 +124,13 @@ class GeneticAlgorithm:
     def __computeFitness(self):
         trainSize = self.config["TrainingSizeHMM"]
         testSize = self.config["TestingSizeHMM"]
-        for i in range(len(self.population)):
-            if(self.population[i].getFitness() == 0):
-                genes = self.population[i].getGenes()
-                self.celex.trainHMM(trainSize, testSize, genes)
-                fitness = self.celex.testHMM(genes)
-                self.population[i].setFitness(fitness)
+        for i in range(1,len(self.population)):
+            #had to take this out because of mutate!
+            #if(self.population[i].getFitness() == 0):
+            genes = self.population[i].getGenes()
+            self.celex.trainHMM(trainSize, testSize, genes)
+            fitness = self.celex.testHMM(genes)
+            self.population[i].setFitness(fitness)
 
     # sort self.population by fitness (syllabification accurracy)
     # ordering: highest (self.population[0]) -> lowest
