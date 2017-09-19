@@ -6,9 +6,9 @@ import json
 '''
 fileName:       run.py
 Authors:        Jacob Krantz, Max Dulin
-Date Modified:  8/17
+Date Modified:  9/17
 
-- main file to run entire machine
+- main file to run machine
 - Syllabifies a file using NIST or CELEX
 '''
 class color:
@@ -35,7 +35,7 @@ def runS(NIST, CELEX, comparator):
             if comparator == "NIST":
                 syl = NIST.syllabify(obs.lower())
             else:
-                syl = CELEX.syllabify(obs.lower())
+                syl = CELEX.syllabify(obs.lower(), GUID)
             print("Syllabification: " + syl)
 
 def help():
@@ -83,6 +83,7 @@ def main():
 
     comparator = config["comparator"]
     trainedComparator = config["comparator"]
+    hmmGUID = "" # used for CELEX file management
     choice = 0
     while(choice != 6):
         print("\n" + color.BOLD + "Main Menu"+ color.END)
@@ -105,14 +106,20 @@ Choose an option:
                 choice = 0
 
         if(choice == 1):
-            nist.trainHMM() if comparator == "NIST" else celex.InputTrainHMM()
+            if comparator == "NIST":
+                nist.trainHMM()
+            else:
+                hmmGUID = celex.InputTrainHMM()
             trainedComparator = comparator
 
         elif(choice == 2):
-            runS(nist, celex, comparator)
+            runS(nist, celex, comparator, hmmGUID)
 
         elif(choice == 3):
-            nist.testHMM() if comparator == "NIST" else celex.testHMM()
+            if comparator == "NIST":
+                nist.testHMM()
+            else:
+                celex.testHMM([], hmmGUID)
 
         elif(choice == 4):
             comparator = getComparator(config)

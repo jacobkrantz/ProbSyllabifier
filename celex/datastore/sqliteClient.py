@@ -1,14 +1,10 @@
-# TODO build general parser for the alphabet to be queried.
-#   ex: CPA -> PhonSylCPA, PhonCPA based on config.json
-# TODO write function for query of pronunciation
-# TODO write function for query of syllabification
 import sqlite3
 import json
 import io
 from contextlib import closing
 from collections import OrderedDict
 
-# Important: multithreading is not currently supported
+# Important: multithreading not possible without external library or db migration
 class SQLiteClient:
 
     def __init__(self, databaseContext):
