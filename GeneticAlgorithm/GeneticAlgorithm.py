@@ -3,6 +3,7 @@ from celex import Celex
 from Chromosome import Chromosome
 from Mating import Mating
 from random import randint
+import shutil
 import copy
 import multiprocessing
 import os
