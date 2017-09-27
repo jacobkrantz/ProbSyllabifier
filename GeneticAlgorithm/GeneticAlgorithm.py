@@ -1,5 +1,5 @@
 from activePool import ActivePool
-from celex import CELEXSAFE
+from celex import Celex
 from Chromosome import Chromosome
 from Mating import Mating
 from random import randint
@@ -12,7 +12,7 @@ import time
 '''
 fileName:       GeneticAlgorithm.py
 Authors:        Jacob Krantz, Maxwell Dulin
-Date Modified:  9/18/17
+Date Modified:  9/27/17
 
 Library for all Genetic Algorithm functionality.
 This should be the only class referenced outside this module
@@ -24,7 +24,7 @@ class GeneticAlgorithm:
         # population holds a list of chromosomes
         self.population = []
         self.config = config
-        self.celex = CELEXSAFE()
+        self.celex = Celex()
         self.mating = Mating(config)
 
     # displays all GeneticAlgorithm parameters to the console
@@ -62,8 +62,8 @@ class GeneticAlgorithm:
                 newChromosome.insertIntoCategory(randomCategory, gene)
 
             self.population.append(newChromosome)
-        self.__computeFitness()
-        self.__sort()
+        self._computeFitness()
+        self._sort()
 
     # pulls an existing population from an evolution log file.
     def importPopulation(self, resumeFrom):
@@ -83,8 +83,8 @@ class GeneticAlgorithm:
                         newChromosome.insertIntoCategory(i, gene)
                 self.population.append(newChromosome)
 
-        self.__computeFitness()
-        self.__displayPopulation(resumeFrom)
+        self._computeFitness()
+        self._displayPopulation(resumeFrom)
 
     # Move current logs to the archive.
     # Each run is kept under unique folder.
@@ -111,11 +111,11 @@ class GeneticAlgorithm:
     def evolve(self, evolutionCount = 0):
         while evolutionCount < self.config["NumEvolutions"]:
             self.population = self.mating.crossover(self.population)
-            self.__mutate()
-            self.__computeFitness()
-            self.__sort()
-            self.__saveAllChromosomes(evolutionCount)
-            self.__displayPopulation(evolutionCount)
+            self._mutate()
+            self._computeFitness()
+            self._sort()
+            self._saveAllChromosomes(evolutionCount)
+            self._displayPopulation(evolutionCount)
             evolutionCount += 1
 
     #----------------#
@@ -123,7 +123,7 @@ class GeneticAlgorithm:
     #----------------#
 
     # compute the fitness of all chromosomes in the population.
-    def __computeFitness(self):
+    def _computeFitness(self):
         sizes = (self.config["TrainingSizeHMM"], self.config["TestingSizeHMM"])
         self.celex.loadSets(sizes[0], sizes[1])
 
@@ -144,7 +144,7 @@ class GeneticAlgorithm:
             self.population[result[0]].setFitness(result[1])
 
     # sets Chromosome.fitness equal to syllabification accuracy.
-    # hmmSizes = [trainingSize, testingSize]
+    # hmmSizes = (trainingSize, testingSize)
     def _computeSingleFitness(self, i, hmmSizes, s, pool, resultsQueue):
         processName = multiprocessing.current_process().name
         with s:
@@ -157,13 +157,13 @@ class GeneticAlgorithm:
 
     # sort self.population by fitness (syllabification accurracy)
     # ordering: highest (self.population[0]) -> lowest
-    def __sort(self):
+    def _sort(self):
         self.population.sort()
         self.population.reverse()
 
     # keeps the population from getting stagnant by moving around genes
     # in the chromosome pseudo-randomly
-    def __mutate(self):
+    def _mutate(self):
 
         for i in range(1,len(self.population)):
             chrom = self.population[i]
@@ -204,26 +204,25 @@ class GeneticAlgorithm:
             '''
 
     # outputs all chromosomes to a log file cooresponding to a given evolution.
-    def __saveAllChromosomes(self, curEvolution):
-        map(lambda x: self.__saveChromosomeAtIndex(x, curEvolution), range(len(self.population)))
+    def _saveAllChromosomes(self, curEvolution):
+        location = self.config["LogFileLocation"]
+        name = "evo" + str(curEvolution) + ".log"
+        fileName = location + name
+        map(lambda x: self._saveChromosomeAtIndex(x, fileName), range(len(self.population)))
 
     # chromosome 'self.population[index]' saved in "GeneticAlgorithm/EvolutionLogs".
     # truncates the file if inserting from index 0.
     # Each 2-line group is a chromosome.
     # Categories are tab-delimited.
     # Genes have no spaces between them.
-    def __saveChromosomeAtIndex(self, index, curEvolution):
-        location = self.config["LogFileLocation"]
-        name = "evo" + str(curEvolution) + ".log"
-        fileName = location + name
-
+    def _saveChromosomeAtIndex(self, index, fileName):
         howToOpen = 'w' if index == 0 else 'a'
         with open(fileName, howToOpen) as outFile:
             for category in self.population[index].getGenes():
                 outFile.write(''.join(category) + '\t')
             outFile.write('\n' + str(self.population[index].getFitness()) + '\n')
 
-    def __displayPopulation(self, evolutionNumber = 0):
+    def _displayPopulation(self, evolutionNumber = 0):
         print("Population after evolution #" + str(evolutionNumber))
         for i in range(len(self.population)):
             print("chrom" + str(i) + "\t" + str(self.population[i].getFitness()))

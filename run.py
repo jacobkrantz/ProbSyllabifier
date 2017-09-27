@@ -1,4 +1,4 @@
-from celex import CELEX
+from celex import Celex
 from nist import NIST
 import sys
 import json
@@ -9,16 +9,15 @@ Authors:        Jacob Krantz, Max Dulin
 Date Modified:  9/17
 
 - main file to run machine
-- Syllabifies a file using NIST or CELEX
+- Syllabifies a file using NIST or Celex
 '''
 class color:
     YELLOW = '\033[93m'
     BOLD = '\033[1m'
     END = '\033[0m'
 
-# this currently doesn't work
 # runs the probabilistic syllabifier for either a phoneme or file.
-def runS(NIST, CELEX, comparator):
+def runS(NIST, Celex, comparator):
     obs = " "
 
     while(obs != ''):
@@ -30,12 +29,12 @@ def runS(NIST, CELEX, comparator):
             if comparator == "NIST":
                 NIST.syllabifyFile(obs,"HMMFiles/outfile.txt",comparator)
             else:
-                CELEX.syllabifyFile(obs,"HMMFiles/outfile.txt",comparator)
+                Celex.syllabifyFile(obs,"HMMFiles/outfile.txt",comparator)
         elif(obs != ''):
             if comparator == "NIST":
                 syl = NIST.syllabify(obs.lower())
             else:
-                syl = CELEX.syllabify(obs.lower(), GUID)
+                syl = Celex.syllabify(obs.lower(), GUID)
             print("Syllabification: " + syl)
 
 def help():
@@ -62,7 +61,7 @@ def getComparator(config):
         json.dump(config, outfile, sort_keys = True, indent = 4)
     return comparator
 
-#Ensures that alphabets
+#Ensures correct comparator
 def isLegalSelection(curComparator, trainedComparator, selection):
     if (selection in [1,4,5,6]) or (curComparator == trainedComparator):
         return True
@@ -75,7 +74,7 @@ def loadConfiguration():
 
 def main():
     nist = NIST()
-    celex = CELEX()
+    celex = Celex()
     config = loadConfiguration()
     print "----------------------------------------"
     print "Welcome to the Probabilistic Syllabifier"

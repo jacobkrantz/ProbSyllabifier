@@ -99,6 +99,20 @@ class SQLQueryService(SQLiteClient):
             cursor.execute(query)
             return cursor.fetchone()[0]
 
+    # returns all columns for an incorrect syllabification.
+    # selects all rows that are incorrect.
+    # returns a unicode 4-tuple (word, probSyl, celexSylab, isSame)
+    def getIncorrectResults(self):
+        self._checkPermissions("read_permissions")
+        query = """
+            SELECT *
+            FROM workingresults
+            WHERE Same = 0
+            """
+        with closing(self.connection.cursor()) as cursor:
+            cursor.execute(query)
+            return cursor.fetchall()
+
     # numberOfWords: integer
     # wordBlacklist: list of strings
     # returns set of words in ASCII encoding
