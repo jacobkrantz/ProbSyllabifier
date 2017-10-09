@@ -1,5 +1,6 @@
-from sqliteClient import SQLiteClient
+from config import settings as config
 from contextlib import closing
+from sqliteClient import SQLiteClient
 
 # does not support multithreading, even within batch functions.
 class SQLQueryService(SQLiteClient):
@@ -192,7 +193,7 @@ class SQLQueryService(SQLiteClient):
             return { str(key):str(value) for key,value in syllabifications.items() }
 
     def _getAlphabetColumn(self, prefix):
-        return prefix + self.config[self._databaseContext]["default_alphabet"]
+        return prefix + config[self._databaseContext]["default_alphabet"]
 
 
 class IndexException(Exception):

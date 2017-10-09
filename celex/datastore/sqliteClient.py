@@ -1,16 +1,14 @@
-import sqlite3
-import json
-import io
+from config import settings as config
 from contextlib import closing
 from collections import OrderedDict
+import sqlite3
 
 # Important: multithreading not possible without external library or db migration
 class SQLiteClient:
 
-    def __init__(self, databaseContext):
-        self._databaseContext = databaseContext
-        self.config = self._loadConfiguration()
-        self.connection = sqlite3.connect(self.config[self._databaseContext]["path"])
+    def __init__(self):
+        self._databaseContext = config["dataLoader"]["databaseContext"]
+        self.connection = sqlite3.connect(config[self._databaseContext]["path"])
 
     # string tableName
     # OrderedDict columnsAndTypes: column_name:column_datatype
@@ -59,20 +57,15 @@ class SQLiteClient:
     #   "Private"    #
     #----------------#
 
-    def _loadConfiguration(self):
-        with open('config.json') as json_data_file:
-            data = json.load(json_data_file)
-        return data
-
     # string whichpermission can be: "read_permissions" OR "write_permissions"
     def _checkPermissions(self, whichPermission):
-        if(not self.config[self._databaseContext][whichPermission]):
+        if(not config[self._databaseContext][whichPermission]):
             raise PermissionsException("User does not have permission: " + whichPermission)
         else:
             return True
 
     def _checkProtected(self, tableName):
-        if tableName in self.config[self._databaseContext]["protected_tables"]:
+        if tableName in config[self._databaseContext]["protected_tables"]:
             raise PermissionsException("Cannot execute: %s is a protected table" % tableName)
         else:
             return True

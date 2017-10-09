@@ -1,20 +1,18 @@
+from config import settings as config
 from datastore import SQLQueryService
 from probSyllabifier import ProbSyllabifier, HMM
 from utils import AbstractSyllabRunner
 import logging as log
-import json
 import uuid
 
 class Celex(AbstractSyllabRunner):
 
     def __init__(self):
         log.basicConfig(format='%(asctime)s %(levelname)s:%(message)s', datefmt='%X', level=log.INFO)
-        self.SQLQueryService = SQLQueryService("wordformsDB")
+        self.SQLQueryService = SQLQueryService()
         self._CSylResultsDict = dict()
         self._pronunciationsDict = dict()
         self._syllabifiedLst = []
-        with open('config.json') as json_data_file:
-            self.config = json.load(json_data_file)
 
     # Prompts user for training and testing sizes.
     # Loads sets, trains the HMM, and syllabifies Celex.
@@ -55,7 +53,7 @@ class Celex(AbstractSyllabRunner):
         pSylResultsDict = self._syllabifyTesting(GUID, transcriptionScheme)
         testResultsList = self._combineResults(pSylResultsDict)
 
-        if(self.config["write_results_to_DB"]):
+        if(config["write_results_to_DB"]):
             self._fillResultsTable(testResultsList)
 
         self.hmm.clean()

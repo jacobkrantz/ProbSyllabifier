@@ -2,6 +2,7 @@ from GeneticAlgorithm import GeneticAlgorithm
 import json
 import sys
 from random import randint
+from config import GAConfig as config
 
 '''
 fileName:       optimize.py
@@ -16,16 +17,9 @@ Date Modified:  9/10/17
     ex. 'python optimize.py 50'
 '''
 
-# loads all GeneticAlgorithm paramters as JSON (a dictionary)
-def loadConfiguration():
-    with open('config.json') as json_data_file:
-        data = json.load(json_data_file)
-    return data["GeneticAlgorithm"]
-
 # evolutionNumber represents the evolution log file to continue from
 def optimize():
-    config = loadConfiguration()
-    ga = GeneticAlgorithm(config)
+    ga = GeneticAlgorithm()
     ga.displayParameters()
 
     assert(config["PopulationSize"]/4 == config["NumMatingPairs"])

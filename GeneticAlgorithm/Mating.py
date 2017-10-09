@@ -1,3 +1,4 @@
+from config import GAConfig as config
 from random import randint
 import copy
 '''
@@ -14,8 +15,7 @@ Contains the workings for mating together the population.
 
 class Mating:
 
-    def __init__(self, config):
-        self.config = config
+    def __init__(self):
         self.newPopulation = []
 
     # performs as specified in above header
@@ -39,7 +39,7 @@ class Mating:
         usedList = []
 
 
-        for i in range(self.config["NumMatingPairs"]):
+        for i in range(config["NumMatingPairs"]):
 
             spot1 = randint(0,amount-1)
             while(spot1 in usedList):
@@ -83,7 +83,7 @@ class Mating:
         child1.setFitness(0)
 
         #exchanging the phones into their new, mated categories
-        for phone in self.config["GeneList"]:
+        for phone in config["GeneList"]:
 
             randNum = randint(0,100)
             #father

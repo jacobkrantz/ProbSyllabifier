@@ -1,12 +1,13 @@
+from config import settings as config
 from syllabParser import SyllabParser
 import json
 import numpy as np
 import sys
 
 '''
-fileName:       utils.py
+fileName:       hmmUtils.py
 Authors:        Jacob Krantz
-Date Modified:  2/26/17
+Date Modified:  10/9/17
 
 Common utilities needed for building matrices with a HMM
 '''
@@ -14,8 +15,6 @@ class HMMUtils:
 
     def __init__(self):
         self.sylParser = SyllabParser()
-        with open('config.json') as json_data_file:
-            self.config = json.load(json_data_file)
 
     # intialize a matrix using numpy with provided size: (X,Y)
     # returns matrix
@@ -98,9 +97,9 @@ class HMMUtils:
     # returns as a list of lists.
     def getTagNames(self,lang):
         if(lang == 1):
-            inFile = open(self.config["NistTranscriptionFile"], 'r')
+            inFile = open(config["NistTranscriptionFile"], 'r')
         else:
-            inFile = open(self.config["CelexTranscriptionFile"], 'r')
+            inFile = open(config["CelexTranscriptionFile"], 'r')
 
         tags = []
         for line in inFile:
