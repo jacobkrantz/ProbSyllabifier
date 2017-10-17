@@ -16,7 +16,7 @@ evolutionStdDevList = []
 try:
     logNumber = 0
     while True:
-        path = "GeneticAlgorithm/EvolutionLogs/Archive/0/"
+        path = "../GeneticAlgorithm/EvolutionLogs/Archive/0/"
         fileName = "evo" + str(logNumber) + ".log"
         with open(path + fileName, 'r') as inFile:
             fitnessLst = []
