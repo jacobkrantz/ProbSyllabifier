@@ -7,7 +7,7 @@ import logging as log
 '''
 fileName:       ProbSyllabifier.py
 Authors:        Jacob Krantz
-Date Modified:  3/14/17
+Date Modified:  10/17
 
 - Purpose: Syllabifies a given phoneme (or file of phonemes)
     - uses the Viterbi Algrithm
@@ -21,7 +21,7 @@ class ProbSyllabifier:
 
     # initializes all data structures necessary
     # to syllabify a phoneme or a file.
-    def __init__(self, transciptionScheme=[]):
+    def __init__(self, transcriptionScheme=[]):
         log.basicConfig(format='%(asctime)s %(levelname)s:%(message)s', datefmt='%X', level=log.INFO)
         self.hmmUtils = HMMUtils()
         self.__matrixA = []
@@ -32,7 +32,7 @@ class ProbSyllabifier:
         self.__iMax = 0
         self.__jMax = 0
         self.__comparator = "NIST"
-        self.transciptionScheme = transciptionScheme
+        self.transcriptionScheme = transcriptionScheme
 
     # initializes the necessary data structures by loading them from files
     # within the /HMMFiles/ directory.
@@ -139,13 +139,14 @@ class ProbSyllabifier:
         if self.__comparator == "CELEX":
             return list(observation)
 
-        obsLst = []
+        obsLst = ['<']
         for phone in observation.split(' '):
             if phone[0] in ['"',"'"]:     # remove ' or " at start.
                 phone = phone[1:]
             if phone[-1] in ['"',"'"]:    # for removing from end.
                 phone = phone[:-1]
             obsLst.append(phone)
+        obsLst.append('>')
         return obsLst
 
 
@@ -154,7 +155,7 @@ class ProbSyllabifier:
             lang = 1
         else:
             lang = 2
-        return list(map(lambda x:self.hmmUtils.getCategory(x, lang, self.transciptionScheme), obsLst))
+        return list(map(lambda x:self.hmmUtils.getCategory(x, lang, self.transcriptionScheme), obsLst))
 
     # convert obsLst to its bigrams
     def __convertToBigrams(self,obsLst):

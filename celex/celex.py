@@ -5,6 +5,8 @@ from utils import AbstractSyllabRunner
 import logging as log
 import uuid
 
+# transcriptionSchemes passed in will be modified to include
+# static entries as specified in Celex.addStaticTags()
 class Celex(AbstractSyllabRunner):
 
     def __init__(self):
@@ -40,7 +42,7 @@ class Celex(AbstractSyllabRunner):
         GUID = str(uuid.uuid1()) # set new GUID based on host machine and current time
 
         log.info("Starting step: Train HMM Model")
-        self.hmm = HMM(2, transcriptionScheme, self._syllabifiedLst) # lang hack: 2 is celex
+        self.hmm = HMM(2, self.addStaticTags(transcriptionScheme), self._syllabifiedLst) # lang hack: 2 is celex
         self.hmm.setGUID(GUID)
         self.hmm.buildMatrixA()
         self.hmm.buildMatrixB()
@@ -50,7 +52,7 @@ class Celex(AbstractSyllabRunner):
 
     # thread-safe when DB results is false.
     def testHMM(self, transcriptionScheme=[], GUID=""):
-        pSylResultsDict = self._syllabifyTesting(GUID, transcriptionScheme)
+        pSylResultsDict = self._syllabifyTesting(GUID, self.addStaticTags(transcriptionScheme))
         testResultsList = self._combineResults(pSylResultsDict)
 
         if(config["write_results_to_DB"]):
@@ -125,6 +127,15 @@ class Celex(AbstractSyllabRunner):
         print "Ignoring", skippedSyllabCount, "skips:", ignoredPercentSame, "%"
         print "----------------------------------------"
         return percentSame
+
+    # add all static tags to the incoming transcriptionScheme.
+    # current use: include start and end tags for a word ('<', '>')
+    #   as its own category.
+    def addStaticTags(self, transcriptionScheme):
+        startAndEnd = ['<','>']
+        if (startAndEnd not in transcriptionScheme) and (len(transcriptionScheme) > 0):
+            transcriptionScheme.append(startAndEnd)
+        return transcriptionScheme
 
     def _toASCII(self, wordLst):
         return map(lambda x: x[0].encode('utf-8'), wordLst)

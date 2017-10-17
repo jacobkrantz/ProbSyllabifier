@@ -55,6 +55,7 @@ class SyllabParser:
     #   a boundary cannot follow a boundary
     def _parseCelexWord(self, word):
         word = word.split()[0]
+        word = '<' + word + '>'
         phonemeBigramList = []
         wasBoundary = False
         if word[0] == '-' or word[-1] == '-':
