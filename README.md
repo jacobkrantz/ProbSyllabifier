@@ -1,65 +1,67 @@
 # ProbSyllabifier
-Probabilistic syllabifier of English language using HMM.
-Trains and tests against the CELEX dataset using DISC, a phonetic transcription similar to IPA.
-Also trains and tests against NIST with Arpabet. Word sets for NIST are generated using the Brown Corpus with custom tokenization.
+Probabilistic syllabifier of written language using a first order Hidden Markov Model and the Genetic Algorithm.  
+#### Goal  
+Create an automatic, probabilistic syllabifier that can achieve the highest possible accuracy of syllabification when tested against words not previously seen.  
+Words are represented as a sequence of sounds using the phonetic alphabet DISC, a digital version of IPA. Data source: Celex.  
+Also trains and tests against NIST with Arpabet. Word sets for NIST are generated using the Brown Corpus with custom tokenization.  
+#### Background  
+This is a research project sponsored by Gonzaga University Department of Computer Science. Director of research is Dr. Paul De Palma. Presentation of this work was done at the Spokane Intercollegiate Research Conference (SIRC) in Spokane, WA, earning the Top Oral Presentation award. Also presented at Gonzaga's Research Showcase Poster Session. 
 
 ---
-### Syllabification
+## Syllabification
+### Getting Started
+To work with this syllabification software in Celex, you need a have a copy of the dataset.  
+`wordforms.db` contains part of the Celex linguistics dataset refactored to integrate more easily into this python project.  
+To work with the NIST source, you need to have [NIST syllabification Software](https://www.nist.gov/file/65961) installed.  
+Other data sources are possible but not implemented, such as Miriam Webster.  
+### Running the Syllabifier  
+A typical run of the syllabifier will involve training the HMM, running the syllabifier, and obtaining an output accuracy. To run the syllabifier, call:  
+`$ python run.py`  
+At the main menu, enter option 1 to choose the training and testing size for the upcoming run.  
+When the main menu returns, enter option 3 to run the syllabifier under the conditions previously set.  
+This will run the syllabifier on randomized words and print an output of its accuracy.  
+If `"write_results_to_DB": true` in `config.json`, you can query the results directly in `wordforms.db` using SQL commands.  
 
-#### Programs:
+### Computing For Optimization  
+Our Hidden Markov Model utilizes a dynamic, categorical tagset. To generate this tagset, the HMM needs to be given a scheme of how to convert the observations (DISC sounds) into their corresponding category. To do this autonomously, we start with random categories. Using a Genetic Algorithm, we are able to compute the optimal categorization (given enough time). To start optimizing from the beginning, run:  
+`$ python optimize.py `  
+If you wish to continue optimizing a previous run, use the command below but replace i with the evolution number to continue from. This evolution must have a log file in the `GeneticAlgorithm/EvolutionLogs/` folder.  
+`$ python optimize.py  i `  
+## Celex Code Example
+#### Process for measuring syllabification accuracy  
+`Celex.py` is the interface for ProbSyllabifier working with Celex.  
+Both `run.py` and `optimize.py` utilize this interface.
+Working with it directly can be done as follows:
+```python
+c = Celex()
+c.loadSets(10000, 1500) # testingSize, trainingSize
 
-*NIST.py*  
-Interfaces directly with the NIST Syllabifier.  
-*SyllabInfo.py*  
-Syllabifies an entire file of words and outputs resulting dictionary to a new file.  
-*SyllabParser.py*  
-Takes in the syllabDict.txt and outputs a list containing each word with a bigram that was a phone given the previous phone, along with whether there was a syllable boundary.  
-*HMM.py*  
-Used to build a Hidden Markov Model: trains A and B matrices.  
-*utils.py*  
-Tools currently associated with training and using HMM matrices.  
-*run.py*  
-This is the main file to run on:
-Run this file to use the Syllabifier. Used for building the sets for the syllabifier, training the matrices, running the syllabifier and testing the syllabifier. T
+# train the A and B matrices of the Hidden Markov Model.
+# pass in a transcriptionScheme that contains all phone categories (see test/test_celex.py)
+# or default to specification in config.json.
+Guid = c.trainHMM([]) # default to config
+
+# Accuracy is the percentage a whole word was syllabified correctly out of all test words.
+# either pass in a complete transcriptionScheme or an empty list, same as above.
+Accuracy = c.testHMM([], Guid)
+```
+
+## Tests
+Tests should be ran before any pull requests.  
+Unit tests are implemented in Python's `unittest` module and accessed through:  
+```
+$ cd ProbSyllabifier
+$ python -m unittest discover -s test
+```
+#### Test Cases
+`test_celex.py` ensures that Celex training and testing work with both a given transcription scheme and without.
+
+## Contributors
+Suggestions, issues, and pull requests are welcomed!  
+See [Getting Started](#getting-started)  
+Further contact: `jkrantz@zagmail.gonzaga.edu`  
+See current [Contributors](github.com/jacobkrantz/ProbSyllabifier/graphs/contributors)
 
 
-### Tokenization
-
-*brownTokenizer.py*  
-tokenizes a corpus  
-*freqLst.py*  
-generates a file containing the 1000 most frequent words given a tokenized corpus  
-*randomWords.py*  
-follows FreqLst.py. generates a random subset of words given a tokenized grouping of words
-
-
-#### HMM Files:
-*MatrixA.txt*  
-Holds the information from Matrix A  
-*MatrixB.txt*  
-Holds the information from Matrix B  
-*syllabDict.txt*  
-Houses the dictionary created in NISTSyllab.py.
-*phoneCategoriesArp.txt*
-Holds the categories for the Arpabet phones
-*phoneCategoriesIPA.txt*
-Holds the temporary categories for the IPA phones
-
-
-#### Corpus Files:
-
-*brown_words.txt*  
-All tokenized words in the Brown corpus  
-*editorial_words.txt*  
-every untokenized word in the Editorials category of the Brown corpus  
-*freqEditWords.txt*  
-1000 most frequently used words in the Editorials category of the brown corpus  
-*freq_words.txt*  
-1000 most frequently used words in the brown corpus  
-*randomWords.txt*  
-random selection of 20 words from freq_words.txt  
-
-#### Observations and Future Ideas
-What if we built a support vector machine from this?
-We could test if the word is so many phones then it should have 1,2,3... syllables in it.
-some of the problems
+## License
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) for details  
