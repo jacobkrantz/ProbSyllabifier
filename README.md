@@ -21,11 +21,12 @@ At the main menu, enter option 1 to choose the training and testing size for the
 When the main menu returns, enter option 3 to run the syllabifier under the conditions previously set.  
 This will run the syllabifier on randomized words and print an output of its accuracy.  
 If `"write_results_to_DB": true` in `config.json`, you can query the results directly in `wordforms.db` using SQL commands.  
+Note: Do not run the NIST aspect of the project. It is the old system which has been completely replaced by the CELEX system. 
 
 ### Computing For Optimization  
 Our Hidden Markov Model utilizes a dynamic, categorical tagset. To generate this tagset, the HMM needs to be given a scheme of how to convert the observations (DISC sounds) into their corresponding category. To do this autonomously, we start with random categories. Using a Genetic Algorithm, we are able to compute the optimal categorization (given enough time). To start optimizing from the beginning, run:  
 `$ python optimize.py `  
-If you wish to continue optimizing a previous run, use the command below but replace i with the evolution number to continue from. This evolution must have a log file in the `GeneticAlgorithm/EvolutionLogs/` folder.  
+If you wish to continue optimizing a previous run, use the command below but replace i with the evolution number to continue from. This evolution must have a log file in the `GeneticAlgorithm/EvolutionLogs/` folder. However, be sure to store the evoluations in another location for overwriting purposes.  
 `$ python optimize.py  i `  
 ## Celex Code Example
 #### Process for measuring syllabification accuracy  
