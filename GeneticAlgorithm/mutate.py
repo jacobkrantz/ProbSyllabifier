@@ -19,7 +19,9 @@ Genetic Algorithm mutations.
 # in the chromosome pseudo-randomly
 def mutate(population):
     mutationFactor = calculateMutationFactor(population)
-
+    percentage = mutationFactor * 100
+    print "percentage:",percentage
+    print "mutationFactor: ",mutationFactor
     for i in range(1,len(population)):
         chrom = population[i]
         #we need to rebuild the chromosome because it's a list of sets
@@ -29,7 +31,7 @@ def mutate(population):
         #per gene mutate
         for category in chrom.getGenes():
             for gene in category:
-                percentage = mutationFactor * 100
+
                 randNum = randint(0,99)
                 #corresponds to the mutation factor
                 if(randNum >= 0 and randNum <= percentage):
@@ -45,17 +47,20 @@ def mutate(population):
     return population
 
 # calcuates a standard deviation of the top 8 chromosomes fitness.
-# Rreturns a variable mutation factor, higher when low deviation, lower
+# Returns a variable mutation factor, higher when low deviation, lower
 # when high deviation.
 def calculateMutationFactor(population):
-    stdev = np.std(np.array(list(map(lambda x: x.getFitness(), population[:8]))))
+    stdev = np.std(np.array(list(map(lambda x: x.getFitness(), population[:12]))))
+
     desiredDev = float(config["DesiredDeviation"])
     mutationFactor = float(config["BaseMutationFactor"])
+
     if stdev <= desiredDev:
-        mutationFactor -= (stdev - desiredDev) / (desiredDev * 10)
+        mutationFactor -= (stdev - desiredDev) / float((desiredDev * 10))
     elif stdev > (2 * desiredDev):
         mutationFactor *= 0.75
-
+    else:
+        pass
     print "Standard Deviation: ", str(stdev)
     print "Mutation Factor: ", str(mutationFactor)
     return mutationFactor
