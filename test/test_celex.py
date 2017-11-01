@@ -3,8 +3,10 @@ import unittest
 
 class TestCelex(unittest.TestCase):
 
-    def test_with_transcription(self):
-        transciptionScheme = [
+    def setUp(self):
+        self.celex = Celex()
+        self.celex.loadSets(500,25)
+        self.transciptionScheme = [
             ['b','h','z','m','0','x','Z'],
             ['p','C','T','_','v'],
             ['k'],
@@ -18,17 +20,27 @@ class TestCelex(unittest.TestCase):
             ['q','s'],
             ['J','w','g','f']
         ]
-        c = Celex()
-        c.loadSets(500,25)
-        HMMBO = c.trainHMM(transciptionScheme)
-        percentSame = c.testHMM(HMMBO)
+
+    def tearDown(self):
+        self.celex = None
+        self.transcriptionScheme = None
+
+    def test_hmmbo(self):
+        HMMBO = self.celex.trainHMM(self.transciptionScheme)
+        self.assertGreater(len(HMMBO.observationLookup), 0)
+        self.assertGreater(len(HMMBO.hiddenLookup), 0)
+        self.assertGreater(len(HMMBO.transcriptionScheme), 0)
+        self.assertIsNotNone(HMMBO.matrixA)
+        self.assertIsNotNone(HMMBO.matrixB)
+
+    def test_with_transcription(self):
+        HMMBO = self.celex.trainHMM(self.transciptionScheme)
+        percentSame = self.celex.testHMM(HMMBO)
         self.assertTrue(percentSame > 0.00)
 
     def test_without_transcription(self):
-        c = Celex()
-        c.loadSets(500,25)
-        HMMBO = c.trainHMM([])
-        percentSame = c.testHMM(HMMBO)
+        HMMBO = self.celex.trainHMM()
+        percentSame = self.celex.testHMM(HMMBO)
         self.assertTrue(percentSame > 0.00)
 
 

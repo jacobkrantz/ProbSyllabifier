@@ -34,13 +34,13 @@ class TestMutate(unittest.TestCase):
         self.assertNotAlmostEqual(mutationFactor, self.initMutFactor)
 
         mutationFactor = mutate.calculateMutationFactor(self.populationZero)
-        # mutation should stay increase greatly
+        # mutation should increase greatly
         self.assertGreater(mutationFactor, self.initMutFactor)
         self.assertNotAlmostEqual(mutationFactor, self.initMutFactor)
 
         mutationFactor = mutate.calculateMutationFactor(self.populationHigh)
-        # mutation should stay the same when (desiredDev < dev < 2*desiredDev)
-        self.assertEqual(mutationFactor, self.initMutFactor)
+        # mutation should decrease when (2*desiredDev < dev)
+        self.assertGreater(self.initMutFactor, mutationFactor)
 
     def test_mutate(self):
         '''
@@ -78,8 +78,8 @@ class TestMutate(unittest.TestCase):
         for fitness in [87,88,88,88,88,88,88,88,88,89,89,89]:
             self.populationLow.append(self._makeChromosome(fitness))
 
-        self.populationHigh = [] # dev: 3.60555
-        for fitness in [83,84,85,86,87,88,89,90,91,92,93,94]:
+        self.populationHigh = [] # dev: 5.940998
+        for fitness in [75,77,85,86,87,88,89,90,91,92,93,94]:
             self.populationHigh.append(self._makeChromosome(fitness))
 
     def _setUp_mutate(self):
