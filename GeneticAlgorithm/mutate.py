@@ -4,54 +4,43 @@ from random import randint
 import numpy as np
 
 '''
-fileName:       GeneticAlgorithm.py
+fileName:       mutate.py
 Authors:        Jacob Krantz, Maxwell Dulin
-Date Modified:  10/8/17
+Date Modified:  10/31/17
 
 Genetic Algorithm mutations.
     - automatically determine a mutation factor
     based on stagnation of the population.
     - mutate the population based on a given
     mutation factor.
+    - mutates all chromosomes except for the top.
 '''
 
-# keeps the population from getting stagnant by moving around genes
-# in the chromosome pseudo-randomly
-def mutate(population):
-    mutationFactor = calculateMutationFactor(population)
-    percentage = mutationFactor * 100
-    print "percentage:",percentage
-    print "mutationFactor: ",mutationFactor
-    for i in range(1,len(population)):
-        chrom = population[i]
-        #we need to rebuild the chromosome because it's a list of sets
-        newChromosome = Chromosome(config["NumCategories"])
-        curIter = 0
+def mutate(pop):
+    """
+    Keeps the population from getting stagnant.
+    Mutates the entire population.
 
-        #per gene mutate
-        for category in chrom.getGenes():
-            for gene in category:
+    Args:
+        pop (list of type Chromosome)
+    Returns:
+        pop (list of type Chromosome)
+    """
+    mutFactor = calculateMutationFactor(pop)
+    return [pop[0]] + list(map(lambda x:mutateChrom(x,mutFactor), pop[1:]))
 
-                randNum = randint(0,99)
-                #corresponds to the mutation factor
-                if(randNum >= 0 and randNum <= percentage):
-                    randomCategory = randint(0, config["NumCategories"] - 1)
-                    #makes sure it cannnot be inserted back into the same category
-                    while(curIter == randomCategory):
-                        randomCategory = randint(0, config["NumCategories"] - 1)
-                    newChromosome.insertIntoCategory(randomCategory, gene)
-                else:
-                    newChromosome.insertIntoCategory(curIter, gene)
-            curIter = curIter + 1
+def calculateMutationFactor(pop):
+    """
+    Calcuates a standard deviation of the top chromosomes fitness.
+    Returns a variable mutation factor; higher when low deviation,
+    lower when high deviation.
 
-    return population
-
-# calcuates a standard deviation of the top 8 chromosomes fitness.
-# Returns a variable mutation factor, higher when low deviation, lower
-# when high deviation.
-def calculateMutationFactor(population):
-    stdev = np.std(np.array(list(map(lambda x: x.getFitness(), population[:12]))))
-
+    Args:
+        pop (list of type Chromosome): entire working population.
+    Returns:
+        float: factor for chromosome mutation.
+    """
+    stdev = np.std(np.array(list(map(lambda x: x.getFitness(), pop[:config["NumChromsInDeviation"]]))))
     desiredDev = float(config["DesiredDeviation"])
     mutationFactor = float(config["BaseMutationFactor"])
 
@@ -59,8 +48,27 @@ def calculateMutationFactor(population):
         mutationFactor -= (stdev - desiredDev) / float((desiredDev * 10))
     elif stdev > (2 * desiredDev):
         mutationFactor *= 0.75
-    else:
-        pass
-    print "Standard Deviation: ", str(stdev)
-    print "Mutation Factor: ", str(mutationFactor)
+
     return mutationFactor
+
+def mutateChrom(chromosome, mutationFactor):
+    '''
+    Per-gene: each gene has a percent chance of mutating to a random category.
+
+    Args:
+        chromosome (Chromosome): the chomosome to mutate
+        mutationFactor (float): the factor used to alter the chromosome
+    Returns:
+        Chromosome: the provided chromosome with mutations made
+    '''
+    newChromosome = Chromosome(config["NumCategories"])
+
+    for catIndex, category in enumerate(chromosome.getGenes()):
+        for gene in category:
+            newCategory = catIndex
+            if(float(randint(0,99))/100 <= mutationFactor):
+                while(newCategory == catIndex):
+                    newCategory = randint(0, config["NumCategories"] - 1)
+            newChromosome.insertIntoCategory(newCategory, gene)
+
+    return newChromosome
