@@ -1,212 +1,171 @@
 from utils import HMMUtils
-import os
+from HMMBO import HMMBO
 
-'''
-fileName:       HMM.py
-Authors:        Jacob Krantz
-Date Modified:  9/17
-
-- Builds A and B matrices of an HMM
-- Functions:
-    - buildMatrixA()
-    - buildMatrixB()
-    - makeViterbiFiles()
-    - getTrainingSize()
-'''
 class HMM:
+    """ Trains a Hidden Markov Model with provided training data. """
 
-    # lang = 1 for NIST.
-    # lang = 2 for CELEX. `trainingSet` must be populated for CELEX.
-    # transcriptionScheme should be [] if not used.
     def __init__(self, lang, transcriptionScheme, trainingSet=[]):
+        """
+        Args:
+            lang (int): 1 for NIST, 2 for CELEX.
+            transcriptionScheme (list of sets of phones):
+                                        should be '[]' if not used.
+            trainingSet (list of strings): optional set of words to train from.
+                                        Must be populated if lang = 2 (CELEX)
+        """
         self.utils = HMMUtils()
-        self.lang = lang
+        self.HMMBO = HMMBO()
+        self.HMMBO.transcriptionScheme = transcriptionScheme
         self.allBigramTups = self._loadTrainingData(trainingSet)
-        self.transcriptionScheme = transcriptionScheme
-        self.boundFreqDict = {}
         self.tagDict       = {}
         self.bigramLookup  = []
-        self.tagBigrams    = []
         self.tagLookup     = []
-        self.boundCount    = 0
-        self.numBigrams    = 0
-        self.GUID          = ""
-        self.__loadFiles()
+        self._loadStructures(lang, transcriptionScheme)
 
-    def setGUID(self, GUID):
-        self.GUID = GUID
+    def train(self):
+        """
+        Trains all structures needed for the Hidden Markov Model.
+        Fills out all attributes of the HMMBO accordingly.
+        Returns:
+            HMMBO: business object containing training information.
+        """
+        self.HMMBO.matrixA = self._buildMatrixA()
+        self.HMMBO.matrixB = self.buildMatrixB()
+        self.HMMBO.observationLookup = self.bigramLookup
+        self.HMMBO.hiddenLookup = self.tagLookup
+        return self.HMMBO
 
-    # goes through process of creating MatrixA for an HMM.
-    # MatrixA is the transition probability of going from one
-    #     boundary to another.
-    #
-    # for both x and y, 0 is no boundary.
-    # for both x and y, 1 is a boundary.
-    # each entry is normalized by prior tag count.
-    #
-    # builds matrix probabilities,
-    #     outputs final matrix to a file "./HMM/MatrixA.txt"
-    #     using numpy. Also returns MatrixA.
-    def buildMatrixA(self):
-        for phoneme in self.allBigramTups:
-            self.tagBigrams += self.utils.getTagBigrams(phoneme)
-
-        tagBigramDict = self.utils.buildTagBigramDict(self.tagBigrams)
-        matrixA = self.__insertProbA(tagBigramDict)
-        self.utils.outputMatrix(matrixA, "MatrixA" + self.GUID, "A")
-
-        return matrixA
-
-
-    # goes through process of creating MatrixB for an HMM.
-    # MatrixB is...
-    #
-    # for y direction, 0 is no boundary and 1 is a boundary
-    #
-    # builds matrix probabilities,
-    #     outputs final matrix to a file "./HMM/MatrixB.txt"
-    #     using numpy.
-    def buildMatrixB(self):
-        MatrixB = self.utils.initMatrix(self.numBigrams,len(self.tagLookup))
-        MatrixB = self.__insertCountB(MatrixB)
-        MatrixB = self.normalizeNaiveB(MatrixB)
-
-        self.utils.outputMatrix(MatrixB, "MatrixB" + self.GUID, "B")
-
-
-    # creates files that allow the Viterbi algorithm to use the matrices
-    # created. Creates files:
-    # - ./HMMFiles/obsLookup{GUID}.txt
-    # - ./HMMFiles/hiddenLookup{GUID}.txt
-    def makeViterbiFiles(self):
-        obsLookupName = "./HMMFiles/obsLookup" + self.GUID + ".txt"
-        hiddenLookupName = "./HMMFiles/hiddenLookup" + self.GUID + ".txt"
-        try:
-            self._filesDidLoad()
-        except Exception as e:
-            print "reload", e
-            self.__loadFiles()
-        finally:
-            self.utils.makeLookup(self.bigramLookup, obsLookupName)
-            self.utils.makeLookup(self.tagDict, hiddenLookupName)
-
-    # return an integer of the number of items that exist in the training set.
     def getTrainingSize(self):
+        """
+        Returns:
+            int: number of syllabified words in the training set.
+        """
         return len(self.allBigramTups)
-
-    # remove files containing the GUID
-    def clean(self):
-        if self.GUID == "":
-            return
-
-        source = "./HMMFiles/"
-        for f in os.listdir(source):
-            if self.GUID in f:
-                os.remove(source + f)
 
     # ------------------------------------------------------
     # helper functions below
     # ------------------------------------------------------
 
+    def _buildMatrixA(self):
+        """
+        Goes through process of creating MatrixA for an HMM.
+        MatrixA is the transition probability of going from one
+             boundary to another.
+
+        for both x and y, 0 is no boundary.
+        for both x and y, 1 is a boundary.
+        each entry is normalized by prior tag count.
+
+        Returns:
+            numpy matrix: matrixA transition probabilities
+        """
+        tagBigrams = []
+        for phoneme in self.allBigramTups:
+            tagBigrams += self.utils.getTagBigrams(phoneme)
+
+        tagBigramDict = self.utils.buildTagBigramDict(tagBigrams)
+        matrixA = self.__insertProbA(tagBigramDict)
+        return matrixA
+
+    def buildMatrixB(self):
+        """
+        Goes through the process of creating MatrixB for an HMM.
+        For y direction, 0 is no boundary and 1 is a boundary.
+
+        Returns:
+            numpy matrix: matrixB hidden state prior probabilities
+        """
+        matrixB = self.utils.initMatrix(len(self.bigramLookup),len(self.tagLookup))
+        matrixB = self.__insertCountB(matrixB)
+        matrixB = self.normalizeNaiveB(matrixB)
+        return matrixB
+
     def _loadTrainingData(self, trainingSet):
+        """
+        Args:
+            trainingSet(list of strings): set of words to train from. Can be empty.
+        Returns:
+            List of lists of tuples: [[(phone,phone,int),(...),],[...],] where
+                            int is 0 for no boundary 1 for yes boundary.
+        """
         if len(trainingSet) == 0:   # from nist
             return self.utils.getNistBigramTups()
         return self.utils.parseCelexTrainingSet(trainingSet)
 
-
-    # loads values into necessary data structures for building the HMM
-    #       - allBigramTups
-    #       - tagDict
-    #       - tagLookup
-    #       - bigramLookup
-    #       - numBigrams
-    #       - bigramFreqDict
-    def __loadFiles(self):
-        if len(self.tagDict) != 0:
-            assert(False)
-        self.tagDict, self.tagLookup = self.utils.getTagLookup(self.allBigramTups,self.lang, self.transcriptionScheme)
-        self.allBigramTups = self.utils.expandTags(self.allBigramTups,self.lang,self.transcriptionScheme)
-        #print self.allBigramTups
+    def _loadStructures(self, lang, transcriptionScheme):
+        """ loads necessary data structures for building the HMM """
+        self.tagDict, self.tagLookup = self.utils.getTagLookup(self.allBigramTups,lang, transcriptionScheme)
+        self.allBigramTups = self.utils.expandTags(self.allBigramTups,lang,transcriptionScheme)
         self.bigramLookup = self.utils.getBigramLookup(self.allBigramTups)
-        self.numBigrams = len(self.bigramLookup)
-        self.bigramFreqDict = self.utils.getBigramFreqDict(self.allBigramTups, self.numBigrams)
+        self.bigramFreqDict = self.utils.getBigramFreqDict(self.allBigramTups, len(self.bigramLookup))
         self._filesDidLoad()
 
-    # inserts the count of a tag given the previous tag
-    # populates matrixA with these values after normalizing the
-    # probabilities by the occurance count of the prior tag (tagDict).
-    # Param 1: a dictionary of bigrams as the key: value is the number of occuarances
     def __insertProbA(self, tagBigramDict):
-        #makes a matrix as big as the the tagLookUp is. X = Y.
-        xy = len(self.tagLookup)
-
-        matrixA = self.utils.initMatrix(xy,xy)
-
+        """
+        Inserts the count of a tag given the previous tag
+        populates matrixA with these values after normalizing the
+        probabilities by the occurance count of the prior tag (tagDict).
+        Args:
+            tagBigramDict (dictionary <(string,string), int>): bigram of tags
+                                with value being number of occurrances.
+        Returns:
+            numpy matrix: matrixA
+        """
+        matrixA = self.utils.initMatrix(len(self.tagLookup),len(self.tagLookup))
         for entry in tagBigramDict:
             iTag = entry[0]
             jTag = entry[1]
 
-            #the total count of times that the bigram of tags appears in the order
-            count = tagBigramDict[entry]
-            #This is the count of the iTag's that we need to normalize it.
-            divisor = self.tagDict[iTag]
-            #normalizes the probability
-            probability = count / float(divisor)
-
-            #these find the index of where they should be on matrixA
-            #tagLookup cooresponds to the spot on the matrix
-            iIndex = self.tagLookup.index(iTag)
+            count = tagBigramDict[entry]         # Count of tag bigram occurrances
+            divisor = self.tagDict[iTag]         # Count of the iTags
+            probability = count / float(divisor) # normalizes the probability
+            iIndex = self.tagLookup.index(iTag)  # use tagLookup for matrix location
             jIndex = self.tagLookup.index(jTag)
 
-            #sets the value into the matrix
-            matrixA[iIndex,jIndex] = probability
+            matrixA[iIndex,jIndex] = probability # inserts prob into the matrix
 
         return matrixA
 
-
-    # inserts the count of a bigram given a boundary
-    # populates matrixB with these values and return matrixB
-    # Param 1: A matrix
     def __insertCountB(self, MatrixB):
+        """
+        Inserts the count of a bigram given a boundary.
+        Populates matrixB with these values.
+        Args:
+            matrixB (numpy matrix)
+        Returns:
+            numpy matrix: matrixB
+        """
         for phoneme in self.allBigramTups:
             for bigram in phoneme:
                 tup = (bigram[0],bigram[1])
                 i = self.bigramLookup.index(tup)
-
-                # easy test for bigram occurance
-                #if(tup == ('ae','l')):
-                #    print bigram
-
-                curTag = bigram[2]
-                j = self.tagLookup.index(curTag)
+                j = self.tagLookup.index(bigram[2]) # current tag
                 MatrixB[i, j] = MatrixB[i, j] + 1
-
         return MatrixB
 
-
-    # normaliziation strategy: divide all MatrixB entries by the probability
-    # of the bigram occurring.
-    # Param 1: The matrix that is to be normalized
     def normalizeNaiveB(self, MatrixB):
-        for i in range(0, self.numBigrams):     # loop through each phone bigram
-            bigram = self.bigramLookup[i]
+        """
+        Normaliziation strategy: divide all MatrixB entries by the probability
+        of the bigram occurring.
+        Args:
+            matrixB (numpy matrix)
+        Returns:
+            numpy matrix: matrixB
+        """
+        for i, bigram in enumerate(self.bigramLookup):
             bigramProb = self.bigramFreqDict[bigram]
             for j in range(0, len(self.tagLookup)):     # loop through each tag
                 MatrixB[i,j] = MatrixB[i,j] / float(bigramProb)
-
         return MatrixB
 
-
-
-
-    # called to ensure class structures are all loaded. Fail fast.
     def _filesDidLoad(self):
+        """ Ensures all structures are loaded. Fail fast. """
         assert(len(self.tagDict)        != 0)
         assert(len(self.tagLookup)      != 0)
         assert(len(self.allBigramTups)  != 0)
         assert(len(self.bigramLookup)   != 0)
         assert(len(self.bigramFreqDict) != 0)
-        assert(self.numBigrams          != 0)
+        assert(len(self.bigramLookup)   != 0)
 
         # All items in lookup must be unique
         assert(len(self.bigramLookup) == len(set(self.bigramLookup)))

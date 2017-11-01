@@ -20,15 +20,15 @@ class TestCelex(unittest.TestCase):
         ]
         c = Celex()
         c.loadSets(500,25)
-        GUID = c.trainHMM(transciptionScheme)
-        percentSame = c.testHMM(transciptionScheme, GUID)
+        HMMBO = c.trainHMM(transciptionScheme)
+        percentSame = c.testHMM(HMMBO)
         self.assertTrue(percentSame > 0.00)
 
     def test_without_transcription(self):
         c = Celex()
         c.loadSets(500,25)
-        GUID = c.trainHMM([])
-        percentSame = c.testHMM([], GUID)
+        HMMBO = c.trainHMM([])
+        percentSame = c.testHMM(HMMBO)
         self.assertTrue(percentSame > 0.00)
 
 

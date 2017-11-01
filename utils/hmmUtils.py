@@ -4,14 +4,8 @@ import json
 import numpy as np
 import sys
 
-'''
-fileName:       hmmUtils.py
-Authors:        Jacob Krantz
-Date Modified:  10/9/17
-
-Common utilities needed for building matrices with a HMM
-'''
 class HMMUtils:
+    """ Common utilities needed for building matrices with a HMM """
 
     def __init__(self):
         self.sylParser = SyllabParser()
@@ -20,22 +14,6 @@ class HMMUtils:
     # returns matrix
     def initMatrix(self, X, Y):
         return np.zeros((X,Y), dtype=np.float)
-
-    # Given a matrix created with numpy, outputMatrix sends the matrix
-    # to a txt file under the provided name.
-    def outputMatrix(self, matrix, fileName, customHeader):
-        fileName = "HMMFiles/" + fileName + ".txt"
-        np.savetxt(fileName, matrix, newline = '\n',header = customHeader, fmt = '%.5f')
-
-    # given the name of a file, imports a matrix using the numpy tool.
-    # prints error to console upon failure.
-    def importMatrix(self, fileName):
-        try:
-            matrix = np.loadtxt(fileName, dtype = 'float')
-        except IOError:
-            print(fileName +" does not exist or is corrupt.")
-            sys.exit(0)
-        return matrix
 
     # uses SyllabParser to generate a list of lists.
     # allBigramTups: [[(phone,phone,int),(...),],[...],] where int
@@ -109,26 +87,6 @@ class HMMUtils:
 
         return tags
 
-    # phonemeLst is allBigramTups
-    # returns a list of all
-    def getBoundLst(self, phonemeLst):
-        boundLst = []
-        for phoneme in phonemeLst:
-            for tup in phoneme:
-                boundLst.append(tup[2])
-
-        return boundLst
-
-    #Puts the tagDict into a list
-    #This is the label for each of the matrix spots
-    def getTagLst(self,tagDict):
-        tagLst = []
-        for i in range(0,len(tagDict)):
-            largest = max(tagDict, key=tagDict.get)
-            tagLst.append(largest)
-            del tagDict[largest]
-        return tagLst
-
     # for input phoneme: [(phone,phone,int),(...),]
     # returns a list of bigram tuples.
     # ex: [('m0d','d1s'),('d1s','n1l'),('n1l','a0m')]
@@ -175,81 +133,30 @@ class HMMUtils:
 
         return phonemeLst
 
-    # counts and returns the number of boundaries matching
-    # the passed in integer within boundaryLst.
-    def getNumBounds(self, boundaryLst, match):
-        total = 0
-
-        for bound in boundaryLst:
-            if(bound == match):
-                total += 1
-
-        return total
-
     # allBigramTups: [[(phone,phone,int),(...),],[...],]
     # creates a master lookup list for all unique bigrams trained on.
     # bigrams are inserted into the list as tuples:
     # [(phone,phone),(phone,phone)...]
     def getBigramLookup(self, allBigramTups):
-        bigramLookup = []
+        bigramLookup = set()
 
         for phoneme in allBigramTups:
             for bigram in phoneme:
-                newTup = (bigram[0],bigram[1])
-                if newTup not in bigramLookup:
-                    bigramLookup.append(newTup)
-        return bigramLookup
+                bigramLookup.add((bigram[0],bigram[1]))
+        return list(bigramLookup)
 
     # builds a dictionary containing bigram: P(bigram)
     # used for normalizing MatrixB
     def getBigramFreqDict(self, allBigramTups, numBigrams):
-        bigramFreqDict = {}
+        bFreqDict = {}
 
         for phoneme in allBigramTups:
             for bigram in phoneme:
                 newTup = (bigram[0],bigram[1])
-                if(newTup not in bigramFreqDict):
-                    bigramFreqDict[newTup] = 1
+                if(newTup not in bFreqDict):
+                    bFreqDict[newTup] = 1
                 else:
-                    bigramFreqDict[newTup] += 1
+                    bFreqDict[newTup] += 1
 
-        return self.__normBigramFreqDict(bigramFreqDict, numBigrams)
-
-    # nornamlize the bigramFreqDict to (countBigram / countAllBigrams)
-    def __normBigramFreqDict(self, bfDict, numBigrams):
-        return dict(map(lambda (k,v): (k, v/float(numBigrams)), bfDict.iteritems()))
-
-    # ------------------------------------------------------
-    # File outputs for Viterbi
-    # ------------------------------------------------------
-
-    # outputs a list to a file. Entries are newline delimited
-    def makeLookup(self, lookup, fileName):
-        with open(fileName,'w') as File:
-            map(lambda item:File.write(str(item)+'\n'), lookup)
-
-    # generates a dictionary of hiddenState: probability
-    def makeHiddenProb(self, hiddenLst):
-        hiddenProb = self.__makeHiddenProbHelper(hiddenLst)
-        with open("HMMFiles/hiddenProb.txt",'w') as File:
-            for state in hiddenProb:
-                File.write(str(state) + ' ')
-                File.write(str(hiddenProb[state]) + '\n')
-
-    #returns a dictionary of the probability of a hidden state
-    #equation: hiddenProb = count(state) / count(all states)
-    def __makeHiddenProbHelper(self, hiddenLst):
-        hiddenProb = {}
-
-        # insert counts int dict
-        for state in hiddenLst:
-            if state not in hiddenProb:
-                hiddenProb[state] = 1
-            else:
-                hiddenProb[state] += 1
-
-        # normalize counts to list length
-        for state in hiddenProb:
-            hiddenProb[state] = hiddenProb[state] / float(len(hiddenLst))
-
-        return hiddenProb
+        # nornamlize the bFreqDict to (countBigram / countAllBigrams)
+        return dict(map(lambda (k,v): (k,v/float(numBigrams)),bFreqDict.iteritems()))

@@ -82,7 +82,6 @@ class GeneticAlgorithm:
                         newChromosome.insertIntoCategory(i, gene)
                 self.population.append(newChromosome)
 
-        self._computeFitness()
         self._displayPopulation(resumeFrom)
 
     # Move current logs to the archive.
@@ -149,8 +148,9 @@ class GeneticAlgorithm:
         with s:
             pool.makeActive(processName)
             genes = self.population[i].getGenes()
-            GUID = self.celex.trainHMM(genes)
-            fitness = self.celex.testHMM(genes, GUID)
+            HMMBO = self.celex.trainHMM(genes)
+            fitness = self.celex.testHMM(HMMBO)
+            HMMBO = None
             resultsQueue.put((i, fitness))
             pool.makeInactive(processName)
 

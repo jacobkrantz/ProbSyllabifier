@@ -1,77 +1,47 @@
 from utils import SyllabTools, HMMUtils
 import numpy as np
-import sys
-from ast import literal_eval
 import logging as log
 
-'''
-fileName:       ProbSyllabifier.py
-Authors:        Jacob Krantz
-Date Modified:  10/17
-
-- Purpose: Syllabifies a given phoneme (or file of phonemes)
-    - uses the Viterbi Algrithm
-    - skips syllabification if a foreign phone bigram is parsed
-- Functions:
-    - syllabifyFile(fileIN, fileOUT)
-    - syllabify(phonemeString)
-'''
-
 class ProbSyllabifier:
+    """
+    Syllabifies a given sequence of phones using the Viterbi Algorithm.
+    Provides an empty result when a foreign phone bigram is parsed.
+    """
 
-    # initializes all data structures necessary
-    # to syllabify a phoneme or a file.
-    def __init__(self, transcriptionScheme=[]):
+    def __init__(self, HMMBO):
+        """ Unpack the HMMBO data object. """
         log.basicConfig(format='%(asctime)s %(levelname)s:%(message)s', datefmt='%X', level=log.INFO)
-        self.hmmUtils = HMMUtils()
-        self.__matrixA = []
-        self.__matrixB = []
-        self.__exceptionLst = []
-        self.__obsLookup = []
-        self.__hiddenLookup = []
-        self.__iMax = 0
-        self.__jMax = 0
-        self.__comparator = "NIST"
-        self.transcriptionScheme = transcriptionScheme
+        self.hmmUtils     = HMMUtils()
+        self.matrixA      = HMMBO.matrixA
+        self.matrixB      = HMMBO.matrixB
+        self.obsLookup    = HMMBO.observationLookup
+        self.hiddenLookup = HMMBO.hiddenLookup
+        self.tranScheme   = HMMBO.transcriptionScheme
+        self.comparator   = ""
 
-    # initializes the necessary data structures by loading them from files
-    # within the /HMMFiles/ directory.
-    def loadStructures(self, GUID=""):
-        obsName = "./HMMFiles/obsLookup" + GUID + ".txt"
-        hiddenName = "./HMMFiles/hiddenLookup" + GUID + ".txt"
+    def syllabifyFile(self, fileIN, fileOUT, comparator="CELEX"):
+        """
+        Currently ignored (11/1/17).
+        Needs big rework, but not used.
+        """
+        # self.comparator = comparator
+        # self.sTools = SyllabTools(self.comparator)
+        # self.sTools.inFile = fileIN
+        # self.sTools.outFile = fileOUT
+        # self.sTools.readWords()
+        # self.sTools.buildArpabet()
+        # syllabDict = self.__syllabifyAll()
+        # self.__printDictToFile(syllabDict)
+        raise NotImplementedError("not in use")
 
-        self.__matrixA      = self.__loadMatrix("A", GUID)
-        self.__matrixB      = self.__loadMatrix("B", GUID)
-        self.__obsLookup    = self.__loadLookup(obsName)
-        self.__obsLookup    = self.__fixObsLookup()
-        self.__hiddenLookup = self.__loadLookup(hiddenName)
-
-
-    # given a file containing a dict of word: syllab,
-    # syllabifies each and outputs the results into a new file under the
-    # new file name.
-    # param 1: phoneme file in
-    # param 2: fileName for syllabification out
-    def syllabifyFile(self, fileIN, fileOUT,comparator="NIST"):
-        self.__comparator = comparator
-        self.sTools = SyllabTools(self.__comparator)
-        self.sTools.inFile = fileIN
-        self.sTools.outFile = fileOUT
-        self.getExceptionLst # for reset
-
-        self.sTools.readWords()
-        self.sTools.buildArpabet()
-        syllabDict = self.__syllabifyAll()
-
-        numSkips = len(self.getExceptionLst()) # resets the exception list
-        print("Number of words skipped: " + str(numSkips))
-
-        self.__printDictToFile(syllabDict)
-
-
-    # given an observation string, generates the most likely hidden state.
-    def syllabify(self, observation, comparator="NIST"):
-        self.__comparator = comparator
+    def syllabify(self, observation, comparator="CELEX"):
+        """
+        Generates the most likely hidden state.
+        Args:
+            observation (string): sequence of phones
+            comparator (string): either "NIST" or default "CELEX"
+        """
+        self.comparator = comparator
         obsLst = self.__makeObsLst(observation)
 
         if len(obsLst) == 1: # early return for single phone obs
@@ -83,60 +53,23 @@ class ProbSyllabifier:
 
         isValid, problemObs = self.__isValidObs(transcribedObs)
 
-        if(isValid):
-            matrixV, matrixP = self.__buildMatrixV(transcribedObs)
-            outputLst = self.__decodeMatrix(matrixV, matrixP, transcribedObs)
-            finalStr = self.__makeFinalStr(obsLst, outputLst)
-        else:
+        if(not isValid):
             badBigram = problemObs[0] +  " " + problemObs[1]
             log.warning("(%s) does not exist in training set.", badBigram)
             return []
 
-        return finalStr
+        matrixV, matrixP = self.__buildMatrixV(transcribedObs)
+        outputLst = self.__decodeMatrix(matrixV, matrixP, transcribedObs)
+        return self.__makeFinalStr(obsLst, outputLst)
 
     # ------------------------------------------------------
     # helper functions below
     # ------------------------------------------------------
 
-
-    # loads either MatrixA (if which == 'A') or MatrixB (if which == 'B')
-    def __loadMatrix(self, which, GUID=""):
-        fileName = "./HMMFiles/Matrix" + which + GUID + ".txt"
-
-        try:
-            matrix = np.loadtxt(fileName, dtype = 'float')
-        except:
-            print(fileName +" does not exist or is corrupt.")
-            sys.exit(0)
-        return matrix
-
-    # given a fileName, loads the list that exists inside of it.
-    # each line of the file corresponds to a list entry.
-    def __loadLookup(self, fileName):
-        lookup = []
-        try:
-            rawFile = open(fileName,'r')
-            for line in rawFile:
-                item = line.strip('\n')
-                lookup.append(item)
-        except IOError:
-            print(fileName + " does not exist or is corrupt.")
-            sys.exit(0)
-        return lookup
-
-
-    # converts the observation lookup data structure from strings to tuples
-    def __fixObsLookup(self):
-        tmpLst = []
-        for obs in self.__obsLookup:
-            tmpLst.append(literal_eval(obs))
-        return tmpLst
-
-
     # given an observation string, appends each phone to a new
     # obersvation list. returns list.
     def __makeObsLst(self, observation):
-        if self.__comparator == "CELEX":
+        if self.comparator == "CELEX":
             return list(observation)
 
         obsLst = ['<']
@@ -151,11 +84,11 @@ class ProbSyllabifier:
 
 
     def __transcribePhones(self, obsLst):
-        if self.__comparator == "NIST":
+        if self.comparator == "NIST":
             lang = 1
         else:
             lang = 2
-        return list(map(lambda x:self.hmmUtils.getCategory(x, lang, self.transcriptionScheme), obsLst))
+        return list(map(lambda x:self.hmmUtils.getCategory(x, lang, self.tranScheme), obsLst))
 
     # convert obsLst to its bigrams
     def __convertToBigrams(self,obsLst):
@@ -174,7 +107,7 @@ class ProbSyllabifier:
             for i in range(0,len(obsLst)):
 
                 problemObs = obsLst[i]
-                self.__obsLookup.index(obsLst[i])
+                self.obsLookup.index(obsLst[i])
 
         except ValueError:
             return False, problemObs
@@ -188,28 +121,28 @@ class ProbSyllabifier:
     #       i and j backwards. Our matrixB is correct, but had to be flipped
     #       in reference here to be used "properly".
     def __buildMatrixV(self, obsLst):
-        self.__iMax = len(self.__hiddenLookup)
-        self.__jMax = len(obsLst)
-        matrixV = np.zeros((self.__iMax,self.__jMax), dtype=np.float) # Viterbi matrix
-        matrixP = np.zeros((self.__iMax,self.__jMax), dtype='int,int') # backpointer matrix
+        iMax = len(self.hiddenLookup)
+        jMax = len(obsLst)
+        matrixV = np.zeros((iMax,jMax), dtype=np.float) # Viterbi matrix
+        matrixP = np.zeros((iMax,jMax), dtype='int,int') # backpointer matrix
 
-        if(self.__jMax == 0): # no bigrams, just one phone
+        if(jMax == 0): # no bigrams, just one phone
             return matrixV, matrixP
 
-        for i in range(0,self.__iMax):                #initialization step
-            obsIndex = self.__obsLookup.index(obsLst[0])
-            matrixV[i,0] = self.__matrixB[obsIndex, i]#flipped
+        for i in range(0,iMax):                #initialization step
+            obsIndex = self.obsLookup.index(obsLst[0])
+            matrixV[i,0] = self.matrixB[obsIndex, i]#flipped
 
-        for j in range(1,self.__jMax):                #iterative step
-            obsBigram = self.__obsLookup.index(obsLst[j])
-            for i in range(0,self.__iMax):
+        for j in range(1,jMax):                #iterative step
+            obsBigram = self.obsLookup.index(obsLst[j])
+            for i in range(0,iMax):
                 curProb = 0
                 maxProb = 0
                 iBack = 0
                 jBack = 0
-                for oldI in range(0,self.__iMax):
-                    Bword = self.__obsLookup[j]
-                    curProb = matrixV[oldI,j-1] * self.__matrixA[oldI,i] * self.__matrixB[obsBigram, i]
+                for oldI in range(0,iMax):
+                    Bword = self.obsLookup[j]
+                    curProb = matrixV[oldI,j-1] * self.matrixA[oldI,i] * self.matrixB[obsBigram, i]
 
                     if (curProb > maxProb):
                         maxProb = curProb
@@ -228,22 +161,23 @@ class ProbSyllabifier:
     def __decodeMatrix(self, matrixV, matrixP, obsLst):
             revOutput = []
 
+            jMax = len(obsLst)
             maxFinal = 0
             iFinal = 0
 
-            for i in range(0,self.__iMax):         #only grabs final max prob
-                currentFinal = matrixV[i,self.__jMax - 1]
+            for i in range(0,len(self.hiddenLookup)):         #only grabs final max prob
+                currentFinal = matrixV[i,jMax - 1]
                 if(currentFinal > maxFinal):
                     maxFinal = currentFinal
                     iFinal = i
 
-            revOutput.append(self.__hiddenLookup[iFinal])
-            iCur = matrixP[iFinal,self.__jMax - 1][0]
-            jCur = matrixP[iFinal,self.__jMax - 1][1]
+            revOutput.append(self.hiddenLookup[iFinal])
+            iCur = matrixP[iFinal,jMax - 1][0]
+            jCur = matrixP[iFinal,jMax - 1][1]
 
-            for j in range(self.__jMax-2,-1,-1):
+            for j in range(jMax-2,-1,-1):
 
-                revOutput.append(self.__hiddenLookup[iCur])
+                revOutput.append(self.hiddenLookup[iCur])
                 iCurOld = iCur
                 iCur = matrixP[iCur,jCur][0]
                 jCur = matrixP[iCurOld,jCur][1]
@@ -262,10 +196,10 @@ class ProbSyllabifier:
             isTruncated = (i == len(obsLst) - 1)
             finalStr += obsLst[i][0]
             if(outputLst[i][1] == '0' or isTruncated):
-                if self.__comparator == "NIST":
+                if self.comparator == "NIST":
                     finalStr += " "
             else:
-                if self.__comparator == "NIST":
+                if self.comparator == "NIST":
                     finalStr += " | "
                 else:
                     finalStr += "-"

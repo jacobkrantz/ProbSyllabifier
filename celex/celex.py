@@ -39,26 +39,20 @@ class Celex(AbstractSyllabRunner):
         log.info("Finished step: Syllabify CELEX")
 
     def trainHMM(self, transcriptionScheme=[]):
-        GUID = str(uuid.uuid1()) # set new GUID based on host machine and current time
-
         log.info("Starting step: Train HMM Model")
         self.hmm = HMM(2, self.addStaticTags(transcriptionScheme), self._syllabifiedLst) # lang hack: 2 is celex
-        self.hmm.setGUID(GUID)
-        self.hmm.buildMatrixA()
-        self.hmm.buildMatrixB()
-        self.hmm.makeViterbiFiles()
+        HMMBO = self.hmm.train()
         log.info("Finished step: Train HMM Model")
-        return GUID
+        return HMMBO
 
     # thread-safe when DB results is false.
-    def testHMM(self, transcriptionScheme=[], GUID=""):
-        pSylResultsDict = self._syllabifyTesting(GUID, self.addStaticTags(transcriptionScheme))
+    def testHMM(self, HMMBO):
+        pSylResultsDict = self._syllabifyTesting(HMMBO)
         testResultsList = self._combineResults(pSylResultsDict)
 
         if(config["write_results_to_DB"]):
             self._fillResultsTable(testResultsList)
 
-        self.hmm.clean()
         self._CSylResultsDict = dict()
         self._PSylResultsDict = dict()
         return self._compare(testResultsList)
@@ -81,10 +75,9 @@ class Celex(AbstractSyllabRunner):
 
     # builds dictionary of {testWord:syllabification}
     # for pSylResultsDict
-    def _syllabifyTesting(self, GUID, transcriptionScheme=[]):
+    def _syllabifyTesting(self, HMMBO):
         log.info("Starting step: Syllabify ProbSyllabifier")
-        self.ps = ProbSyllabifier(transcriptionScheme)
-        self.ps.loadStructures(GUID)
+        self.ps = ProbSyllabifier(HMMBO)
         pSylResultsDict = {}
         for word, pronunciation in self._pronunciationsDict.iteritems():
             pSylResultsDict[word] = self.ps.syllabify(pronunciation, "CELEX")

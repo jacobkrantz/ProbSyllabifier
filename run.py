@@ -1,7 +1,7 @@
 from celex import Celex
 from nist import NIST
-import sys
 import json
+import sys
 
 '''
 fileName:       run.py
@@ -24,8 +24,6 @@ def runS(NIST, Celex, comparator):
         obs = raw_input("Enter filename or phoneme: ")
         syl = ""
         if("." in obs):
-            #for some reason the output file wasn't here so I created
-            #one to be used in order for the function to work
             if comparator == "NIST":
                 NIST.syllabifyFile(obs,"HMMFiles/outfile.txt",comparator)
             else:
@@ -34,12 +32,12 @@ def runS(NIST, Celex, comparator):
             if comparator == "NIST":
                 syl = NIST.syllabify(obs.lower())
             else:
-                syl = Celex.syllabify(obs.lower(), GUID)
+                syl = Celex.syllabify(obs.lower())
             print("Syllabification: " + syl)
 
 def help():
     print "Running the Syllabifier:"
-    print "     To syllabify a phoneme, enter phones separated by a space."
+    print "     To syllabify a word, enter phones separated by a space."
     print "     To return to the main menu, hit enter with no input."
 
 #gets the type of syllabifaction that the user wants to do
@@ -82,7 +80,6 @@ def main():
 
     comparator = config["comparator"]
     trainedComparator = config["comparator"]
-    hmmGUID = "" # used for CELEX file management
     choice = 0
     while(choice != 6):
         print("\n" + color.BOLD + "Main Menu"+ color.END)
@@ -108,17 +105,17 @@ Choose an option:
             if comparator == "NIST":
                 nist.trainHMM()
             else:
-                hmmGUID = celex.InputTrainHMM()
+                HMMBO = celex.InputTrainHMM()
             trainedComparator = comparator
 
         elif(choice == 2):
-            runS(nist, celex, comparator, hmmGUID)
+            runS(nist, celex, comparator, HMMBO)
 
         elif(choice == 3):
             if comparator == "NIST":
                 nist.testHMM()
             else:
-                celex.testHMM([], hmmGUID)
+                celex.testHMM(HMMBO)
 
         elif(choice == 4):
             comparator = getComparator(config)
