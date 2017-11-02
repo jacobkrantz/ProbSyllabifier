@@ -20,17 +20,17 @@ Date Modified:  9/10/17
 # evolutionNumber represents the evolution log file to continue from
 def optimize():
     ga = GeneticAlgorithm()
-    ga.displayParameters()
+    ga.display_parameters()
 
     assert(config["PopulationSize"]/4 == config["NumMatingPairs"])
     evolutionNumber = 0
     if len(sys.argv) > 1:
         evolutionNumber = int(sys.argv[1])
-        ga.importPopulation(evolutionNumber)
+        ga.import_population(evolutionNumber)
         evolutionNumber += 1
     else:
-        ga.archiveLogs()
-        ga.initializePopulation()
+        ga.archive_logs()
+        ga.initialize_population()
 
     ga.evolve(evolutionNumber)
 

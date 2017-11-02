@@ -28,17 +28,17 @@ class TestMutate(unittest.TestCase):
         tests that an approximately correct mutation factor is generated
         for the upcoming round of mutations.
         '''
-        mutationFactor = mutate.calculateMutationFactor(self.populationLow)
+        mutationFactor = mutate.calculate_mutation_factor(self.populationLow)
         # mutation should increase when (dev < desiredDev)
         self.assertGreater(mutationFactor, self.initMutFactor)
         self.assertNotAlmostEqual(mutationFactor, self.initMutFactor)
 
-        mutationFactor = mutate.calculateMutationFactor(self.populationZero)
+        mutationFactor = mutate.calculate_mutation_factor(self.populationZero)
         # mutation should increase greatly
         self.assertGreater(mutationFactor, self.initMutFactor)
         self.assertNotAlmostEqual(mutationFactor, self.initMutFactor)
 
-        mutationFactor = mutate.calculateMutationFactor(self.populationHigh)
+        mutationFactor = mutate.calculate_mutation_factor(self.populationHigh)
         # mutation should decrease when (2*desiredDev < dev)
         self.assertGreater(self.initMutFactor, mutationFactor)
 
@@ -49,13 +49,13 @@ class TestMutate(unittest.TestCase):
         '''
         newPopulation = mutate.mutate(self.population)
         # first chromosome in population should not be mutated
-        self.assertEqual(newPopulation[0].getGenes(), self.population[0].getGenes())
+        self.assertEqual(newPopulation[0].get_genes(), self.population[0].get_genes())
 
         # at least one chromosome should have a mutation performed
         # (this may fail at an incredibly low mutation factor. check config)
         diffExists = False
         for i, chromosome in enumerate(newPopulation):
-            if(self.population[i].getGenes() != chromosome.getGenes()):
+            if(self.population[i].get_genes() != chromosome.get_genes()):
                 diffExists = True
         self.assertTrue(diffExists)
 
@@ -105,23 +105,23 @@ class TestMutate(unittest.TestCase):
         self.population = []
         for j in range(config["NumChromsInDeviation"]):
             newChromosome = Chromosome(config["NumCategories"])
-            newChromosome.setFitness(88.9)
+            newChromosome.set_fitness(88.9)
             for i in range(len(self.genes) - 1):
                 for gene in self.genes[i]:
-                    newChromosome.insertIntoCategory(i, gene)
+                    newChromosome.insert_into_category(i, gene)
             self.population.append(newChromosome)
 
     # helper function sets a single chromosome
     def _makeChromosome(self, fitness):
         chrom = Chromosome(0)
-        chrom.setFitness(fitness)
+        chrom.set_fitness(fitness)
         return chrom
 
     # keep for deeper testing purposes. not currently used.
     def _displayPopulation(self, pop):
         for chrom in pop:
             print "chromosome:"
-            for category in chrom.getGenes():
+            for category in chrom.get_genes():
                 for gene in category:
                     sys.stdout.write(gene)
                 sys.stdout.write(' ')

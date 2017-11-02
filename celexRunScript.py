@@ -22,6 +22,6 @@ with open(evoFileLocation,'r') as evo:
         transcriptionScheme.append(map(lambda x: x, category))
 
 c = Celex()
-c.loadSets(trainingSize,testingSize)
+c.load_sets(trainingSize, testingSize)
 GUID = c.trainHMM(transcriptionScheme)
 percentSame = c.testHMM(transcriptionScheme, GUID)

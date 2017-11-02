@@ -5,7 +5,7 @@ class TestCelex(unittest.TestCase):
 
     def setUp(self):
         self.celex = Celex()
-        self.celex.loadSets(500,25)
+        self.celex.load_sets(500, 25)
         self.transciptionScheme = [
             ['b','h','z','m','0','x','Z'],
             ['p','C','T','_','v'],

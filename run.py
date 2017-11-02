@@ -20,7 +20,7 @@ class color:
 def runS(NIST, Celex, comparator):
     obs = " "
 
-    while(obs != ''):
+    while obs != '':
         obs = raw_input("Enter filename or phoneme: ")
         syl = ""
         if("." in obs):
@@ -105,7 +105,7 @@ Choose an option:
             if comparator == "NIST":
                 nist.trainHMM()
             else:
-                HMMBO = celex.InputTrainHMM()
+                HMMBO = celex.input_train_hmm()
             trainedComparator = comparator
 
         elif(choice == 2):
