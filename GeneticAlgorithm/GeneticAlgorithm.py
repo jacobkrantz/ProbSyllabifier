@@ -154,19 +154,19 @@ class GeneticAlgorithm:
         with s:
             pool.make_active(process_name)
             genes = self.population[i].get_genes()
-            hmmbo = self.celex.trainHMM(genes)
-            fitness = self.celex.testHMM(hmmbo)
+            hmmbo = self.celex.train_hmm(genes)
+            fitness = self.celex.test_hmm(hmmbo)
             hmmbo = None
             results_queue.put((i, fitness))
             pool.make_inactive(process_name)
 
-    # sort self.population by fitness (syllabification accurracy)
+    # sort self.population by fitness (syllabification accuracy)
     # ordering: highest (self.population[0]) -> lowest
     def _sort(self):
         self.population.sort()
         self.population.reverse()
 
-    # outputs all chromosomes to a log file cooresponding to a given evolution.
+    # outputs all chromosomes to a log file corresponding to a given evolution.
     def _save_all_chromosomes(self, cur_evolution):
         location = config["LogFileLocation"]
         name = "evo" + str(cur_evolution) + ".log"
@@ -174,7 +174,8 @@ class GeneticAlgorithm:
         map(lambda x: self._save_chromosome_at_index(x, file_name),
             range(len(self.population)))
 
-    # chromosome 'self.population[index]' saved in "GeneticAlgorithm/EvolutionLogs".
+    # chromosome 'self.population[index]' saved in
+    # "GeneticAlgorithm/EvolutionLogs".
     # truncates the file if inserting from index 0.
     # Each 2-line group is a chromosome.
     # Categories are tab-delimited.

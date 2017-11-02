@@ -1,7 +1,8 @@
+import json
+import textwrap
+
 from celex import Celex
 from nist import NIST
-import json
-import sys
 
 '''
 fileName:       run.py
@@ -11,116 +12,128 @@ Date Modified:  9/17
 - main file to run machine
 - Syllabifies a file using NIST or Celex
 '''
-class color:
+
+
+class Color:
     YELLOW = '\033[93m'
     BOLD = '\033[1m'
     END = '\033[0m'
 
+
 # runs the probabilistic syllabifier for either a phoneme or file.
-def runS(NIST, Celex, comparator):
+def run_s(nist, celex, comparator):
     obs = " "
 
     while obs != '':
         obs = raw_input("Enter filename or phoneme: ")
         syl = ""
-        if("." in obs):
+        if "." in obs:
             if comparator == "NIST":
-                NIST.syllabifyFile(obs,"HMMFiles/outfile.txt",comparator)
+                nist.syllabify_file(obs, "HMMFiles/outfile.txt", comparator)
             else:
-                Celex.syllabifyFile(obs,"HMMFiles/outfile.txt",comparator)
-        elif(obs != ''):
+                celex.syllabify_file(obs, "HMMFiles/outfile.txt", comparator)
+        elif obs != '':
             if comparator == "NIST":
-                syl = NIST.syllabify(obs.lower())
+                syl = nist.syllabify(obs.lower())
             else:
-                syl = Celex.syllabify(obs.lower())
+                syl = celex.syllabify(obs.lower())
             print("Syllabification: " + syl)
+
 
 def help():
     print "Running the Syllabifier:"
     print "     To syllabify a word, enter phones separated by a space."
     print "     To return to the main menu, hit enter with no input."
 
-#gets the type of syllabifaction that the user wants to do
-def getComparator(config):
-    comparatorId = 0
-    while comparatorId not in [1,2]:
-        print("\n" + color.BOLD + "Main Menu" + color.END)
+
+# gets the type of syllabifaction that the user wants to do
+def get_comparator(config):
+    comparator_id = 0
+    while comparator_id not in [1, 2]:
+        print("\n" + Color.BOLD + "Main Menu" + Color.END)
         print "Choose a Comparator:"
         print "1. NIST (with Arpabet)"
         print "2. CELEX (with DISC)"
         try:
-            comparatorId = int(input())
+            comparator_id = int(input())
         except:
-            comparatorId = 0
+            comparator_id = 0
 
-    comparator = "NIST" if comparatorId == 1 else "CELEX"
+    comparator = "NIST" if comparator_id == 1 else "CELEX"
     config["comparator"] = comparator
-    with open('config.json','w') as outfile:
-        json.dump(config, outfile, sort_keys = True, indent = 4)
+    with open('config.json', 'w') as outfile:
+        json.dump(config, outfile, sort_keys=True, indent=4)
     return comparator
 
-#Ensures correct comparator
-def isLegalSelection(curComparator, trainedComparator, selection):
-    if (selection in [1,4,5,6]) or (curComparator == trainedComparator):
+
+# Ensures correct comparator
+def is_legal_selection(cur_comparator, trained_comparator, selection):
+    if (selection in [1, 4, 5, 6]) or (cur_comparator == trained_comparator):
         return True
     print "HMM trained in other Comparator. Try retraining"
 
-def loadConfiguration():
+
+def load_configuration():
     with open('config.json') as json_data_file:
         data = json.load(json_data_file)
     return data
 
+
 def main():
     nist = NIST()
     celex = Celex()
-    config = loadConfiguration()
+    config = load_configuration()
     print "----------------------------------------"
     print "Welcome to the Probabilistic Syllabifier"
     print "----------------------------------------"
 
     comparator = config["comparator"]
-    trainedComparator = config["comparator"]
+    trained_comparator = config["comparator"]
     choice = 0
-    while(choice != 6):
-        print("\n" + color.BOLD + "Main Menu"+ color.END)
-        print("Comparator: " +color.YELLOW + comparator + color.END)
-        optionSelect = """
-Choose an option:
-1. Train the HMM
-2. Run the Syllabifier
-3. Test Results
-4. Switch Phonetic Languages
-5. Help
-6. Quit\n"""
+    while choice != 6:
+        print("\n" + Color.BOLD + "Main Menu" + Color.END)
+        print("Comparator: " + Color.YELLOW + comparator + Color.END)
+        option_select = textwrap.dedent(
+            """
+            Choose an option:
+            1. Train the HMM
+            2. Run the Syllabifier
+            3. Test Results
+            4. Switch Phonetic Languages
+            5. Help
+            6. Quit\n"""
+        )
 
         try:
-            choice = int(input(optionSelect))
+            choice = int(input(option_select))
         except ValueError:
-            choice = 0 # loop again
+            choice = 0  # loop again
         finally:
-            if not isLegalSelection(comparator,trainedComparator,choice):
+            if not is_legal_selection(comparator, trained_comparator, choice):
                 choice = 0
 
-        if(choice == 1):
+        if choice == 1:
             if comparator == "NIST":
-                nist.trainHMM()
+                nist.train_hmm()
             else:
-                HMMBO = celex.input_train_hmm()
-            trainedComparator = comparator
+                hmmbo = celex.input_train_hmm()
+            trained_comparator = comparator
 
-        elif(choice == 2):
-            runS(nist, celex, comparator, HMMBO)
+        elif choice == 2:
+            run_s(nist, celex, comparator, hmmbo)
 
-        elif(choice == 3):
+        elif choice == 3:
             if comparator == "NIST":
-                nist.testHMM()
+                nist.test_hmm()
             else:
-                celex.testHMM(HMMBO)
+                celex.test_hmm(hmmbo)
 
-        elif(choice == 4):
-            comparator = getComparator(config)
+        elif choice == 4:
+            comparator = get_comparator(config)
 
-        elif(choice == 5):
+        elif choice == 5:
             help()
 
-main()
+
+if __name__ == '__main__':
+    main()

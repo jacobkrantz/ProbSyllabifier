@@ -1,33 +1,36 @@
-from probSyllabifier import HMM, ProbSyllabifier
+from __future__ import print_function
+
 from nistClient import NISTClient
+from probSyllabifier import HMM, ProbSyllabifier
 from testing import CompareNIST
 from utils import AbstractSyllabRunner, FrequentWords as FW
+
 
 class NIST(AbstractSyllabRunner):
 
     def __init__(self):
-        self.NISTClient = NISTClient()
-        self.cNIST = CompareNIST()
-        self._lang = 1 # 1 == NIST, needed for HMM. outdated.
+        self.nist_client = NISTClient()
+        self.c_nist = CompareNIST()
+        self._lang = 1  # 1 == NIST, needed for HMM. outdated.
 
-    def trainHMM(self):
-        self._buildSets()
-        self._trainHMM()
+    def train_hmm(self):
+        self._build_sets()
+        self._train_hmm()
 
-    def testHMM(self):
+    def test_hmm(self):
         self.ps = ProbSyllabifier()
         self.ps.loadStructures()
-        testIN = "./corpusFiles/testSet.txt"
-        testOUT = "./HMMFiles/probSyllabs.txt"
-        self.ps.syllabifyFile(testIN, testOUT,"NIST")
+        test_in = "./corpusFiles/testSet.txt"
+        test_out = "./HMMFiles/probSyllabs.txt"
+        self.ps.syllabify_file(test_in, test_out, "NIST")
 
-        NISTname = "./HMMFiles/NISTtest.txt"
-        probName = "./HMMFiles/probSyllabs.txt"
-        self.cNIST.compare(NISTname, probName)
+        nist_name = "./HMMFiles/NISTtest.txt"
+        prob_name = "./HMMFiles/probSyllabs.txt"
+        self.c_nist.compare(nist_name, prob_name)
 
-        viewDif = raw_input("view differences (y): ")
-        if(viewDif == 'y'):
-            self.cNIST.viewDifferences()
+        view_dif = raw_input("view differences (y): ")
+        if view_dif == 'y':
+            self.c_nist.view_differences()
 
     # returns string of syllabified observation
     def syllabify(self, observation):
@@ -37,60 +40,61 @@ class NIST(AbstractSyllabRunner):
             self.ps = ProbSyllabifier()
             return self.ps.syllabify(observation)
 
-    def syllabifyFile(self, fileIN, fileOUT, comparator="NIST"):
+    def syllabify_file(self, file_in, file_out, comparator="NIST"):
         try:
-            self.ps.syllabifyFile(fileIN, fileOUT, comparator)
+            self.ps.syllabify_file(file_in, file_out, comparator)
         except:
             self.ps = ProbSyllabifier()
-            self.ps.syllabifyFile(fileIN, fileOUT, comparator)
+            self.ps.syllabify_file(file_in, file_out, comparator)
 
-    #----------------#
-    #   "Private"    #
-    #----------------#
+    # ---------------- #
+    #    "Private"     #
+    # ---------------- #
 
-    def _buildSets(self):
-        inFile = "./corpusFiles/brown_words.txt" #/editorial_words.txt
-        outFile = "./HMMFiles/SyllabDict.txt"
-        freqFile = "./corpusFiles/freqWords.txt"
+    def _build_sets(self):
+        in_file = "./corpusFiles/brown_words.txt"  # /editorial_words.txt
+        out_file = "./HMMFiles/SyllabDict.txt"
+        freq_file = "./corpusFiles/freqWords.txt"
 
-        inTest = "./corpusFiles/testSet.txt"
-        outTest = "./HMMFiles/NISTtest.txt"
+        in_test = "./corpusFiles/testSet.txt"
+        out_test = "./HMMFiles/NISTtest.txt"
 
-        print ("current input file: " + inFile)
-        print ("current output file: " + outFile)
+        print("current input file: " + in_file)
+        print("current output file: " + out_file)
 
         user_in = raw_input("Press enter to continue, or 'c' to change: ")
-        if(user_in == 'c'):
-            inFile = raw_input("choose input file: ")
-            outFIle = raw_input("choose output file: ")
+        if user_in == 'c':
+            in_file = raw_input("choose input file: ")
+            out_file = raw_input("choose output file: ")
 
-        self._generateWords(inFile, inTest)
+        self._generate_words(in_file, in_test)
         try:
-            self.NISTClient.syllabifyFile(freqFile,outFile)
-            self.NISTClient.syllabifyFile(inTest,outTest)
+            self.nist_client.syllabify_file(freq_file, out_file)
+            self.nist_client.syllabify_file(in_test, out_test)
 
         except IOError as err:
-            print err
+            print(err)
 
     # build A and B matrices. Makes files to be used in the Viterbi
     # decoding algorithm.
-    def _trainHMM(self):
+    def _train_hmm(self):
         hmm = HMM(self._lang)
 
-        hmm.buildMatrixA() # "./HMMFiles/MatrixA.txt"
-        hmm.buildMatrixB() # "./HMMFiles/MatrixB.txt"
+        hmm._build_matrix_a()  # "./HMMFiles/MatrixA.txt"
+        hmm.build_matrix_b()  # "./HMMFiles/MatrixB.txt"
         hmm.makeViterbiFiles()
-        print("Items in training set: " + str(hmm.getTrainingSize()))
+        print("Items in training set: " + str(hmm.get_training_size()))
 
     # builds word set files to be used in NIST syllabification
-    def _generateWords(self, fileIn, testFileIn):
+    def _generate_words(self, file_in, test_file_in):
         fw = FW()
-        numWords = int(raw_input("Enter number of words to syllabify: "))
-        numTestWords = int(raw_input("Enter number of words to test on: "))
+        num_words = int(raw_input("Enter number of words to syllabify: "))
+        num_test_words = int(raw_input("Enter number of words to test on: "))
 
         # pulling from entire corpus or editorials
-        fileIn = "./corpusFiles/brown_words.txt" #/editorial_words.txt
-        fwOut = "./corpusFiles/freqWords.txt"
+        file_in = "./corpusFiles/brown_words.txt"  # /editorial_words.txt
+        fw_out = "./corpusFiles/freqWords.txt"
 
-        fw.generateMostFreq(fileIn, fwOut, numWords)
-        fw.generateTesting(fileIn, testFileIn, numTestWords) # testFileIn is outfile
+        fw.generate_most_freq(file_in, fw_out, num_words)
+        # testFileIn is outfile
+        fw.generate_testing(file_in, test_file_in, num_test_words)

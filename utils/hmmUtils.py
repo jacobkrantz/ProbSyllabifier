@@ -1,115 +1,123 @@
+import numpy as np
+
 from config import settings as config
 from syllabParser import SyllabParser
-import json
-import numpy as np
-import sys
+
 
 class HMMUtils:
     """ Common utilities needed for building matrices with a HMM """
 
     def __init__(self):
-        self.sylParser = SyllabParser()
+        self.syl_parser = SyllabParser()
 
-    # intialize a matrix using numpy with provided size: (X,Y)
+    # initialize a matrix using numpy with provided size: (X,Y)
     # returns matrix
-    def initMatrix(self, X, Y):
-        return np.zeros((X,Y), dtype=np.float)
+    def init_matrix(self, x, y):
+        return np.zeros((x, y), dtype=np.float)
 
     # uses SyllabParser to generate a list of lists.
     # allBigramTups: [[(phone,phone,int),(...),],[...],] where int
     # corresponds to the type of boundary.
-    def getNistBigramTups(self):
-        return self.sylParser.makeNistPhonemeLst()
+    def get_nist_bigram_tups(self):
+        return self.syl_parser.make_nist_phoneme_lst()
 
     # uses SyllabParser to generate a list of lists.
     # allBigramTups: [[(phone,phone,int),(...),],[...],] where int
     # corresponds to the type of boundary.
-    def parseCelexTrainingSet(self, trainingSet):
-        return self.sylParser.parseCelexTrainingSet(trainingSet)
+    def parse_celex_training_set(self, training_set):
+        return self.syl_parser.parse_celex_training_set(training_set)
 
     # generates the tag dictionary by iterating though the bigram tuples and
     # looking up what type of consonant or vowel each phone belongs to.
-    # returns a dictionary of [tag]: [number of occurances]
+    # returns a dictionary of [tag]: [number of occurrences]
     # also returns a lookup list for matrix indices.
-    def getTagLookup(self, allBigramTups, lang, transciptionScheme=[]):
+    def get_tag_lookup(self, all_bigram_tups, lang, transciption_scheme=[]):
         category1 = ''
         category2 = ''
-        tagDict = {}
-        tagLookup = set()
+        tag_dict = {}
+        tag_lookup = set()
 
-        for phoneme in allBigramTups:
+        for phoneme in all_bigram_tups:
             for tup in phoneme:
-                category1 = self.getCategory(tup[0], lang, transciptionScheme)
-                category2 = self.getCategory(tup[1], lang, transciptionScheme)
-                tagString = category1 + str(tup[2]) + category2
-                tagLookup.add(tagString)
-                if tagString in tagDict:
-                    tagDict[tagString] += 1
+                category1 = self.get_category(
+                    tup[0],
+                    lang,
+                    transciption_scheme
+                )
+                category2 = self.get_category(
+                    tup[1],
+                    lang,
+                    transciption_scheme
+                )
+                tag_string = category1 + str(tup[2]) + category2
+                tag_lookup.add(tag_string)
+                if tag_string in tag_dict:
+                    tag_dict[tag_string] += 1
                 else:
-                    tagDict[tagString] = 1
+                    tag_dict[tag_string] = 1
 
-        return tagDict, list(tagLookup)
+        return tag_dict, list(tag_lookup)
 
     # returns the category that the phone belongs to.
     # transciptionScheme is for CELEX used in GA
-    def getCategory(self, phone,lang, transciptionScheme=[]):
-        if transciptionScheme:
-            for category in transciptionScheme:
+    def get_category(self, phone, lang, transciption_scheme=[]):
+        if transciption_scheme:
+            for category in transciption_scheme:
                 if phone in category:
                     # return an ascii character starting at 'a'
-                    return chr(transciptionScheme.index(category) + 97)
+                    return chr(transciption_scheme.index(category) + 97)
             raise LookupError(phone + " not found in tagset.")
 
         cat = ""
-        tagNames = self.getTagNames(lang)
+        tag_names = self.get_tag_names(lang)
         if lang == 1:
             phone = phone.upper()
 
-        for category in tagNames:
+        for category in tag_names:
             if phone in category:
                 cat = category[0]
-                return cat[0] # remove trailing unique ID
+                return cat[0]  # remove trailing unique ID
         raise LookupError(phone + " not found in tagset.")
 
     # imports the tags from a specific file.
     # returns as a list of lists.
-    def getTagNames(self,lang):
-        if(lang == 1):
-            inFile = open(config["NistTranscriptionFile"], 'r')
+    def get_tag_names(self, lang):
+        if lang == 1:
+            in_file = open(config["NistTranscriptionFile"], 'r')
         else:
-            inFile = open(config["CelexTranscriptionFile"], 'r')
+            in_file = open(config["CelexTranscriptionFile"], 'r')
 
         tags = []
-        for line in inFile:
-            tmpLst = line.split(' ')
-            tmpLst[len(tmpLst) - 1] = tmpLst[len(tmpLst) - 1].strip('\r\n')
-            tags.append(tmpLst)
+        for line in in_file:
+            tmp_lst = line.split(' ')
+            tmp_lst[len(tmp_lst) - 1] = tmp_lst[len(tmp_lst) - 1].strip('\r\n')
+            tags.append(tmp_lst)
 
         return tags
 
     # for input phoneme: [(phone,phone,int),(...),]
     # returns a list of bigram tuples.
     # ex: [('m0d','d1s'),('d1s','n1l'),('n1l','a0m')]
-    def getTagBigrams(self, phoneme):
-        TagBigrams = []
-        for i in range(1,len(phoneme) - 1):
+    def get_tag_bigrams(self, phoneme):
+        tag_bigrams = []
+        for i in range(1, len(phoneme) - 1):
             tupl = (phoneme[i - 1][2], phoneme[i][2])
-            TagBigrams.append(tupl)
+            tag_bigrams.append(tupl)
 
-        return TagBigrams
+        return tag_bigrams
 
     # param: all tag bigrams, including duplicates.
-    # creates a dictionary of [bigram]: [number of occurances]
-    def buildTagBigramDict(self, tagBigrams):
-        tagBigramDict = {}
+    # creates a dictionary of [bigram]: [number of occurrences]
+    def build_tag_bigram_dict(self, tag_bigrams):
+        tag_bigram_dict = {}
 
-        for bigramTup in tagBigrams:
-            if bigramTup in tagBigramDict:
-                tagBigramDict[bigramTup] +=1
+        for bigram_tup in tag_bigrams:
+            if bigram_tup in tag_bigram_dict:
+                tag_bigram_dict[bigram_tup] += 1
             else:
-                tagBigramDict[bigramTup] = 1
+                tag_bigram_dict[bigram_tup] = 1
 
-        return tagBigramDict
+        return tag_bigram_dict
 
     # ------------------------------------------------------
     # B Matrix functions below
@@ -118,45 +126,46 @@ class HMMUtils:
     # expands the tagset to have vowel/consonant
     # knowledge in place of boundary 1 or 0.
     # returns the adjusted phoneme list
-    def expandTags(self, phonemeLst,lang, transciptionScheme=[]):
+    def expand_tags(self, phoneme_lst, lang, transciption_scheme=[]):
         spot = ''
         spot1 = ''
         spot2 = ''
 
-        for phoneme in phonemeLst:
+        for phoneme in phoneme_lst:
             for tup in phoneme:
-                tup[0] = self.getCategory(tup[0],lang,transciptionScheme)
-                isBoundary = str(tup[2])
-                tup[1] = self.getCategory(tup[1],lang,transciptionScheme)
-                tagString = tup[0] + isBoundary + tup[1]
-                tup[2] = tagString
+                tup[0] = self.get_category(tup[0], lang, transciption_scheme)
+                is_boundary = str(tup[2])
+                tup[1] = self.get_category(tup[1], lang, transciption_scheme)
+                tag_string = tup[0] + is_boundary + tup[1]
+                tup[2] = tag_string
 
-        return phonemeLst
+        return phoneme_lst
 
     # allBigramTups: [[(phone,phone,int),(...),],[...],]
     # creates a master lookup list for all unique bigrams trained on.
     # bigrams are inserted into the list as tuples:
     # [(phone,phone),(phone,phone)...]
-    def getBigramLookup(self, allBigramTups):
-        bigramLookup = set()
+    def get_bigram_lookup(self, all_bigram_tups):
+        bigram_lookup = set()
 
-        for phoneme in allBigramTups:
+        for phoneme in all_bigram_tups:
             for bigram in phoneme:
-                bigramLookup.add((bigram[0],bigram[1]))
-        return list(bigramLookup)
+                bigram_lookup.add((bigram[0], bigram[1]))
+        return list(bigram_lookup)
 
     # builds a dictionary containing bigram: P(bigram)
     # used for normalizing MatrixB
-    def getBigramFreqDict(self, allBigramTups, numBigrams):
-        bFreqDict = {}
+    def get_bigram_freq_dict(self, all_bigram_tups, num_bigrams):
+        b_freq_dict = {}
 
-        for phoneme in allBigramTups:
+        for phoneme in all_bigram_tups:
             for bigram in phoneme:
-                newTup = (bigram[0],bigram[1])
-                if(newTup not in bFreqDict):
-                    bFreqDict[newTup] = 1
+                new_tup = (bigram[0], bigram[1])
+                if new_tup not in b_freq_dict:
+                    b_freq_dict[new_tup] = 1
                 else:
-                    bFreqDict[newTup] += 1
+                    b_freq_dict[new_tup] += 1
 
-        # nornamlize the bFreqDict to (countBigram / countAllBigrams)
-        return dict(map(lambda (k,v): (k,v/float(numBigrams)),bFreqDict.iteritems()))
+        # normalize the b_freq_dict to (countBigram / countAllBigrams)
+        return dict(map(lambda (k, v):
+                        (k, v / float(num_bigrams)), b_freq_dict.iteritems()))

@@ -25,9 +25,9 @@ class SQLQueryService(SQLiteClient):
             pronunciation = cursor.fetchone()
             return pronunciation[0] if pronunciation else ""
 
-    def get_many_pronunciations(self, wordList):
+    def get_many_pronunciations(self, word_list):
         """
-        :param wordList: list of strings
+        :param word_list: list of strings
         :return: dict of {word: pronunciation}
             if the word does not exist in the database, entry is not
             returned
@@ -36,7 +36,7 @@ class SQLQueryService(SQLiteClient):
         batch_size = 10
         batch_lst = []
         many_pros = []
-        for word in wordList:
+        for word in word_list:
             batch_lst.append(word)
             if len(batch_lst) >= batch_size:
                 many_pros = dict(many_pros,

@@ -18,7 +18,7 @@ class Celex(AbstractSyllabRunner):
             level=log.INFO
         )
         self.SQLQueryService = SQLQueryService()
-        self._CSylResultsDict = dict()
+        self.__c_syl_results_dict = dict()
         self._pronunciationsDict = dict()
         self._syllabifiedLst = []
 
@@ -28,7 +28,7 @@ class Celex(AbstractSyllabRunner):
         training_size = int(input("enter number of words to train on: "))
         testing_size = int(input("enter number of words to test on: "))
         self.load_sets(training_size, testing_size)
-        return self.trainHMM()
+        return self.train_hmm()
 
     # Populates testing and training sets.
     # Computes CELEX syllabification results.
@@ -40,13 +40,13 @@ class Celex(AbstractSyllabRunner):
         testing_set = self._to_ascii(
             self.SQLQueryService.get_word_subset(testing_size, training_set)
         )
-        self._CSylResultsDict = (
+        self.__c_syl_results_dict = (
             self.SQLQueryService.get_many_syllabifications(training_set)
         )
-        self._syllabifiedLst = self._CSylResultsDict.values()
+        self._syllabifiedLst = self.__c_syl_results_dict.values()
         log.info("Finished step: Building sets.")
         log.info("Starting step: Syllabify CELEX")
-        self._CSylResultsDict = (
+        self.__c_syl_results_dict = (
             self.SQLQueryService.get_many_syllabifications(testing_set)
         )
         self._pronunciationsDict = (
@@ -54,11 +54,11 @@ class Celex(AbstractSyllabRunner):
         )
         log.info("Finished step: Syllabify CELEX")
 
-    def trainHMM(self, transcriptionScheme=[]):
+    def train_hmm(self, transcription_scheme=[]):
         log.info("Starting step: Train HMM Model")
         self.hmm = HMM(
             2,  # lang hack: 2 is celex
-            self.add_static_tags(transcriptionScheme),
+            self.add_static_tags(transcription_scheme),
             self._syllabifiedLst
         )
         hmmbc = self.hmm.train()
@@ -66,15 +66,15 @@ class Celex(AbstractSyllabRunner):
         return hmmbc
 
     # thread-safe when DB results is false.
-    def testHMM(self, HMMBO):
-        p_syl_results_dict = self._syllabify_testing(HMMBO)
+    def test_hmm(self, hmmbo):
+        p_syl_results_dict = self._syllabify_testing(hmmbo)
         test_results_list = self._combine_results(p_syl_results_dict)
 
         if config["write_results_to_DB"]:
             self._fill_results_table(test_results_list)
 
-        self._CSylResultsDict = dict()
-        self._PSylResultsDict = dict()
+        self.__c_syl_results_dict = dict()
+        self.__p_syl_results_dict = dict()
         return self._compare(test_results_list)
 
     # Where Psyl is different than Csyl,
@@ -86,8 +86,8 @@ class Celex(AbstractSyllabRunner):
     def syllabify(self, observation):
         return self.ps.syllabify(observation, "CELEX")
 
-    def syllabifyFile(self, file_in, file_out):
-        self.ps.syllabifyFile(file_in, file_out, "CELEX")
+    def syllabify_file(self, file_in, file_out):
+        self.ps.syllabify_file(file_in, file_out, "CELEX")
 
     # ---------------- #
     #    "Private"     #
@@ -114,7 +114,7 @@ class Celex(AbstractSyllabRunner):
         for word, p_syllab in p_results_dict.iteritems():
             if not p_syllab:
                 p_syllab = ""
-            c_syllab = self._CSylResultsDict[word]
+            c_syllab = self.__c_syl_results_dict[word]
             is_same = int(c_syllab == p_syllab)
             test_results_line = {
                 "Word": word,
@@ -161,7 +161,7 @@ class Celex(AbstractSyllabRunner):
     def add_static_tags(self, transcription_scheme):
         start_and_end = ['<', '>']
         if (start_and_end not in transcription_scheme
-            and len(transcription_scheme) > 0):
+                and len(transcription_scheme) > 0):
             transcription_scheme.append(start_and_end)
         return transcription_scheme
 
