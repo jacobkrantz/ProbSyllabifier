@@ -1,11 +1,14 @@
-Nasal m F n N C H
-Plosive p b t d k g J _
-Fricative f v T D s z S Z x h
-Approximant j w
-Trill r R
-LateralApproximant l P
-Close i u 7 9
-Mid-Close I U 1 5
-Open-Mid E V Q $ 3 4 8
-Half-Full { @ # 2 6 c q 0 ~
+a p b ~
+b z v t T
+c D 3 w V 9 {
+d S d n
+e # F I Q R u 2
+f E i H q P 5 8
+g c g f k J C
+h N Z r $ j
+i 1 @ U 4 7
+j l 6
+k h
+l s x
+m 0 m _
 Word < >
