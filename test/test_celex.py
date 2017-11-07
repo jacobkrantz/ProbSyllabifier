@@ -7,7 +7,7 @@ class TestCelex(unittest.TestCase):
     def setUp(self):
         self.celex = Celex()
         self.celex.load_sets(500, 25)
-        self.transciptionScheme = [
+        self.transcription_scheme = [
             ['b', 'h', 'z', 'm', '0', 'x', 'Z'],
             ['p', 'C', 'T', '_', 'v'],
             ['k'],
@@ -27,15 +27,15 @@ class TestCelex(unittest.TestCase):
         self.transcriptionScheme = None
 
     def test_hmmbo(self):
-        hmmbo = self.celex.train_hmm(self.transciptionScheme)
-        self.assertGreater(len(hmmbo.observationLookup), 0)
-        self.assertGreater(len(hmmbo.hiddenLookup), 0)
-        self.assertGreater(len(hmmbo.transcriptionScheme), 0)
-        self.assertIsNotNone(hmmbo.matrixA)
-        self.assertIsNotNone(hmmbo.matrixB)
+        hmmbo = self.celex.train_hmm(self.transcription_scheme)
+        self.assertGreater(len(hmmbo.observation_lookup), 0)
+        self.assertGreater(len(hmmbo.hidden_lookup), 0)
+        self.assertGreater(len(hmmbo.transcription_scheme), 0)
+        self.assertIsNotNone(hmmbo.matrix_a)
+        self.assertIsNotNone(hmmbo.matrix_b)
 
     def test_with_transcription(self):
-        hmmbo = self.celex.train_hmm(self.transciptionScheme)
+        hmmbo = self.celex.train_hmm(self.transcription_scheme)
         percent_same = self.celex.test_hmm(hmmbo)
         self.assertTrue(percent_same > 0.00)
 

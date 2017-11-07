@@ -19,11 +19,11 @@ class ProbSyllabifier:
             level=log.INFO
         )
         self.hmm_utils = HMMUtils()
-        self.matrix_a = hmmbo.matrixA
-        self.matrix_b = hmmbo.matrixB
-        self.obs_lookup = hmmbo.observationLookup
-        self.hidden_lookup = hmmbo.hiddenLookup
-        self.tran_scheme = hmmbo.transcriptionScheme
+        self.matrix_a = hmmbo.matrix_a
+        self.matrix_b = hmmbo.matrix_b
+        self.obs_lookup = hmmbo.observation_lookup
+        self.hidden_lookup = hmmbo.hidden_lookup
+        self.tran_scheme = hmmbo.transcription_scheme
         self.comparator = ""
 
     def syllabify_file(self, file_in, file_out, comparator="CELEX"):
