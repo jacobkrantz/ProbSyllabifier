@@ -1,105 +1,138 @@
-from utils import SyllabParser
-
-'''
+"""
 fileName:       testing.py
 Authors:        Jacob Krantz
 Date Modified:  3/14/17
 
-Contains classes for testing the perfomance of Sylabifiers.
+Contains classes for testing the performance of Syllabifiers.
 - CompareNIST
     * compare
     * viewDifferences
-'''
+"""
+from __future__ import print_function
+
+from utils import SyllabParser
+
+
 class CompareNIST:
-
     def __init__(self):
-        self.sParser = SyllabParser()
-        self.__difLst = []
-        self.__nSyllabs  = []
-        self.__cSyllabs = []
+        self.s_parser = SyllabParser()
+        self.__dif_lst = []
+        self.__n_syllabs = []
+        self.__c_syllabs = []
 
-    # compares the syllabifications of compFile to those done by NIST.
-    # Printed percentage is how accurate compFile is to NISTfile.
-    # Both compFile and NISTfile must be in specific formats.
-    def compare(self, NISTfile, compFile):
-        self.__nSyllabs = self.__importFile(NISTfile)
-        self.__cSyllabs = self.__importFile(compFile)
+    def compare(self, nist_file, comp_file):
+        """
+        Compares the syllabifications of compFile to those done by NIST.
+        Printed percentage is how accurate compFile is to NISTfile.
+        Both compFile and NISTfile must be in specific formats.
 
-        percentSim = self.__runComparison()
-        self.__outputResults(percentSim)
+        :param nist_file:
+        :param comp_file:
+        :return:
+        """
+        self.__n_syllabs = self.__import_file(nist_file)
+        self.__c_syllabs = self.__import_file(comp_file)
 
+        percent_sim = self.__run_comparison()
+        self.__output_results(percent_sim)
 
-    # prints the differences between NIST and the compared file
-    def viewDifferences(self):
-        for i in range(1, len(self.__difLst), 2):
-            #This should also print the word; but this would require
-            #the datatype to change from a list into a dictionary
-            #or for two different lists to be present.
-            print "Word: "
+    def view_differences(self):
+        """
+        Prints the differences between NIST and the compared file
+
+        :return: None
+        """
+        for i in range(1, len(self.__dif_lst), 2):
+            # This should also print the word; but this would require
+            # the datatype to change from a list into a dictionary
+            # or for two different lists to be present.
+            print("Word: ")
             print("NIST: "),
-            print(self.__difLst[i-1])
+            print(self.__dif_lst[i - 1])
             print("Prob: "),
-            print(self.__difLst[i])
-            print
+            print(self.__dif_lst[i])
+            print()
 
-        self.__difLst = []
-
+        self.__dif_lst = []
 
     # ------------------------------------------------------
     # Private functions below
     # ------------------------------------------------------
 
-    # Imports a file that is formatted like 'SyllabDict.txt'.
-    # Parses file with SyllabParser and returns result (list of lists).
-    def __importFile(self, fileName):
-        return self.sParser.makeNistPhonemeLst(fileName)
+    def __import_file(self, file_name):
+        """
+        Imports a file that is formatted like 'SyllabDict.txt'.
+        Parses file with SyllabParser and returns result (list of lists).
 
-    # assumes that the ordering of nSyllabs is the same as cSyllabs.
-    # iterates through both datasets. For each that are the same, adds
-    # to same count. Also counts total entries. Returns percent.
-    def __runComparison(self):
-        end = len(self.__cSyllabs)
-        sameCount = 0
-        nSylIndex = 0
+        :param file_name:
+        :return:
+        """
+        return self.s_parser.make_nist_phoneme_lst(file_name)
+
+    def __run_comparison(self):
+        """
+        Assumes that the ordering of nSyllabs is the same as cSyllabs.
+        iterates through both datasets. For each that are the same,
+        adds to same count. Also counts total entries.
+
+        :return: float, percent
+        """
+        end = len(self.__c_syllabs)
+        same_count = 0
+        n_syl_index = 0
         same = True
 
-        for i in range(0, end): # loop lines
+        for i in range(end):  # loop lines
 
-            nSylIndex = self.__isSamePhoneme(i, nSylIndex)
+            n_syl_index = self.__is_same_phoneme(i, n_syl_index)
 
-            for j in range(0,len(self.__cSyllabs[i])): # loop bigrams
+            for j in range(len(self.__c_syllabs[i])):  # loop bigrams
 
-                if(self.__nSyllabs[nSylIndex][j][2] != self.__cSyllabs[i][j][2]):
+                if (self.__n_syllabs[n_syl_index][j][2]
+                        != self.__c_syllabs[i][j][2]):
                     same = False
 
-            if(same):
-                sameCount += 1
+            if same:
+                same_count += 1
             else:
                 same = True
-                self.__difLst.append(self.__nSyllabs[nSylIndex])
-                self.__difLst.append(self.__cSyllabs[i])
+                self.__dif_lst.append(self.__n_syllabs[n_syl_index])
+                self.__dif_lst.append(self.__c_syllabs[i])
 
-            nSylIndex += 1
+            n_syl_index += 1
 
-        return (sameCount / float(end) * 100)
+        return same_count / float(end) * 100
 
-    # checks if both phonemes to be compared are the same. Loops through
-    # checking each bigram contents. Continues until they are the same.
-    # returns the adjusted index for nSyllabs.
-    def __isSamePhoneme(self, i, nSylIndex):
-        if(len(self.__nSyllabs[nSylIndex]) != len(self.__cSyllabs[i])):
-            return self.__isSamePhoneme(i, nSylIndex + 1)
+    def __is_same_phoneme(self, i, n_syl_index):
+        """
+        Checks if both phonemes to be compared are the same. Loops through
+        checking each bigram contents. Continues until they are the same.
+        returns the adjusted index for nSyllabs.
 
-        for j in range(0, len(self.__nSyllabs[nSylIndex])):
+        :param i:
+        :param n_syl_index:
+        :return:
+        """
+        if len(self.__n_syllabs[n_syl_index]) != len(self.__c_syllabs[i]):
+            return self.__is_same_phoneme(i, n_syl_index + 1)
 
-            d1 = (self.__nSyllabs[nSylIndex][j][0] != self.__cSyllabs[i][j][0])
-            d2 = (self.__nSyllabs[nSylIndex][j][1] != self.__cSyllabs[i][j][1])
+        for j in range(len(self.__n_syllabs[n_syl_index])):
 
-            if(d1 or d2):
-                return self.__isSamePhoneme(i, nSylIndex + 1)
+            d1 = (self.__n_syllabs[n_syl_index][j][0]
+                  != self.__c_syllabs[i][j][0])
+            d2 = (self.__n_syllabs[n_syl_index][j][1]
+                  != self.__c_syllabs[i][j][1])
 
-        return nSylIndex # the same
+            if d1 or d2:
+                return self.__is_same_phoneme(i, n_syl_index + 1)
 
-    # prints the percentage to the commandline
-    def __outputResults(self, percentSim):
-        print("File is " + str(percentSim) + "% similar to NIST.")
+        return n_syl_index  # the same
+
+    def __output_results(self, percent_sim):
+        """
+        Prints the percentage to the commandline
+
+        :param percent_sim:
+        :return:
+        """
+        print("File is " + str(percent_sim) + "% similar to NIST.")

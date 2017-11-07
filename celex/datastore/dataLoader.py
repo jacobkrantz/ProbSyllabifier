@@ -1,27 +1,36 @@
 from sqliteClient import SQLiteClient
-from collections import OrderedDict
+
+
 class DataLoader(SQLiteClient):
 
     # columns delimited with '\'    ex: 'wrong\r.Q.N.\r.Q.N.\rQN\r.Q.N.\1'
     # entries delimited with newline character
     # Note on usage: column types assumed to be strings. Must correct within
     #   this function if columns are other types.
-    def loadTableFromFile(self, tableToLoad, filePath, columnNameList, unique=True):
-        firstColumnValueSet = set()
+    def load_table_from_file(
+            self,
+            table_to_load,
+            file_path,
+            column_name_list,
+            unique=True):
 
-        with open(filePath) as fileToLoad:
-            for line in fileToLoad:
-                valueDict = {}
-                formattedLine = line.strip('\n').split("\\")
-                for i in range(len(columnNameList)):
-                    valueDict[columnNameList[i]] = formattedLine[i]
+        first_column_values = set()
+
+        with open(file_path) as file_to_load:
+            for line in file_to_load:
+                value_dict = {}
+                formatted_line = line.strip('\n').split("\\")
+                for i, col in enumerate(column_name_list):
+                    value_dict[col] = formatted_line[i]
                     if i == 5:
-                        valueDict[columnNameList[i]] = int(valueDict[columnNameList[i]])
+                        value_dict[col] = int(value_dict[col])
 
-                if not valueDict[columnNameList[0]] in firstColumnValueSet or not unique:
-                    self.insertIntoTable(tableToLoad, valueDict)
-                    firstColumnValueSet.add(valueDict[columnNameList[0]])
+                if (value_dict[column_name_list[0]] not in first_column_values
+                        or not unique):
+                    self.insert_into_table(table_to_load, value_dict)
+                    first_column_values.add(value_dict[column_name_list[0]])
 
-if(__name__ == "__main__"):
-    dl = DataLoader("wordformsDB")
-    dl.truncateTable("workingresults")
+
+if __name__ == "__main__":
+    dl = DataLoader("wordformsDB")  # TODO unexpected argument...
+    dl.truncate_table("workingresults")

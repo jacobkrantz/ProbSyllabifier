@@ -1,84 +1,106 @@
-from config import settings as config
 from contextlib import closing
+
+from config import settings as config
 from sqliteClient import SQLiteClient
 
-# does not support multithreading, even within batch functions.
-class SQLQueryService(SQLiteClient):
 
-    # returns "" if word is not in the database
-    def getSinglePronunciation(self, word):
-        self._checkPermissions("read_permissions")
+class SQLQueryService(SQLiteClient):
+    """ Does not support multithreading, even within batch functions """
+
+    def get_single_pronunciation(self, word):
+        """
+        :param word: string
+        :return: string, "" if word is not in the database
+        """
+        self._check_permissions("read_permissions")
 
         query = """
             SELECT %s
             FROM pronunciations
             WHERE Word = ?
-            """ % self._getAlphabetColumn("Phon")
+            """ % self._get_alphabet_column("Phon")
 
         with closing(self.connection.cursor()) as cursor:
             cursor.execute(query, (word,))
             pronunciation = cursor.fetchone()
             return pronunciation[0] if pronunciation else ""
 
-    # wordList: list of strings
-    # returns dictionary of {word:pronunciation}
-    # if the word does not exist in the database, entry is not returned
-    def getManyPronunciations(self, wordList):
-        self._checkPermissions("read_permissions")
-        batchSize = 10
-        batchLst = []
-        manyPros = []
-        for word in wordList:
-            batchLst.append(word)
-            if len(batchLst) >= batchSize:
-                manyPros = dict(manyPros, **self._getBatchPronunciations(batchLst))
-                batchLst = []
-        return dict(manyPros, **self._getBatchPronunciations(batchLst))
+    def get_many_pronunciations(self, word_list):
+        """
+        :param word_list: list of strings
+        :return: dict of {word: pronunciation}
+            if the word does not exist in the database, entry is not
+            returned
+        """
+        self._check_permissions("read_permissions")
+        batch_size = 10
+        batch_lst = []
+        many_pros = []
+        for word in word_list:
+            batch_lst.append(word)
+            if len(batch_lst) >= batch_size:
+                many_pros = dict(many_pros,
+                                 **self._get_batch_pronunciations(batch_lst))
+                batch_lst = []
+        return dict(many_pros, **self._get_batch_pronunciations(batch_lst))
 
-    # returns "" if word is not in the database
-    def getSingleSyllabification(self, word):
-        self._checkPermissions("read_permissions")
+    def get_single_syllabification(self, word):
+        """
+        :param word: string
+        :return: string, "" if word is not in the database
+        """
+        self._check_permissions("read_permissions")
 
         query = """
             SELECT %s
             FROM syllabifications
             WHERE Word = ?
-            """ % self._getAlphabetColumn("PhonSyl")
+            """ % self._get_alphabet_column("PhonSyl")
 
         with closing(self.connection.cursor()) as cursor:
             cursor.execute(query, (word,))
             syllabification = cursor.fetchone()
             return syllabification[0] if syllabification else ""
 
-    # wordList: list of strings
-    # returns dictionary of {word:syllabification}
-    # if the word does not exist in the database, entry is not returned
-    def getManySyllabifications(self, wordList):
-        self._checkPermissions("read_permissions")
-        batchSize = 10
-        batchLst = []
-        manySyls = []
-        for word in wordList:
-            batchLst.append(word)
-            if len(batchLst) >= batchSize:
-                manySyls = dict(manySyls, **self._syllabifyBatch(batchLst)) # dict combination
-                batchLst = []
-        return dict(manySyls, **self._syllabifyBatch(batchLst))
+    def get_many_syllabifications(self, word_list):
+        """
+        :param word_list: list of strings
+        :return: dict of {word: syllabification}
+            if the word does not exist in the database, entry is not
+            returned
+        """
+        self._check_permissions("read_permissions")
+        batch_size = 10
+        batch_lst = []
+        many_syls = []
+        for word in word_list:
+            batch_lst.append(word)
+            if len(batch_lst) >= batch_size:
+                # dict combination
+                many_syls = dict(many_syls, **self._syllabify_batch(batch_lst))
+                batch_lst = []
+        return dict(many_syls, **self._syllabify_batch(batch_lst))
 
-    # returns total number of words in a given table: integer
-    def getEntryCount(self, tableName):
-        self._checkPermissions("read_permissions")
+    def get_entry_count(self, table_name):
+        """
+        :param table_name: string
+        :return: integer, total number of words in a given table
+        """
+        self._check_permissions("read_permissions")
         query = """
             SELECT COUNT(Word)
             FROM %s
-            """ % self._scrubParameter(tableName)
+            """ % self._scrub_parameter(table_name)
         with closing(self.connection.cursor()) as cursor:
             cursor.execute(query)
             return cursor.fetchone()[0]
 
-    def getIsSameSyllabificationCount(self, ignoreSkipped=False):
-        self._checkPermissions("read_permissions")
-        whereProbSylNotEmpty = 'AND ProbSyl != ""' if ignoreSkipped else ""
+    def get_is_same_syllabification_count(self, ignore_skipped=False):
+        self._check_permissions("read_permissions")
+        if ignore_skipped:
+            where_prob_syl_not_empty = 'AND ProbSyl != ""'
+        else:
+            where_prob_syl_not_empty = ""
         query = """
             SELECT COUNT(Word)
             FROM workingresults
@@ -88,8 +110,8 @@ class SQLQueryService(SQLiteClient):
             cursor.execute(query)
             return cursor.fetchone()[0]
 
-    def getSkippedProbSylCount(self):
-        self._checkPermissions("read_permissions")
+    def get_skipped_prob_syl_count(self):
+        self._check_permissions("read_permissions")
         query = """
             SELECT COUNT(Word)
             FROM workingresults
@@ -100,11 +122,13 @@ class SQLQueryService(SQLiteClient):
             cursor.execute(query)
             return cursor.fetchone()[0]
 
-    # returns all columns for an incorrect syllabification.
-    # selects all rows that are incorrect.
-    # returns a unicode 4-tuple (word, probSyl, celexSylab, isSame)
-    def getIncorrectResults(self):
-        self._checkPermissions("read_permissions")
+    def get_incorrect_results(self):
+        """
+        :return: all columns for an incorrect syllabification.
+            selects all rows that are incorrect.
+            returns a unicode 4-tuple (word, probSyl, celexSylab, isSame)
+        """
+        self._check_permissions("read_permissions")
         query = """
             SELECT *
             FROM workingresults
@@ -114,14 +138,19 @@ class SQLQueryService(SQLiteClient):
             cursor.execute(query)
             return cursor.fetchall()
 
-    # numberOfWords: integer
-    # wordBlacklist: list of strings
-    # returns set of words in ASCII encoding
-    def getWordSubset(self, numberOfWords, wordBlacklist=set()):
+    def get_word_subset(self, number_of_words, word_blacklist=set()):
+        """
+        :param number_of_words: integer
+        :param word_blacklist: list of strings
+        :return: set of words in ASCII encoding
+        """
         # this implementation makes me sad, but it works.
-        self._checkPermissions("read_permissions")
-        if numberOfWords + len(wordBlacklist) > self._getCountOfWordEntries:
-            raise IndexException("numberOfWords exceeds potential entries in 'words' table")
+        self._check_permissions("read_permissions")
+        if (number_of_words + len(word_blacklist)
+                > self._get_count_of_word_entries):
+            raise IndexException(
+                "numberOfWords exceeds potential entries in 'words' table"
+            )
 
         query = """
             SELECT Word
@@ -131,22 +160,22 @@ class SQLQueryService(SQLiteClient):
             """
         with closing(self.connection.cursor()) as cursor:
             cursor.execute(query)
-            allWordsSet = set(cursor.fetchall())
-            wordSubSet = set()
+            all_words_set = set(cursor.fetchall())
+            word_sub_set = set()
 
-            while len(wordSubSet) < numberOfWords:
-                word = allWordsSet.pop()
-                if word not in wordBlacklist:
-                    wordSubSet.add(word)
+            while len(word_sub_set) < number_of_words:
+                word = all_words_set.pop()
+                if word not in word_blacklist:
+                    word_sub_set.add(word)
 
-        assert(len(wordSubSet.intersection(wordBlacklist)) == 0)
-        return wordSubSet
+        assert (len(word_sub_set.intersection(word_blacklist)) == 0)
+        return word_sub_set
 
-    #----------------#
-    #   "Private"    #
-    #----------------#
+    # ---------------- #
+    #    "Private"     #
+    # ---------------- #
 
-    def _getCountOfWordEntries(self):
+    def _get_count_of_word_entries(self):
         with closing(self.connection.cursor()) as cursor:
             cursor.execute("""
                 SELECT COUNT (*)
@@ -155,44 +184,45 @@ class SQLQueryService(SQLiteClient):
                 """)
             return cursor.fetchone()[0]
 
-    def _getBatchPronunciations(self, wordList):
-        if len(wordList) > 100:
+    def _get_batch_pronunciations(self, word_list):
+        if len(word_list) > 100:
             raise OverflowError("SQLite cannot handle large input size")
-        wordsString = ', '.join(map(str, wordList))
-        places = ','.join(['?'] * len(wordList))
+        words_string = ', '.join(map(str, word_list))
+        places = ','.join(['?'] * len(word_list))
         query = """
             SELECT
                 Word,
                 %s
             FROM pronunciations
             WHERE Word IN ({})
-            """ % self._getAlphabetColumn("Phon")
+            """ % self._get_alphabet_column("Phon")
 
         with closing(self.connection.cursor()) as cursor:
-            cursor.execute(query.format(places), tuple(wordList))
+            cursor.execute(query.format(places), tuple(word_list))
             pronunciations = dict(cursor.fetchall())
-            return { str(key):str(value) for key,value in pronunciations.items() }
+            return {str(key): str(value)
+                    for key, value in pronunciations.items()}
 
-
-    def _syllabifyBatch(self, wordList):
-        if len(wordList) > 100:
+    def _syllabify_batch(self, word_list):
+        if len(word_list) > 100:
             raise OverflowError("SQLite cannot handle large input size")
-        wordsString = ', '.join(map(str, wordList))
-        places = ','.join(['?'] * len(wordList))
+        words_string = ', '.join(map(str, word_list))
+        places = ','.join(['?'] * len(word_list))
         query = """
             SELECT
                 Word,
                 %s
             FROM syllabifications
             WHERE Word IN ({})
-            """ % self._getAlphabetColumn("PhonSyl")
+            """ % self._get_alphabet_column("PhonSyl")
 
         with closing(self.connection.cursor()) as cursor:
-            cursor.execute(query.format(places), tuple(wordList))
+            cursor.execute(query.format(places), tuple(word_list))
             syllabifications = dict(cursor.fetchall())
-            return { str(key):str(value) for key,value in syllabifications.items() }
+            return {str(key): str(value)
+                    for key, value in syllabifications.items()}
 
-    def _getAlphabetColumn(self, prefix):
+    def _get_alphabet_column(self, prefix):
         return prefix + config[self._databaseContext]["default_alphabet"]
 
 

@@ -1,7 +1,8 @@
 from abc import ABCMeta, abstractmethod
 
+
 # intention for class: a generic 'run.py' can instantiate each class that
-# implements 'AbstractSyllabRunner'. The methods abastracted below can
+# implements 'AbstractSyllabRunner'. The methods abstracted below can
 # in theory be called for any syllab comparator (NIST, CELEX). The 'run.py'
 # will be very simple, containing only a menu and calling system to each of
 # these classes.
@@ -9,11 +10,11 @@ class AbstractSyllabRunner(object):
     __metaclass__ = ABCMeta
 
     @abstractmethod
-    def trainHMM(self):
+    def train_hmm(self):
         pass
 
     @abstractmethod
-    def testHMM(self):
+    def test_hmm(self):
         pass
 
     @abstractmethod
@@ -21,5 +22,5 @@ class AbstractSyllabRunner(object):
         pass
 
     @abstractmethod
-    def syllabifyFile(self, fileIN, fileOUT,comparator):
+    def syllabify_file(self, file_in, file_out, comparator):
         pass

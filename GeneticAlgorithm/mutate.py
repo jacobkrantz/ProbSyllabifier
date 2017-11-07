@@ -1,7 +1,9 @@
+from random import randint
+
+import numpy as np
+
 from Chromosome import Chromosome
 from config import GAConfig as config
-from random import randint
-import numpy as np
 
 '''
 fileName:       mutate.py
@@ -16,6 +18,7 @@ Genetic Algorithm mutations.
     - mutates all chromosomes except for the top.
 '''
 
+
 def mutate(pop):
     """
     Keeps the population from getting stagnant.
@@ -26,12 +29,13 @@ def mutate(pop):
     Returns:
         pop (list of type Chromosome)
     """
-    mutFactor = calculateMutationFactor(pop)
-    return [pop[0]] + list(map(lambda x:mutateChrom(x,mutFactor), pop[1:]))
+    mut_factor = calculate_mutation_factor(pop)
+    return [pop[0]] + list(map(lambda x: mutate_chrom(x, mut_factor), pop[1:]))
 
-def calculateMutationFactor(pop):
+
+def calculate_mutation_factor(pop):
     """
-    Calcuates a standard deviation of the top chromosomes fitness.
+    Calculates a standard deviation of the top chromosomes fitness.
     Returns a variable mutation factor; higher when low deviation,
     lower when high deviation.
 
@@ -40,35 +44,39 @@ def calculateMutationFactor(pop):
     Returns:
         float: factor for chromosome mutation.
     """
-    stdev = np.std(np.array(list(map(lambda x: x.getFitness(), pop[:config["NumChromsInDeviation"]]))))
-    desiredDev = float(config["DesiredDeviation"])
-    mutationFactor = float(config["BaseMutationFactor"])
+    stdev = np.std(np.array(list(map(
+        lambda x: x.get_fitness(),
+        pop[:config["NumChromsInDeviation"]]
+    ))))
+    desired_dev = float(config["DesiredDeviation"])
+    mutation_factor = float(config["BaseMutationFactor"])
 
-    if stdev <= desiredDev:
-        mutationFactor -= (stdev - desiredDev) / float((desiredDev * 10))
-    elif stdev > (2 * desiredDev):
-        mutationFactor *= 0.75
+    if stdev <= desired_dev:
+        mutation_factor -= (stdev - desired_dev) / float((desired_dev * 10))
+    elif stdev > (2 * desired_dev):
+        mutation_factor *= 0.75
 
-    return mutationFactor
+    return mutation_factor
 
-def mutateChrom(chromosome, mutationFactor):
-    '''
+
+def mutate_chrom(chromosome, mutation_factor):
+    """
     Per-gene: each gene has a percent chance of mutating to a random category.
 
     Args:
-        chromosome (Chromosome): the chomosome to mutate
-        mutationFactor (float): the factor used to alter the chromosome
+        chromosome (Chromosome): the chromosome to mutate
+        mutation_factor (float): the factor used to alter the chromosome
     Returns:
         Chromosome: the provided chromosome with mutations made
-    '''
-    newChromosome = Chromosome(config["NumCategories"])
+    """
+    new_chromosome = Chromosome(config["NumCategories"])
 
-    for catIndex, category in enumerate(chromosome.getGenes()):
+    for cat_index, category in enumerate(chromosome.get_genes()):
         for gene in category:
-            newCategory = catIndex
-            if(float(randint(0,99))/100 <= mutationFactor):
-                while(newCategory == catIndex):
-                    newCategory = randint(0, config["NumCategories"] - 1)
-            newChromosome.insertIntoCategory(newCategory, gene)
+            new_category = cat_index
+            if float(randint(0, 99)) / 100 <= mutation_factor:
+                while new_category == cat_index:
+                    new_category = randint(0, config["NumCategories"] - 1)
+            new_chromosome.insert_into_category(new_category, gene)
 
-    return newChromosome
+    return new_chromosome

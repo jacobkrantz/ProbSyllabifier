@@ -1,78 +1,121 @@
-from config import settings as config
-from contextlib import closing
-from collections import OrderedDict
 import sqlite3
+from contextlib import closing
 
-# Important: multithreading not possible without external library or db migration
+from config import settings as config
+
+
+# Important: multithreading not possible without external library or
+# db migration
 class SQLiteClient:
 
     def __init__(self):
         self._databaseContext = config["dataLoader"]["databaseContext"]
-        self.connection = sqlite3.connect(config[self._databaseContext]["path"])
+        self.connection = sqlite3.connect(
+            config[self._databaseContext]["path"]
+        )
 
-    # string tableName
-    # OrderedDict columnsAndTypes: column_name:column_datatype
-    # ***columnsAndTypes not protected against SQL injection
-    def createTable(self, tableName, columnsAndTypes):
-        self._checkPermissions("write_permissions")
-        columnInserts = ""
-        for columnAndTypeTuple in columnsAndTypes.items():
-            columnInserts += columnAndTypeTuple[0] + " " + columnAndTypeTuple[1] + ", "
-        SQL = """ CREATE TABLE %s (%s) """ % (self._scrubParameter(tableName),columnInserts.strip(', '))
+    def create_table(self, table_name, columns_and_types):
+        """
+        :param table_name: string
+        :param columns_and_types: OrderedDict, column_name:column_datatype
+            not protected against SQL injection
+        :return: None
+        """
+        self._check_permissions("write_permissions")
+        column_inserts = ""
+        for column_and_type_tuple in columns_and_types.items():
+            column_inserts += (column_and_type_tuple[0] + " "
+                               + column_and_type_tuple[1] + ", ")
+        sql = """ CREATE TABLE %s (%s) """ % (
+            self._scrub_parameter(table_name),
+            column_inserts.strip(', ')
+        )
         with closing(self.connection.cursor()) as cursor:
-            cursor.execute(SQL)
+            cursor.execute(sql)
             self.connection.commit()
 
-    # string tableName: Table must exist
-    def truncateTable(self, tableName):
-        self._checkPermissions("write_permissions")
-        self._checkProtected(tableName)
-        SQL = """ DELETE FROM %s """ % self._scrubParameter(tableName)
+    def truncate_table(self, table_name):
+        """
+        :param table_name: string, Table must exist
+        :return: None
+        """
+        self._check_permissions("write_permissions")
+        self._check_protected(table_name)
+        sql = """ DELETE FROM %s """ % self._scrub_parameter(table_name)
         with closing(self.connection.cursor()) as cursor:
-            cursor.execute(SQL)
+            cursor.execute(sql)
             self.connection.commit()
 
-    # string tableName: Table must exist
-    def dropTable(self, tableName):
-        self._checkPermissions("write_permissions")
-        self._checkProtected(tableName)
-        SQL = """ DROP TABLE IF EXISTS %s """ % self._scrubParameter(tableName)
+    def drop_table(self, table_name):
+        """
+        :param table_name: Table must exist
+        :return: None
+        """
+
+        self._check_permissions("write_permissions")
+        self._check_protected(table_name)
+        sql = (""" DROP TABLE IF EXISTS %s """
+               % self._scrub_parameter(table_name))
         with closing(self.connection.cursor()) as cursor:
-            cursor.execute(SQL)
+            cursor.execute(sql)
             self.connection.commit()
 
-    # string tableName: Table must exist
-    # dictionary dataDict: Contains key-value pairs for all defined table columns
-    def insertIntoTable(self, tableName, dataDict):
-        self._checkPermissions("write_permissions")
-        places = ','.join(['?'] * len(dataDict))
-        keys = ','.join(dataDict.iterkeys())
-        values = tuple(dataDict.itervalues())
-        SQL = """ INSERT INTO %s (%s) VALUES %s """ % (self._scrubParameter(tableName),keys,values)
+    def insert_into_table(self, table_name, data_dict):
+        """
+        :param table_name: string, Table must exist
+        :param data_dict: dict, contains key/value pairs for all
+            defined table columns
+        :return: None
+        """
+        self._check_permissions("write_permissions")
+        places = ','.join(['?'] * len(data_dict))
+        keys = ','.join(data_dict.iterkeys())
+        values = tuple(data_dict.itervalues())
+        sql = (""" INSERT INTO %s (%s) VALUES %s """
+               % (self._scrub_parameter(table_name), keys, values))
         with closing(self.connection.cursor()) as cursor:
-            cursor.execute(SQL)
+            cursor.execute(sql)
             self.connection.commit()
 
-    #----------------#
-    #   "Private"    #
-    #----------------#
+    # ---------------- #
+    #    "Private"     #
+    # ---------------- #
 
-    # string whichpermission can be: "read_permissions" OR "write_permissions"
-    def _checkPermissions(self, whichPermission):
-        if(not config[self._databaseContext][whichPermission]):
-            raise PermissionsException("User does not have permission: " + whichPermission)
+    def _check_permissions(self, which_permission):
+        """
+        :param which_permission: string, can be:
+            "read_permissions" OR "write_permissions"
+        :raises PermissionsException
+        :return: True
+        """
+        if not config[self._databaseContext][which_permission]:
+            raise PermissionsException(
+                "User does not have permission: " + which_permission
+            )
         else:
             return True
 
-    def _checkProtected(self, tableName):
-        if tableName in config[self._databaseContext]["protected_tables"]:
-            raise PermissionsException("Cannot execute: %s is a protected table" % tableName)
+    def _check_protected(self, table_name):
+        """
+        :param table_name: string
+        :raises PermissionsException
+        :return: True
+        """
+        if table_name in config[self._databaseContext]["protected_tables"]:
+            raise PermissionsException(
+                "Cannot execute: %s is a protected table" % table_name
+            )
         else:
             return True
 
-    # guards against SQL injection. Only works for single parameter
-    def _scrubParameter(self, SQLParameter):
-        return ''.join( chr for chr in SQLParameter if chr.isalnum() )
+    def _scrub_parameter(self, sql_parameter):
+        """ Guards against SQL injection. Only works for single parameter
+
+        :param sql_parameter: string
+        :return: string
+        """
+
+        return ''.join(char for char in sql_parameter if char.isalnum())
 
 
 class PermissionsException(Exception):

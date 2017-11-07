@@ -1,6 +1,8 @@
-from config import GAConfig as config
-from random import randint
 import copy
+from random import randint
+
+from config import GAConfig as config
+
 '''
 fileName:       Mating.py
 Authors:        Jacob Krantz, Max Dulin
@@ -13,86 +15,84 @@ Contains the workings for mating together the population.
 - returns the new population, the same size as passed in. Unordered.
 '''
 
-class Mating:
 
+class Mating:
     def __init__(self):
         self.newPopulation = []
 
     # performs as specified in above header
     def crossover(self, population):
-        #print population[0].getGenes()
+        # print population[0].getGenes()
         self.newPopulation = []
         self.selection(population)
         return copy.deepcopy(self.newPopulation)
 
-    #selects the population to continue on living
-    def selection(self,population):
+    # selects the population to continue on living
+    def selection(self, population):
         amount = len(population)
-        temporaryPopulation = len(population)
-        usedList = []
+        temporary_population = len(population)
+        used_list = []
 
-        #kills the bottom part of the population
-        for count in range(amount/2):
-            del population[len(population)-1]
+        # kills the bottom part of the population
+        for count in range(amount / 2):
+            del population[len(population) - 1]
             self.newPopulation.append(copy.deepcopy(population[count]))
         amount = len(population)
-        usedList = []
-
+        used_list = []
 
         for i in range(config["NumMatingPairs"]):
 
-            spot1 = randint(0,amount-1)
-            while(spot1 in usedList):
-                spot1 = randint(0,amount-1)
+            spot1 = randint(0, amount - 1)
+            while spot1 in used_list:
+                spot1 = randint(0, amount - 1)
 
-            spot2 = randint(0,amount-1)
-            while(spot2 in usedList or spot2 == spot1):
-                spot2 = randint(0,amount-1)
+            spot2 = randint(0, amount - 1)
+            while spot2 in used_list or spot2 == spot1:
+                spot2 = randint(0, amount - 1)
 
-            #setting up the parents chromosomes
+            # setting up the parents chromosomes
             mother = copy.deepcopy(population[spot1])
             father = copy.deepcopy(population[spot2])
 
-            #add two new children to the population
-            #print self.newPopulation[-1].getGenes()
-            self.newPopulation.append(self.matePair(mother,father))
-            self.newPopulation.append(self.matePair(mother,father))
+            # add two new children to the population
+            # print self.newPopulation[-1].getGenes()
+            self.newPopulation.append(self.mate_pair(mother, father))
+            self.newPopulation.append(self.mate_pair(mother, father))
         return
 
+    # Pre: Given the mother and father chromosomes
+    # Post: Returns a child chromosome
+    def mate_pair(self, mother, father):
 
-    #Pre: Given the mother and father chromosomes
-    #Post: Returns a child chromosome
-    def matePair(self,mother,father):
-
-        #possibly need to get the count of the evolution
-        if(mother.getFitness() == 0 or father.getFitness() == 0):
-            if(mother.getFitness() == 0):
-                fatherRange = 70
-                motherRange = 30
+        # possibly need to get the count of the evolution
+        if mother.get_fitness() == 0 or father.get_fitness() == 0:
+            if mother.get_fitness() == 0:
+                father_range = 70
+                mother_range = 30
             else:
-                fatherRange = 30
-                motherRange = 70
+                father_range = 30
+                mother_range = 70
         else:
-            whole = father.getFitness() + mother.getFitness()
-            fatherRange = father.getFitness()/float(whole) * 100
-            motherRange = mother.getFitness()/float(whole) * 100
+            whole = father.get_fitness() + mother.get_fitness()
+            father_range = father.get_fitness() / float(whole) * 100
+            mother_range = mother.get_fitness() / float(whole) * 100
 
-        fatherRange = 50
-        motherRange = 50
+        father_range = 50
+        mother_range = 50
         child1 = copy.deepcopy(father)
-        child1.setFitness(0)
+        child1.set_fitness(0)
 
-        #exchanging the phones into their new, mated categories
+        # exchanging the phones into their new, mated categories
         for phone in config["GeneList"]:
 
-            randNum = randint(0,100)
-            #father
-            if(randNum >= 0 and randNum <= fatherRange):
+            rand_num = randint(0, 100)
+            # father
+            if 0 <= rand_num <= father_range:
                 pass
-            #mother
-            elif(randNum >= fatherRange and randNum <= 100):
-                category = mother.getCategory(phone)
-                child1.insertIntoCategory(category,phone)
+            # mother
+            elif father_range <= rand_num <= 100:
+                category = mother.get_category(phone)
+                child1.insert_into_category(category, phone)
 
-        #print child1.getGenes()
+        # print child1.getGenes()
         return child1
