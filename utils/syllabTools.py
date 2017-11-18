@@ -1,7 +1,7 @@
 import sys
 from subprocess import check_output
 
-from nltk.corpus import cmudict
+#from nltk.corpus import cmudict
 
 '''
 fileName:       syllabInfo.py
@@ -21,7 +21,7 @@ Date Modified:  3/14/17
 
 class SyllabTools:
     def __init__(self, comparator):
-        self.cmu_dict = cmudict.dict()
+        self.cmu_dict = None#cmudict.dict()
         self.word_lst = []
         self.arpabet_dict = {}
         self.ipa_dict = {}

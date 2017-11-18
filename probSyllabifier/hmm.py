@@ -142,7 +142,7 @@ class HMM:
             j_index = self.tag_lookup.index(j_tag)
 
             # inserts prob into the matrix
-            matrix_a[i_index, j_index] = probability
+            matrix_a[i_index][j_index] = probability
 
         return matrix_a
 
@@ -160,7 +160,7 @@ class HMM:
                 tup = (bigram[0], bigram[1])
                 i = self.bigram_lookup.index(tup)
                 j = self.tag_lookup.index(bigram[2])  # current tag
-                matrix_b[i, j] = matrix_b[i, j] + 1
+                matrix_b[i][j] = matrix_b[i][j] + 1
         return matrix_b
 
     def normalize_naive_b(self, matrix_b):
@@ -175,7 +175,7 @@ class HMM:
         for i, bigram in enumerate(self.bigram_lookup):
             bigram_prob = self.bigram_freq_dict[bigram]
             for j in range(len(self.tag_lookup)):  # loop through each tag
-                matrix_b[i, j] = matrix_b[i, j] / float(bigram_prob)
+                matrix_b[i][j] = matrix_b[i][j] / float(bigram_prob)
         return matrix_b
 
     def _files_did_load(self):

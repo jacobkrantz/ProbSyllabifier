@@ -5,7 +5,7 @@ import subprocess
 import sys
 from subprocess import PIPE
 
-from nltk.corpus import cmudict
+#from nltk.corpus import cmudict
 
 '''
 module for running the NIST Syllabifier
@@ -15,7 +15,7 @@ assumes tsylb2 file exists in directory '~/NIST/tsylb2-1.1/'
 
 class NISTClient:
     def __init__(self):
-        self.cmu_dict = cmudict.dict()
+        self.cmu_dict = None #cmudict.dict()
         self.out_file = ""
         self.in_file = ""
 

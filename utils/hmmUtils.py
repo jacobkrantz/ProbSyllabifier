@@ -1,4 +1,4 @@
-import numpy as np
+from copy import deepcopy
 
 from config import settings as config
 from syllabParser import SyllabParser
@@ -10,10 +10,31 @@ class HMMUtils:
     def __init__(self):
         self.syl_parser = SyllabParser()
 
-    # initialize a matrix using numpy with provided size: (X,Y)
-    # returns matrix
-    def init_matrix(self, x, y):
-        return np.zeros((x, y), dtype=np.float)
+    def init_matrix(self, rows, columns, data_type="float"):
+        """
+        Initialize a matrix using numpy with provided size: (X,Y)
+        Args:
+            rows (int)
+            columns (int)
+            data_type (string) must be either 'float' or 'int' to be numpy type.
+                else it will be exact specified value. Defaults to 'float'.
+        Return:
+            the zero matrix of proper size and type
+        """
+        if(data_type == 'int'):
+            item = 0
+        elif(data_type == 'float'):
+            item = 0.0
+        elif(data_type == 'int,int'):
+            item = (0,0)
+
+        matrix = []
+        row = []
+        for i in range(0,columns):
+            row.append(item)
+        for j in range(0,rows):
+            matrix.append(deepcopy(row))
+        return matrix
 
     # uses SyllabParser to generate a list of lists.
     # allBigramTups: [[(phone,phone,int),(...),],[...],] where int
@@ -83,15 +104,16 @@ class HMMUtils:
     # returns as a list of lists.
     def get_tag_names(self, lang):
         if lang == 1:
-            in_file = open(config["NistTranscriptionFile"], 'r')
+            in_file = "NistTranscriptionFile"
         else:
-            in_file = open(config["CelexTranscriptionFile"], 'r')
+            in_file = "CelexTranscriptionFile"
 
-        tags = []
-        for line in in_file:
-            tmp_lst = line.split(' ')
-            tmp_lst[len(tmp_lst) - 1] = tmp_lst[len(tmp_lst) - 1].strip('\r\n')
-            tags.append(tmp_lst)
+        with open(config["CelexTranscriptionFile"], 'r') as file:
+            tags = []
+            for line in file:
+                tmp_lst = line.split(' ')
+                tmp_lst[len(tmp_lst) - 1] = tmp_lst[len(tmp_lst) - 1].strip('\r\n')
+                tags.append(tmp_lst)
 
         return tags
 

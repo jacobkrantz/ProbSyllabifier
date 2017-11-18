@@ -1,5 +1,4 @@
 import matplotlib.pyplot as plt
-import numpy as np
 
 '''
 - Standard deviation is calculated from the fitness values
@@ -9,6 +8,11 @@ import numpy as np
     will be considered in the standard deviation.
 - graphs
 '''
+
+def stddev(lst):
+    mean = float(sum(lst)) / len(lst)
+    return sqrt(float(reduce(lambda x,y: x+y, map(lambda x: (x-mean) **2, lst))) / len(lst))
+
 
 deviation_scope = 8
 evolution_std_dev_list = []
@@ -24,9 +28,8 @@ try:
                 if count % 2 == 0:
                     fitness_lst.append(float(line.strip('\n')))
 
-            temp_fitness_array = np.array(fitness_lst[:deviation_scope])
             evolution_std_dev_list.append(
-                float("%.1f" % np.std(temp_fitness_array))
+                float("%.1f" % stddev(fitness_lst[:deviation_scope]))
             )
         logNumber += 1
 

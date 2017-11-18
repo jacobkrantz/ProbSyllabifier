@@ -1,7 +1,5 @@
 import logging as log
 
-import numpy as np
-
 from utils import HMMUtils
 
 
@@ -130,16 +128,16 @@ class ProbSyllabifier:
         i_max = len(self.hidden_lookup)
         j_max = len(obs_lst)
         # Viterbi matrix
-        matrix_v = np.zeros((i_max, j_max), dtype=np.float)
+        matrix_v = self.hmm_utils.init_matrix(i_max, j_max)
         # backpointer matrix
-        matrix_p = np.zeros((i_max, j_max), dtype='int,int')
+        matrix_p = self.hmm_utils.init_matrix(i_max, j_max, 'int,int')
 
         if j_max == 0:  # no bigrams, just one phone
             return matrix_v, matrix_p
 
         for i in range(i_max):  # initialization step
             obs_index = self.obs_lookup.index(obs_lst[0])
-            matrix_v[i, 0] = self.matrix_b[obs_index, i]  # flipped
+            matrix_v[i][0] = self.matrix_b[obs_index][i]  # flipped
 
         for j in range(1, j_max):  # iterative step
             obs_bigram = self.obs_lookup.index(obs_lst[j])
@@ -149,18 +147,17 @@ class ProbSyllabifier:
                 j_back = 0
                 for old_i in range(i_max):
                     bword = self.obs_lookup[j]
-                    cur_prob = (matrix_v[old_i, j - 1]
-                                * self.matrix_a[old_i, i]
-                                * self.matrix_b[obs_bigram, i])
+                    cur_prob = (matrix_v[old_i][j - 1]
+                                * self.matrix_a[old_i][i]
+                                * self.matrix_b[obs_bigram][i])
 
                     if cur_prob > max_prob:
                         max_prob = cur_prob
                         i_back = old_i
                         j_back = j - 1
 
-                matrix_v[i, j] = max_prob
-                matrix_p[i, j][0] = i_back
-                matrix_p[i, j][1] = j_back
+                matrix_v[i][j] = max_prob
+                matrix_p[i][j] = (i_back, j_back)
 
         return matrix_v, matrix_p
 
@@ -175,20 +172,20 @@ class ProbSyllabifier:
 
         # only grabs final max prob
         for i in range(len(self.hidden_lookup)):
-            current_final = matrix_v[i, j_max - 1]
+            current_final = matrix_v[i][j_max - 1]
             if current_final > max_final:
                 max_final = current_final
                 i_final = i
 
         rev_output.append(self.hidden_lookup[i_final])
-        i_cur = matrix_p[i_final, j_max - 1][0]
-        j_cur = matrix_p[i_final, j_max - 1][1]
+        i_cur = matrix_p[i_final][j_max - 1][0]
+        j_cur = matrix_p[i_final][j_max - 1][1]
 
         for j in range(j_max - 2, -1, -1):
             rev_output.append(self.hidden_lookup[i_cur])
             i_cur_old = i_cur
-            i_cur = matrix_p[i_cur, j_cur][0]
-            j_cur = matrix_p[i_cur_old, j_cur][1]
+            i_cur = matrix_p[i_cur][j_cur][0]
+            j_cur = matrix_p[i_cur_old][j_cur][1]
 
         return rev_output[::-1]
 

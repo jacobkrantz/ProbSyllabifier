@@ -61,9 +61,9 @@ class Celex(AbstractSyllabRunner):
             self.add_static_tags(transcription_scheme),
             self._syllabifiedLst
         )
-        hmmbc = self.hmm.train()
+        hmmbo = self.hmm.train()
         log.info("Finished step: Train HMM Model")
-        return hmmbc
+        return hmmbo
 
     # thread-safe when DB results is false.
     def test_hmm(self, hmmbo):
