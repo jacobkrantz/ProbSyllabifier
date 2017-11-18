@@ -33,7 +33,7 @@ class SQLQueryService(SQLiteClient):
             returned
         """
         self._check_permissions("read_permissions")
-        batch_size = 10
+        batch_size = 100
         batch_lst = []
         many_pros = []
         for word in word_list:
@@ -70,7 +70,7 @@ class SQLQueryService(SQLiteClient):
             returned
         """
         self._check_permissions("read_permissions")
-        batch_size = 10
+        batch_size = 100
         batch_lst = []
         many_syls = []
         for word in word_list:

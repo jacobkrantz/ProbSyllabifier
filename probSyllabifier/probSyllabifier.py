@@ -11,11 +11,7 @@ class ProbSyllabifier:
 
     def __init__(self, hmmbo):
         """ Unpack the HMMBO data object. """
-        log.basicConfig(
-            format='%(asctime)s %(levelname)s:%(message)s',
-            datefmt='%X',
-            level=log.INFO
-        )
+        log.getLogger('')
         self.hmm_utils = HMMUtils()
         self.matrix_a = hmmbo.matrix_a
         self.matrix_b = hmmbo.matrix_b

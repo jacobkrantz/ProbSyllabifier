@@ -12,11 +12,7 @@ from utils import AbstractSyllabRunner
 # static entries as specified in Celex.addStaticTags()
 class Celex(AbstractSyllabRunner):
     def __init__(self):
-        log.basicConfig(
-            format='%(asctime)s %(levelname)s:%(message)s',
-            datefmt='%X',
-            level=log.INFO
-        )
+        log.getLogger('')
         self.SQLQueryService = SQLQueryService()
         self.__c_syl_results_dict = dict()
         self._pronunciationsDict = dict()

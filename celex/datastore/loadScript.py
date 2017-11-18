@@ -66,3 +66,17 @@ cols_and_types = OrderedDict([
     ('Same', 'INTEGER')
 ])
 dl.create_table('workingresults', cols_and_types)
+
+#--------------------------------
+
+# 11/18 done in DB Browser for SQLite
+"""
+INSERT INTO optimized_disc (word, pronunciation, syllabification)
+SELECT
+	syllabifications.Word,
+	pronunciations.PhonDISC,
+	syllabifications.PhonSylDISC
+FROM syllabifications
+JOIN pronunciations
+	ON syllabifications.Word = pronunciations.Word
+""""
