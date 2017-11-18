@@ -56,7 +56,7 @@ class ProbSyllabifier:
 
         if not is_valid:
             bad_bigram = problem_obs[0] + " " + problem_obs[1]
-            log.warning("(%s) does not exist in training set.", bad_bigram)
+            log.debug("(%s) does not exist in training set.", bad_bigram)
             return []
 
         matrix_v, matrix_p = self.__build_matrix_v(transcribed_obs)
