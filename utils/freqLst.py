@@ -2,7 +2,7 @@ from __future__ import print_function
 
 import sys
 
-from nltk.corpus import cmudict
+#from nltk.corpus import cmudict
 
 '''
 fileName:       run.py
@@ -18,7 +18,7 @@ Note: all top 1000 words must exist in CMU pronouncing dictionary
 
 class FrequentWords:
     def __init__(self):
-        self.cmu_dict = cmudict.dict()
+        self.cmu_dict = None #cmudict.dict()
         self.__in_file = ""
         self.__out_file = ""
         self.__num_words = 0

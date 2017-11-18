@@ -2,6 +2,7 @@
     "CelexTranscriptionFile": "HMMFiles/DISC/DISC4.txt",
     "NistTranscriptionFile": "HMMFiles/phoneCategoriesArp.txt",
     "comparator": "CELEX",
+    "logLevel": "info",
     "dataLoader": {
         "databaseContext": "wordformsDB"
     },

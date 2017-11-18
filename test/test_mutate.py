@@ -63,6 +63,12 @@ class TestMutate(unittest.TestCase):
                 diff_exists = True
         self.assertTrue(diff_exists)
 
+    def test_stddev(self):
+        lst = [1,2,3,4,5,6,44,8]
+        self.assertEqual(mutate.stddev(lst), 13.34576243606936)
+        lst = [2,2,2,2,2,2]
+        self.assertEqual(mutate.stddev(lst), 0.0)
+
     # -------------------- #
     #       private        #
     # -------------------- #

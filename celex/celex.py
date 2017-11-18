@@ -12,11 +12,7 @@ from utils import AbstractSyllabRunner
 # static entries as specified in Celex.addStaticTags()
 class Celex(AbstractSyllabRunner):
     def __init__(self):
-        log.basicConfig(
-            format='%(asctime)s %(levelname)s:%(message)s',
-            datefmt='%X',
-            level=log.INFO
-        )
+        log.getLogger('')
         self.SQLQueryService = SQLQueryService()
         self.__c_syl_results_dict = dict()
         self._pronunciationsDict = dict()
@@ -33,7 +29,7 @@ class Celex(AbstractSyllabRunner):
     # Populates testing and training sets.
     # Computes CELEX syllabification results.
     def load_sets(self, training_size, testing_size):
-        log.info("Starting step: Building sets.")
+        log.debug("Starting step: Building sets.")
         training_set = self._to_ascii(
             self.SQLQueryService.get_word_subset(training_size)
         )
@@ -44,26 +40,26 @@ class Celex(AbstractSyllabRunner):
             self.SQLQueryService.get_many_syllabifications(training_set)
         )
         self._syllabifiedLst = self.__c_syl_results_dict.values()
-        log.info("Finished step: Building sets.")
-        log.info("Starting step: Syllabify CELEX")
+        log.debug("Finished step: Building sets.")
+        log.debug("Starting step: Syllabify CELEX")
         self.__c_syl_results_dict = (
             self.SQLQueryService.get_many_syllabifications(testing_set)
         )
         self._pronunciationsDict = (
             self.SQLQueryService.get_many_pronunciations(testing_set)
         )
-        log.info("Finished step: Syllabify CELEX")
+        log.debug("Finished step: Syllabify CELEX")
 
     def train_hmm(self, transcription_scheme=[]):
-        log.info("Starting step: Train HMM Model")
+        log.debug("Starting step: Train HMM Model")
         self.hmm = HMM(
             2,  # lang hack: 2 is celex
             self.add_static_tags(transcription_scheme),
             self._syllabifiedLst
         )
-        hmmbc = self.hmm.train()
-        log.info("Finished step: Train HMM Model")
-        return hmmbc
+        hmmbo = self.hmm.train()
+        log.debug("Finished step: Train HMM Model")
+        return hmmbo
 
     # thread-safe when DB results is false.
     def test_hmm(self, hmmbo):
@@ -96,7 +92,7 @@ class Celex(AbstractSyllabRunner):
     # builds dictionary of {testWord:syllabification}
     # for pSylResultsDict
     def _syllabify_testing(self, hmmbo):
-        log.info("Starting step: Syllabify ProbSyllabifier")
+        log.debug("Starting step: Syllabify ProbSyllabifier")
         self.ps = ProbSyllabifier(hmmbo)
         p_syl_results_dict = {}
         for word, pronunciation in self._pronunciationsDict.iteritems():
@@ -104,7 +100,7 @@ class Celex(AbstractSyllabRunner):
                 pronunciation,
                 "CELEX"
             )
-        log.info("Finished step: Syllabify ProbSyllabifier")
+        log.debug("Finished step: Syllabify ProbSyllabifier")
         return p_syl_results_dict
 
     # Queries result lines from the "workingresults" table
@@ -146,13 +142,16 @@ class Celex(AbstractSyllabRunner):
                 skipped_syllab_count += 1
         percent_same = "{0:.2f}".format(100 * num_same / total_entries)
         ignored_percent_same = "{0:.2f}".format(
-            100 * num_same / total_entries - float(skipped_syllab_count)
+            100 * num_same / (total_entries - float(skipped_syllab_count))
         )
-        print("\n----------------------------------------")
-        print("ProbSyllabifier is " + percent_same + "% similar to CELEX.")
-        print("Ignoring", skipped_syllab_count,
-              "skips:", ignored_percent_same, "%")
-        print("----------------------------------------")
+
+        log_message = ("ProbSyllabifier is "+ percent_same
+            + "% similar to CELEX." + '\n')
+        if(skipped_syllab_count > 0):
+            log_message += ('\t' + "Ignoring " + str(skipped_syllab_count) +
+                " skips: " + str(ignored_percent_same) + "%" + '\n')
+
+        log.info(log_message)
         return percent_same
 
     # add all static tags to the incoming transcriptionScheme.

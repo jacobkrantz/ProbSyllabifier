@@ -1,6 +1,5 @@
+from math import sqrt
 from random import randint
-
-import numpy as np
 
 from Chromosome import Chromosome
 from config import GAConfig as config
@@ -44,10 +43,10 @@ def calculate_mutation_factor(pop):
     Returns:
         float: factor for chromosome mutation.
     """
-    stdev = np.std(np.array(list(map(
+    stdev = stddev(list(map(
         lambda x: x.get_fitness(),
         pop[:config["NumChromsInDeviation"]]
-    ))))
+    )))
     desired_dev = float(config["DesiredDeviation"])
     mutation_factor = float(config["BaseMutationFactor"])
 
@@ -80,3 +79,16 @@ def mutate_chrom(chromosome, mutation_factor):
             new_chromosome.insert_into_category(new_category, gene)
 
     return new_chromosome
+
+
+def stddev(lst):
+    """
+    Calculate the standard deviation of a list of int or float.
+
+    Args:
+        numbers (list<int or float>)
+    Returns:
+        float: resulting standard dev of list
+    """
+    mean = float(sum(lst)) / len(lst)
+    return sqrt(float(reduce(lambda x,y: x+y, map(lambda x: (x-mean) **2, lst))) / len(lst))
