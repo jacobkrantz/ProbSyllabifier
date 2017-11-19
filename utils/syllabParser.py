@@ -41,9 +41,13 @@ class SyllabParser:
 
     # Creates a list of phonemes. Phonemes consist of bigrams of the
     # form: [['d', 'aa', 0], ['aa', 'l', 1], ['l', 'er', 0]]
-    def parse_celex_training_set(self, training_set):
+    def parse_celex_set_as_bigrams(self, training_set):
         training_set = map(lambda x: x.encode('utf-8'), training_set)
-        return map(lambda word: self._parse_celex_word(word), training_set)
+        return map(lambda word: self._parse_celex_word_as_bigram(word), training_set)
+
+    def parse_celex_set_as_trigrams(self, training_set):
+        training_set = map(lambda x: x.encode('utf-8'), training_set)
+        return map(lambda word: self._parse_celex_word_as_trigram(word), training_set)
 
     # ------------------------------
     #            PRIVATE
@@ -51,7 +55,7 @@ class SyllabParser:
 
     # assumptions: a boundary cannot start or end a word
     #   a boundary cannot follow a boundary
-    def _parse_celex_word(self, word):
+    def _parse_celex_word_as_bigram(self, word):
         word = word.split()[0]
         word = '<' + word + '>'
         phoneme_bigram_list = []
@@ -73,6 +77,43 @@ class SyllabParser:
                         "CELEX word '" + word + "' broke syllab rule."
                     )
         return phoneme_bigram_list
+
+    def _parse_celex_word_as_trigram(self, word):
+        """
+        <sQ-pI> becomes:
+            [('<', 's', 'Q', 0, 0),
+             ('s', 'Q', 'p', 0, 1),
+             ('Q', 'p', 'I', 1, 0),
+             ('p', 'I', '>', 0, 0)]
+        Args:
+            word (string): syllabified CELEX DISC
+        Returns:
+            list of trigrams in 5-tuples
+        """
+        word = '<' + word.split()[0] + '>'
+        phoneme_trigram_list = []
+        word_chars = []
+        boundaries = []
+        for i, character in enumerate(word):
+            if(character == '-'):
+                boundaries.append(1)
+            else:
+                word_chars.append(character)
+                if(len(word_chars) > len(boundaries)):
+                    boundaries.append(0)
+
+        for i in range(2, len(word_chars)):
+            trigram = (
+                word_chars[i-2],
+                word_chars[i-1],
+                word_chars[i],
+                boundaries[i-1],
+                boundaries[i]
+            )
+            phoneme_trigram_list.append(trigram)
+
+        return phoneme_trigram_list
+
 
     # Parses a word into bigrams and whether there was a boundary between them.
     # In the format (firstPhone,secondPhone,boundary)

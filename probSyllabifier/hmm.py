@@ -1,4 +1,5 @@
-from utils import HMMUtils
+from config import settings as config
+from utils import BigramHmmUtils, TrigramHmmUtils
 from HMMBO import HMMBO
 
 
@@ -14,7 +15,10 @@ class HMM:
             training_set (list of strings): optional set of words to
                 train from. Must be populated if lang = 2 (CELEX)
         """
-        self.utils = HMMUtils()
+        if(config["NGramValue"] == 2):
+            self.utils = BigramHmmUtils()
+        else:
+            self.utils = TrigramHmmUtils()
         self.hmmbo = HMMBO()
         self.hmmbo.transcription_scheme = transcription_scheme
         self.all_bigram_tups = self._load_training_data(training_set)
@@ -62,9 +66,9 @@ class HMM:
         """
         tag_bigrams = []
         for phoneme in self.all_bigram_tups:
-            tag_bigrams += self.utils.get_tag_bigrams(phoneme)
+            tag_bigrams += self.utils.get_tag_ngrams(phoneme)
 
-        tag_bigram_dict = self.utils.build_tag_bigram_dict(tag_bigrams)
+        tag_bigram_dict = self.utils.build_tag_ngram_dict(tag_bigrams)
         matrix_a = self.__insert_prob_a(tag_bigram_dict)
         return matrix_a
 
@@ -108,8 +112,8 @@ class HMM:
             lang,
             transcription_scheme
         )
-        self.bigram_lookup = self.utils.get_bigram_lookup(self.all_bigram_tups)
-        self.bigram_freq_dict = self.utils.get_bigram_freq_dict(
+        self.bigram_lookup = self.utils.get_ngram_lookup(self.all_bigram_tups)
+        self.bigram_freq_dict = self.utils.get_ngram_freq_dict(
             self.all_bigram_tups,
             len(self.bigram_lookup)
         )
