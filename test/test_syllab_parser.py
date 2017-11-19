@@ -16,13 +16,18 @@ class TestSyllabParser(unittest.TestCase):
         self.sp = None
         self.trainingSet = None
 
-    def test_parse_celex_training_set(self):
-        parse_result = self.sp.parse_celex_training_set(self.trainingSet)
+    def test_parse_celex_set_as_bigrams(self):
+        parse_result = self.sp.parse_celex_set_as_bigrams(self.trainingSet)
         self.assertEqual(len(parse_result), 3)
         for parsed_word in parse_result:
             for bigram in parsed_word:
                 self.assertEqual(len(bigram), 3)
                 self.assertTrue(bigram[2] == 0 or bigram[2] == 1)
+
+    def test_parse_celex_set_as_trigrams(self):
+        parse_result = self.sp.parse_celex_set_as_trigrams(self.trainingSet)
+        self.assertEqual(len(parse_result), 3)
+        # TODO: expand this test.
 
 
 if __name__ == '__main__':

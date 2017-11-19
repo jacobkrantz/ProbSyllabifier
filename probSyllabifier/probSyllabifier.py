@@ -1,6 +1,7 @@
 import logging as log
 
-from utils import HMMUtils
+from config import settings as config
+from utils import BigramHmmUtils, TrigramHmmUtils
 
 
 class ProbSyllabifier:
@@ -12,7 +13,10 @@ class ProbSyllabifier:
     def __init__(self, hmmbo):
         """ Unpack the HMMBO data object. """
         log.getLogger('')
-        self.hmm_utils = HMMUtils()
+        if(config["NGramValue"] == 2):
+            self.utils = BigramHmmUtils()
+        else:
+            self.utils = TrigramHmmUtils()
         self.matrix_a = hmmbo.matrix_a
         self.matrix_b = hmmbo.matrix_b
         self.obs_lookup = hmmbo.observation_lookup
@@ -89,7 +93,7 @@ class ProbSyllabifier:
         else:
             lang = 2
         return list(map(
-            lambda x: self.hmm_utils.get_category(x, lang, self.tran_scheme),
+            lambda x: self.utils.get_category(x, lang, self.tran_scheme),
             obs_lst
         ))
 
@@ -124,9 +128,9 @@ class ProbSyllabifier:
         i_max = len(self.hidden_lookup)
         j_max = len(obs_lst)
         # Viterbi matrix
-        matrix_v = self.hmm_utils.init_matrix(i_max, j_max)
+        matrix_v = self.utils.init_matrix(i_max, j_max)
         # backpointer matrix
-        matrix_p = self.hmm_utils.init_matrix(i_max, j_max, 'int,int')
+        matrix_p = self.utils.init_matrix(i_max, j_max, 'int,int')
 
         if j_max == 0:  # no bigrams, just one phone
             return matrix_v, matrix_p

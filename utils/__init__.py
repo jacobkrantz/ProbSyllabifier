@@ -1,5 +1,6 @@
 from abstractSyllabRunner import AbstractSyllabRunner
 from freqLst import FrequentWords
-from hmmUtils import HMMUtils
+from bigramHmmUtils import BigramHmmUtils
+from trigramHmmUtils import TrigramHmmUtils
 from syllabParser import SyllabParser
 from syllabTools import SyllabTools
