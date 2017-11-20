@@ -93,7 +93,7 @@ class ProbSyllabifier:
         else:
             lang = 2
         return list(map(
-            lambda x: self.utils.get_category(x, lang, self.tran_scheme),
+            lambda x: self.utils._get_category(x, lang, self.tran_scheme),
             obs_lst
         ))
 

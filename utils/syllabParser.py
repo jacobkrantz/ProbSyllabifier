@@ -1,47 +1,35 @@
-"""
-fileName:       SyllabParser.py
-Authors:        Max Dulin, Jacob Krantz
-Date Modified:  3/15/17
-
--Functions:
-    makePhonemeLst
-
-- Parses the SyllabDict.txt into a list of tuples.
-- Default input file:
-    - ./HMMFiles/SyllabDict.txt
-
-"""
-
-
 class SyllabParser:
+    """
+    Utility for parsing input strings into ngram lists. Used for creating
+        training models within the Hidden Markov Model (`hmm.py`).
+    """
+
     def __init__(self):
-        # spot on the line
-        self.spot = 0
-        # where the lines are stored in the beginning
-        self.initial_list = []
-        # the list where the list of bigram lists per word is stored
-        self.bigram_lst = []
-        # the string line from the file inputted
-        self.line = ''
+        self.spot = 0 # spot on the line
+        self.bigram_lst = [] # the list where the list of bigram lists per word is stored
+        self.line = '' # the string line from the file inputted
 
     # Creates a list of phonemes. Phonemes consist of bigrams of the
     # form: [['d', 'aa', 0], ['aa', 'l', 1], ['l', 'er', 0]]
     # filename param defaults to ./HMMFiles./SyllabDict.txt
     def make_nist_phoneme_lst(self, file_name="./HMMFiles/SyllabDict.txt"):
+        initial_list = [] # where the lines are stored in the beginning
         with open(file_name) as f:
             for line in f:
-                self.initial_list.append(line)
+                initial_list.append(line)
 
-        for i in range(len(self.initial_list)):
-            self.__make_parse_word(i)
+        for i, line in enumerate(initial_list):
+            self.__make_parse_word(i, line)
 
-        bigs = self.bigram_lst
-        self.__init__()
-        return bigs
+        return self.bigram_lst
 
-    # Creates a list of phonemes. Phonemes consist of bigrams of the
-    # form: [['d', 'aa', 0], ['aa', 'l', 1], ['l', 'er', 0]]
     def parse_celex_set_as_bigrams(self, training_set):
+        """
+        Args:
+            training_set (list<string>)
+        Returns:
+            list<list<phone>> all training entries broken into bigrams.
+        """
         training_set = map(lambda x: x.encode('utf-8'), training_set)
         return map(lambda word: self._parse_celex_word_as_bigram(word), training_set)
 
@@ -53,11 +41,16 @@ class SyllabParser:
     #            PRIVATE
     # ------------------------------
 
-    # assumptions: a boundary cannot start or end a word
-    #   a boundary cannot follow a boundary
     def _parse_celex_word_as_bigram(self, word):
-        word = word.split()[0]
-        word = '<' + word + '>'
+        """
+        Creates a list of phone bigrams.
+        Args:
+            word (string)
+        Returns:
+            list<[phone,phone,boundary]>
+                example: [['<', 'aa', 0], ['aa', 'l', 1], ['l', '>', 0]]
+        """
+        word = '<' + word.split()[0] + '>'
         phoneme_bigram_list = []
         was_boundary = False
         if word[0] == '-' or word[-1] == '-':
@@ -80,6 +73,7 @@ class SyllabParser:
 
     def _parse_celex_word_as_trigram(self, word):
         """
+        Creates a list of phone trigrams.
         <sQ-pI> becomes:
             [('<', 's', 'Q', 0, 0),
              ('s', 'Q', 'p', 0, 1),
@@ -119,10 +113,9 @@ class SyllabParser:
     # In the format (firstPhone,secondPhone,boundary)
     # if there is a boundary, the value is a 1. If there is no boundary
     # the value is 0.
-    def __make_parse_word(self, index):
+    def __make_parse_word(self, index, line):
         # List to hold each bigram in a word
         phone_lst = []
-        line = self.initial_list[index]
 
         # takes out the beginning word in the dictionary
         while line[0] != ' ':

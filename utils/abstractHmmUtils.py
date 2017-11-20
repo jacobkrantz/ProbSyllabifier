@@ -43,10 +43,10 @@ class AbstractHmmUtils(object):
             matrix.append(deepcopy(row))
         return matrix
 
-    def get_category(self, phone, lang, transcription_scheme=[]):
+    def _get_category(self, phone, lang, transcription_scheme=[]):
         """
         Looks up the category that a phone belongs to.
-        TODO: refactor both get_category and get_tag_names
+        TODO: refactor both _get_category and get_tag_names
         Args:
             phone (character)
             lang (int):  1 if using NIST, else CELEX.
@@ -89,7 +89,7 @@ class AbstractHmmUtils(object):
 
         return tags
 
-    def build_tag_ngram_dict(self, tag_ngrams):
+    def build_tag_bigram_dict(self, tag_ngrams):
         """
         Builds a dictionary of [ngram]:[number of occurrances]
         Args:
@@ -108,6 +108,50 @@ class AbstractHmmUtils(object):
 
         return tag_ngram_dict
 
+    def get_tag_bigrams(self, all_ngram_tups):
+        """
+        for input phoneLst: [(phone,phone,tag),(...),]
+        returns a list of bigram tuples.
+        ex: [('m0d','d1s'),('d1s','n1l'),('n1l','a0m')]
+        """
+        tag_bigrams = []
+        tag_index = len(all_ngram_tups[0][0]) - 1
+
+        for phone_list in all_ngram_tups:
+            for i in range(1, len(phone_list) - 1):
+                tupl = (phone_list[i - 1][tag_index], phone_list[i][tag_index])
+                tag_bigrams.append(tupl)
+                
+        return tag_bigrams
+
+    def get_bigram_lookup_and_freq_dict(self, all_ngram_tups):
+        """
+        allBigramTups: [[(phone,phone,int),(...),],[...],]
+        creates a master lookup list for all unique bigrams trained on.
+        bigrams are inserted into the list as tuples:
+        [(phone,phone),(phone,phone)...]
+        """
+        bigram_lookup = set()
+        bigram_freq_dict = dict()
+
+        for phoneme in all_ngram_tups:
+            for bigram in phoneme:
+                addBigram = []
+                for i in range(config["NGramValue"]):
+                    addBigram.append(bigram[i])
+
+                addBigram = tuple(addBigram)
+                bigram_lookup.add(addBigram)
+                if addBigram in bigram_freq_dict:
+                    bigram_freq_dict[addBigram] += 1
+                else:
+                    bigram_freq_dict[addBigram] = 1
+
+        bigram_lookup = list(bigram_lookup)
+        bigram_freq_dict = dict(map(lambda (k, v):
+                    (k, v / float(len(bigram_lookup))), bigram_freq_dict.iteritems()))
+        return bigram_lookup, bigram_freq_dict
+
     @abstractmethod
     def get_nist_bigram_tups(self):
         pass
@@ -121,17 +165,5 @@ class AbstractHmmUtils(object):
         pass
 
     @abstractmethod
-    def get_tag_ngrams(self, phone_list):
-        pass
-
-    @abstractmethod
-    def expand_tags(self, phoneme_lst, lang, transcription_scheme=[]):
-        pass
-
-    @abstractmethod
-    def get_ngram_lookup(self, all_ngram_tups):
-        pass
-
-    @abstractmethod
-    def get_ngram_freq_dict(self, all_ngram_tups, num_ngrams):
+    def expand_tags(self, all_ngram_tups, lang, transcription_scheme=[]):
         pass
