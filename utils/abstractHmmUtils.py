@@ -152,6 +152,16 @@ class AbstractHmmUtils(object):
                     (k, v / float(len(bigram_lookup))), bigram_freq_dict.iteritems()))
         return bigram_lookup, bigram_freq_dict
 
+    def format_insert(self, float_value):
+	"""
+	Args:
+		float_value (float)
+	Returns:
+		float: formatted to 4 decimal places
+	"""
+        return float("{0:.4f}".format(float_value))
+
+
     @abstractmethod
     def get_nist_bigram_tups(self):
         pass

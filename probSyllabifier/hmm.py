@@ -141,7 +141,7 @@ class HMM:
             j_index = self.tag_lookup.index(j_tag)
 
             # inserts prob into the matrix
-            matrix_a[i_index][j_index] = probability
+            matrix_a[i_index][j_index] = self.utils.format_insert(probability)
 
         return matrix_a
 
@@ -177,7 +177,7 @@ class HMM:
         for i, bigram in enumerate(self.bigram_lookup):
             bigram_prob = self.b_freq_dict[bigram]
             for j in range(len(self.tag_lookup)):  # loop through each tag
-                matrix_b[i][j] = matrix_b[i][j] / float(bigram_prob)
+                matrix_b[i][j] = self.utils.format_insert(matrix_b[i][j] / float(bigram_prob))
         return matrix_b
 
     def _structures_did_load(self):

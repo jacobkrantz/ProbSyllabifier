@@ -155,12 +155,13 @@ class ProbSyllabifier:
     def __build_matrix_v(self, obs_lst):
         i_max = len(self.hidden_lookup)
         j_max = len(obs_lst)
+
         # Viterbi matrix
         matrix_v = self.utils.init_matrix(i_max, j_max)
         # backpointer matrix
         matrix_p = self.utils.init_matrix(i_max, j_max, 'int,int')
 
-        if j_max == 0:  # no bigrams, just one phone
+        if j_max == 0:  # no bigrams, just one entry
             return matrix_v, matrix_p
 
         obs_index = self.obs_lookup.index(obs_lst[0])
@@ -173,18 +174,21 @@ class ProbSyllabifier:
                 max_prob = 0
                 i_back = 0
                 j_back = 0
+
+                matrix_b_multiplier = self.matrix_b[obs_ngram][i]
+                if matrix_b_multiplier == 0.0:
+                    continue
+
                 for old_i in range(i_max):
-                    bword = self.obs_lookup[j]
                     cur_prob = (matrix_v[old_i][j - 1]
                                 * self.matrix_a[old_i][i]
-                                * self.matrix_b[obs_ngram][i])
-
+                                * matrix_b_multiplier)
                     if cur_prob > max_prob:
                         max_prob = cur_prob
                         i_back = old_i
                         j_back = j - 1
 
-                matrix_v[i][j] = max_prob
+                matrix_v[i][j] = self.utils.format_insert(max_prob)
                 matrix_p[i][j] = (i_back, j_back)
 
         return matrix_v, matrix_p
