@@ -96,3 +96,27 @@ class BigramHmmUtils(AbstractHmmUtils):
         # normalize the b_freq_dict to (countBigram / countAllBigrams)
         return dict(map(lambda (k, v):
                         (k, v / float(num_ngrams)), b_freq_dict.iteritems()))
+
+    def make_final_str(self, obs_lst, output_lst, comparator="CELEX"):
+        """
+        Synthesize the resulting syllabification.
+        Args:
+            obs_lst (list<ngram observation>)
+            output_lst (list<tag>) result from Viterbi backtrace
+        Returns:
+            string of syllabified initial input.
+        """
+        final_str = ""
+        for i in range(len(obs_lst)):
+            is_truncated = (i == len(obs_lst) - 1)
+            final_str += obs_lst[i][0]
+            if output_lst[i][1] == '0' or is_truncated:
+                if comparator == "NIST":
+                    final_str += " "
+            else:
+                if comparator == "NIST":
+                    final_str += " | "
+                else:
+                    final_str += "-"
+
+        return final_str + obs_lst[len(obs_lst) - 1][1]

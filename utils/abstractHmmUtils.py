@@ -121,7 +121,7 @@ class AbstractHmmUtils(object):
             for i in range(1, len(phone_list) - 1):
                 tupl = (phone_list[i - 1][tag_index], phone_list[i][tag_index])
                 tag_bigrams.append(tupl)
-                
+
         return tag_bigrams
 
     def get_bigram_lookup_and_freq_dict(self, all_ngram_tups):
@@ -166,4 +166,8 @@ class AbstractHmmUtils(object):
 
     @abstractmethod
     def expand_tags(self, all_ngram_tups, lang, transcription_scheme=[]):
+        pass
+
+    @abstractmethod
+    def make_final_str(self, obs_lst, output_lst):
         pass

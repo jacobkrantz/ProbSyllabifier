@@ -72,3 +72,25 @@ class TrigramHmmUtils(AbstractHmmUtils):
                 all_ngram_tups[i][j] = trigram
 
         return all_ngram_tups
+
+    def make_final_str(self, obs_lst, output_lst):
+        """
+        Synthesize the resulting syllabification.
+        Args:
+            obs_lst (list<ngram observation>)
+            output_lst (list<tag>) result from Viterbi backtrace
+        Returns:
+            string of syllabified initial input.
+        """
+        if output_lst[0][3] == '1':
+            init_boundary = '-'
+        else:
+            init_boundary = ''
+        final_str = obs_lst[0][0] + init_boundary + obs_lst[0][1]
+        for i, observation in enumerate(obs_lst):
+            if output_lst[i][4] == '1':
+                boundary_char = '-'
+            else:
+                boundary_char = ''
+            final_str += (boundary_char + observation[2])
+        return final_str

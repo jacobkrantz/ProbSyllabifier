@@ -70,7 +70,7 @@ class ProbSyllabifier:
 
         matrix_v, matrix_p = self.__build_matrix_v(transcribed_obs)
         output_lst = self.__decode_matrix(matrix_v, matrix_p, transcribed_obs)
-        return self.__make_final_str(obs_lst, output_lst)
+        return self.utils.make_final_str(obs_lst, output_lst)
 
     # ------------------------------------------------------
     # helper functions below
@@ -163,12 +163,12 @@ class ProbSyllabifier:
         if j_max == 0:  # no bigrams, just one phone
             return matrix_v, matrix_p
 
+        obs_index = self.obs_lookup.index(obs_lst[0])
         for i in range(i_max):  # initialization step
-            obs_index = self.obs_lookup.index(obs_lst[0])
             matrix_v[i][0] = self.matrix_b[obs_index][i]  # flipped
 
         for j in range(1, j_max):  # iterative step
-            obs_bigram = self.obs_lookup.index(obs_lst[j])
+            obs_ngram = self.obs_lookup.index(obs_lst[j])
             for i in range(i_max):
                 max_prob = 0
                 i_back = 0
@@ -177,7 +177,7 @@ class ProbSyllabifier:
                     bword = self.obs_lookup[j]
                     cur_prob = (matrix_v[old_i][j - 1]
                                 * self.matrix_a[old_i][i]
-                                * self.matrix_b[obs_bigram][i])
+                                * self.matrix_b[obs_ngram][i])
 
                     if cur_prob > max_prob:
                         max_prob = cur_prob
@@ -216,26 +216,6 @@ class ProbSyllabifier:
             j_cur = matrix_p[i_cur_old][j_cur][1]
 
         return rev_output[::-1]
-
-    # combines the hidden list with the observation list.
-    # returns the final string, formed nicely.
-    def __make_final_str(self, obs_lst, output_lst):
-        final_str = ""
-
-        for i in range(len(obs_lst)):
-
-            is_truncated = (i == len(obs_lst) - 1)
-            final_str += obs_lst[i][0]
-            if output_lst[i][1] == '0' or is_truncated:
-                if self.comparator == "NIST":
-                    final_str += " "
-            else:
-                if self.comparator == "NIST":
-                    final_str += " | "
-                else:
-                    final_str += "-"
-
-        return final_str + obs_lst[len(obs_lst) - 1][1]
 
     # given a list of phonemes, syllabifies all of them.
     # returns a list of syllabifications, with indices corresponding
