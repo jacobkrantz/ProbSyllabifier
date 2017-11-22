@@ -21,10 +21,12 @@ class HMM:
             self.utils = TrigramHmmUtils()
         self.hmmbo = HMMBO()
         self.hmmbo.transcription_scheme = transcription_scheme
-        self.all_bigram_tups = self._load_training_data(training_set)
-        self.tag_dict = {}
+        self.all_ngram_tups = self._load_training_data(training_set)
+        self.tag_dict = dict()
+        self.b_freq_dict = dict()
         self.bigram_lookup = []
         self.tag_lookup = []
+        self.tag_bigrams = []
         self._load_structures(lang, transcription_scheme)
 
     def train(self):
@@ -45,7 +47,7 @@ class HMM:
         Returns:
             int: number of syllabified words in the training set.
         """
-        return len(self.all_bigram_tups)
+        return len(self.all_ngram_tups)
 
     # ------------------------------------------------------
     # helper functions below
@@ -64,11 +66,7 @@ class HMM:
         Returns:
             numpy matrix: matrix_a transition probabilities
         """
-        tag_bigrams = []
-        for phoneme in self.all_bigram_tups:
-            tag_bigrams += self.utils.get_tag_ngrams(phoneme)
-
-        tag_bigram_dict = self.utils.build_tag_ngram_dict(tag_bigrams)
+        tag_bigram_dict = self.utils.build_tag_bigram_dict(self.tag_bigrams)
         matrix_a = self.__insert_prob_a(tag_bigram_dict)
         return matrix_a
 
@@ -103,21 +101,18 @@ class HMM:
     def _load_structures(self, lang, transcription_scheme):
         """ loads necessary data structures for building the HMM """
         self.tag_dict, self.tag_lookup = self.utils.get_tag_lookup(
-            self.all_bigram_tups,
+            self.all_ngram_tups,
             lang,
             transcription_scheme
         )
-        self.all_bigram_tups = self.utils.expand_tags(
-            self.all_bigram_tups,
+        self.all_ngram_tups = self.utils.expand_tags(
+            self.all_ngram_tups,
             lang,
             transcription_scheme
         )
-        self.bigram_lookup = self.utils.get_ngram_lookup(self.all_bigram_tups)
-        self.bigram_freq_dict = self.utils.get_ngram_freq_dict(
-            self.all_bigram_tups,
-            len(self.bigram_lookup)
-        )
-        self._files_did_load()
+        self.tag_bigrams = self.utils.get_tag_bigrams(self.all_ngram_tups)
+        self.bigram_lookup, self.b_freq_dict = self.utils.get_bigram_lookup_and_freq_dict(self.all_ngram_tups)
+        self._structures_did_load()
 
     def __insert_prob_a(self, tag_bigram_dict):
         """
@@ -146,25 +141,28 @@ class HMM:
             j_index = self.tag_lookup.index(j_tag)
 
             # inserts prob into the matrix
-            matrix_a[i_index][j_index] = probability
+            matrix_a[i_index][j_index] = self.utils.format_insert(probability)
 
         return matrix_a
 
     def __insert_count_b(self, matrix_b):
         """
-        Inserts the count of a bigram given a boundary.
-        Populates matrixB with these values.
+        Inserts the count of an ngram given a boundary.
+        Populates matrix_b with these values.
         Args:
-            matrix_b (numpy matrix)
+            matrix_b (2D-array)
         Returns:
-            numpy matrix: matrixB
+            2D-array: matrixB
         """
-        for phoneme in self.all_bigram_tups:
-            for bigram in phoneme:
-                tup = (bigram[0], bigram[1])
-                i = self.bigram_lookup.index(tup)
-                j = self.tag_lookup.index(bigram[2])  # current tag
-                matrix_b[i][j] = matrix_b[i][j] + 1
+        for phone_list in self.all_ngram_tups:
+            for ngram in phone_list:
+                tup = ()
+                for i in range(config["NGramValue"]):
+                    tup += (ngram[i],)
+                row = self.bigram_lookup.index(tup)
+                # current tag stored in lastspot of tuple
+                col = self.tag_lookup.index(ngram[-1])
+                matrix_b[row][col] = matrix_b[row][col] + 1
         return matrix_b
 
     def normalize_naive_b(self, matrix_b):
@@ -177,18 +175,18 @@ class HMM:
             numpy matrix: matrixB
         """
         for i, bigram in enumerate(self.bigram_lookup):
-            bigram_prob = self.bigram_freq_dict[bigram]
+            bigram_prob = self.b_freq_dict[bigram]
             for j in range(len(self.tag_lookup)):  # loop through each tag
-                matrix_b[i][j] = matrix_b[i][j] / float(bigram_prob)
+                matrix_b[i][j] = self.utils.format_insert(matrix_b[i][j] / float(bigram_prob))
         return matrix_b
 
-    def _files_did_load(self):
+    def _structures_did_load(self):
         """ Ensures all structures are loaded. Fail fast. """
         assert (len(self.tag_dict) != 0)
         assert (len(self.tag_lookup) != 0)
-        assert (len(self.all_bigram_tups) != 0)
+        assert (len(self.all_ngram_tups) != 0)
         assert (len(self.bigram_lookup) != 0)
-        assert (len(self.bigram_freq_dict) != 0)
+        assert (len(self.b_freq_dict) != 0)
         assert (len(self.bigram_lookup) != 0)
 
         # All items in lookup must be unique

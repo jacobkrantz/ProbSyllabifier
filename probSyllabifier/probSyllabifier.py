@@ -41,39 +41,49 @@ class ProbSyllabifier:
 
     def syllabify(self, observation, comparator="CELEX"):
         """
-        Generates the most likely hidden state.
+        Generates the syllabification of a given word string.
         Args:
             observation (string): sequence of phones
             comparator (string): either "NIST" or default "CELEX"
+        Returns:
+            string: observation string with '-'
+                            representing syllable boundaries.
         """
         self.comparator = comparator
         obs_lst = self.__make_obs_lst(observation)
 
-        if len(obs_lst) == 1:  # early return for single phone obs
-            return obs_lst[0]
+        if len(obs_lst) < config["NGramValue"]:  # early return small obs
+            return observation # assumption: no syllable boundaries
 
         transcribed_obs = self.__transcribe_phones(obs_lst)
-        transcribed_obs = self.__convert_to_bigrams(transcribed_obs)
-        obs_lst = self.__convert_to_bigrams(obs_lst)
+        transcribed_obs = self.__convert_to_ngrams(transcribed_obs)
+        obs_lst = self.__convert_to_ngrams(obs_lst)
 
         is_valid, problem_obs = self.__is_valid_obs(transcribed_obs)
 
         if not is_valid:
-            bad_bigram = problem_obs[0] + " " + problem_obs[1]
-            log.debug("(%s) does not exist in training set.", bad_bigram)
-            return []
+            bad_ngram = ""
+            for i in range(config["NGramValue"]):
+                bad_ngram += (problem_obs[i] + " ")
+            log.debug("(%s) does not exist in training set.", bad_ngram)
+            return ""
 
         matrix_v, matrix_p = self.__build_matrix_v(transcribed_obs)
         output_lst = self.__decode_matrix(matrix_v, matrix_p, transcribed_obs)
-        return self.__make_final_str(obs_lst, output_lst)
+        return self.utils.make_final_str(obs_lst, output_lst)
 
     # ------------------------------------------------------
     # helper functions below
     # ------------------------------------------------------
 
-    # given an observation string, appends each phone to a new
-    # observation list. returns list.
     def __make_obs_lst(self, observation):
+        """
+        Converts string observation to a list of characters.
+        Args:
+            observation (string). Example: 'abc'
+        Returns:
+            list<char>. Example: ['<','a','b','c','>']
+        """
         if self.comparator == "CELEX":
             return list(observation)
 
@@ -88,27 +98,45 @@ class ProbSyllabifier:
         return obs_lst
 
     def __transcribe_phones(self, obs_lst):
-        if self.comparator == "NIST":
-            lang = 1
-        else:
-            lang = 2
+        """
+        Replaces each character of obs_lst with its category.
+        Args:
+            list<char> list of phones
+        Returns:
+            list<char> with categories instead of phones
+        """
+        lang = 1 if(self.comparator == "NIST") else 2
         return list(map(
-            lambda x: self.utils.get_category(x, lang, self.tran_scheme),
+            lambda x: self.utils._get_category(x, lang, self.tran_scheme),
             obs_lst
         ))
 
-    # convert obs_lst to its bigrams
-    def __convert_to_bigrams(self, obs_lst):
+    def __convert_to_ngrams(self, obs_lst):
+        """
+        Converts an observation list into corresponding n-grams.
+        Args:
+            obs_lst (list<char>): observation list
+        Returns:
+            list<(n-tuple)>
+        """
         bigram_lst = []
-        for i in range(1, len(obs_lst)):
-            tup = (obs_lst[i - 1], obs_lst[i])
+        nValue = config["NGramValue"]
+        for i in range((nValue - 1), len(obs_lst)):
+            tup = tuple()
+            for offset in range(nValue - 1, -1, -1):
+                tup += (obs_lst[i - offset],)
             bigram_lst.append(tup)
         return bigram_lst
 
-    # given an observation list, returns True if all observations exist in
-    # the training set. Returns False and the problem observation as a string
-    # otherwise.
     def __is_valid_obs(self, obs_lst):
+        """
+        Checks if all elements of a list are contained in the training set.
+        Args:
+            obs_lst (list<char>): observation list
+        Returns:
+            boolean: True if observation is valid
+            string: value in obs_lst not in training set.
+        """
         try:
             for i in range(len(obs_lst)):
                 problem_obs = obs_lst[i]
@@ -127,36 +155,40 @@ class ProbSyllabifier:
     def __build_matrix_v(self, obs_lst):
         i_max = len(self.hidden_lookup)
         j_max = len(obs_lst)
+
         # Viterbi matrix
         matrix_v = self.utils.init_matrix(i_max, j_max)
         # backpointer matrix
         matrix_p = self.utils.init_matrix(i_max, j_max, 'int,int')
 
-        if j_max == 0:  # no bigrams, just one phone
+        if j_max == 0:  # no bigrams, just one entry
             return matrix_v, matrix_p
 
+        obs_index = self.obs_lookup.index(obs_lst[0])
         for i in range(i_max):  # initialization step
-            obs_index = self.obs_lookup.index(obs_lst[0])
             matrix_v[i][0] = self.matrix_b[obs_index][i]  # flipped
 
         for j in range(1, j_max):  # iterative step
-            obs_bigram = self.obs_lookup.index(obs_lst[j])
+            obs_ngram = self.obs_lookup.index(obs_lst[j])
             for i in range(i_max):
                 max_prob = 0
                 i_back = 0
                 j_back = 0
+
+                matrix_b_multiplier = self.matrix_b[obs_ngram][i]
+                if matrix_b_multiplier == 0.0:
+                    continue
+
                 for old_i in range(i_max):
-                    bword = self.obs_lookup[j]
                     cur_prob = (matrix_v[old_i][j - 1]
                                 * self.matrix_a[old_i][i]
-                                * self.matrix_b[obs_bigram][i])
-
+                                * matrix_b_multiplier)
                     if cur_prob > max_prob:
                         max_prob = cur_prob
                         i_back = old_i
                         j_back = j - 1
 
-                matrix_v[i][j] = max_prob
+                matrix_v[i][j] = self.utils.format_insert(max_prob)
                 matrix_p[i][j] = (i_back, j_back)
 
         return matrix_v, matrix_p
@@ -188,26 +220,6 @@ class ProbSyllabifier:
             j_cur = matrix_p[i_cur_old][j_cur][1]
 
         return rev_output[::-1]
-
-    # combines the hidden list with the observation list.
-    # returns the final string, formed nicely.
-    def __make_final_str(self, obs_lst, output_lst):
-        final_str = ""
-
-        for i in range(len(obs_lst)):
-
-            is_truncated = (i == len(obs_lst) - 1)
-            final_str += obs_lst[i][0]
-            if output_lst[i][1] == '0' or is_truncated:
-                if self.comparator == "NIST":
-                    final_str += " "
-            else:
-                if self.comparator == "NIST":
-                    final_str += " | "
-                else:
-                    final_str += "-"
-
-        return final_str + obs_lst[len(obs_lst) - 1][1]
 
     # given a list of phonemes, syllabifies all of them.
     # returns a list of syllabifications, with indices corresponding

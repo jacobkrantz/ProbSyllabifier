@@ -31,12 +31,12 @@ class BigramHmmUtils(AbstractHmmUtils):
 
         for phoneme in all_ngram_tups:
             for tup in phoneme:
-                category1 = self.get_category(
+                category1 = self._get_category(
                     tup[0],
                     lang,
                     transcription_scheme
                 )
-                category2 = self.get_category(
+                category2 = self._get_category(
                     tup[1],
                     lang,
                     transcription_scheme
@@ -50,17 +50,6 @@ class BigramHmmUtils(AbstractHmmUtils):
 
         return tag_dict, list(tag_lookup)
 
-    # for input phoneLst: [(phone,phone,int),(...),]
-    # returns a list of bigram tuples.
-    # ex: [('m0d','d1s'),('d1s','n1l'),('n1l','a0m')]
-    def get_tag_ngrams(self, phone_list):
-        tag_bigrams = []
-        for i in range(1, len(phone_list) - 1):
-            tupl = (phone_list[i - 1][2], phone_list[i][2])
-            tag_bigrams.append(tupl)
-
-        return tag_bigrams
-
     # ------------------------------------------------------
     # B Matrix functions below
     # ------------------------------------------------------
@@ -68,20 +57,20 @@ class BigramHmmUtils(AbstractHmmUtils):
     # expands the tagset to have vowel/consonant
     # knowledge in place of boundary 1 or 0.
     # returns the adjusted phoneme list
-    def expand_tags(self, phone_list, lang, transcription_scheme=[]):
+    def expand_tags(self, all_ngram_tups, lang, transcription_scheme=[]):
         spot = ''
         spot1 = ''
         spot2 = ''
 
-        for phoneme in phone_list:
-            for tup in phoneme:
-                tup[0] = self.get_category(
+        for phone_list in all_ngram_tups:
+            for tup in phone_list:
+                tup[0] = self._get_category(
                     tup[0],
                     lang,
                     transcription_scheme
                 )
                 is_boundary = str(tup[2])
-                tup[1] = self.get_category(
+                tup[1] = self._get_category(
                     tup[1],
                     lang,
                     transcription_scheme
@@ -89,19 +78,7 @@ class BigramHmmUtils(AbstractHmmUtils):
                 tag_string = tup[0] + is_boundary + tup[1]
                 tup[2] = tag_string
 
-        return phone_list
-
-    # allBigramTups: [[(phone,phone,int),(...),],[...],]
-    # creates a master lookup list for all unique bigrams trained on.
-    # bigrams are inserted into the list as tuples:
-    # [(phone,phone),(phone,phone)...]
-    def get_ngram_lookup(self, all_ngram_tups):
-        bigram_lookup = set()
-
-        for phoneme in all_ngram_tups:
-            for bigram in phoneme:
-                bigram_lookup.add((bigram[0], bigram[1]))
-        return list(bigram_lookup)
+        return all_ngram_tups
 
     # builds a dictionary containing bigram: P(bigram)
     # used for normalizing MatrixB
@@ -119,3 +96,27 @@ class BigramHmmUtils(AbstractHmmUtils):
         # normalize the b_freq_dict to (countBigram / countAllBigrams)
         return dict(map(lambda (k, v):
                         (k, v / float(num_ngrams)), b_freq_dict.iteritems()))
+
+    def make_final_str(self, obs_lst, output_lst, comparator="CELEX"):
+        """
+        Synthesize the resulting syllabification.
+        Args:
+            obs_lst (list<ngram observation>)
+            output_lst (list<tag>) result from Viterbi backtrace
+        Returns:
+            string of syllabified initial input.
+        """
+        final_str = ""
+        for i in range(len(obs_lst)):
+            is_truncated = (i == len(obs_lst) - 1)
+            final_str += obs_lst[i][0]
+            if output_lst[i][1] == '0' or is_truncated:
+                if comparator == "NIST":
+                    final_str += " "
+            else:
+                if comparator == "NIST":
+                    final_str += " | "
+                else:
+                    final_str += "-"
+
+        return final_str + obs_lst[len(obs_lst) - 1][1]

@@ -1,4 +1,5 @@
 {
+    "environment" : "local",
     "CelexTranscriptionFile": "HMMFiles/DISC/DISC4.txt",
     "NistTranscriptionFile": "HMMFiles/phoneCategoriesArp.txt",
     "comparator": "CELEX",
@@ -27,7 +28,7 @@
       "BaseMutationFactor": 0.05,
       "DesiredDeviation": 1.20,
       "NumChromsInDeviation": 12,
-      "NumEvolutions": 400,
+      "NumEvolutions": 1,
       "NumCategories": 12,
       "TrainingSizeHMM": 10000,
       "TestingSizeHMM": 1200,
@@ -43,5 +44,14 @@
                     "8", "{", "c", "#", "Q",
                     "2", "q", "0", "~"],
       "LogFileLocation": "GeneticAlgorithm/EvolutionLogs/"
+    },
+    "email": {
+      "from_address": "jkrantz989@gmail.com",
+      "to_addresses" : [
+          "jkrantz@zagmail.gonzaga.edu"
+      ],
+      "password": "",
+      "smtp_server": "smtp.gmail.com",
+      "smtp_port": 587
     }
 }
