@@ -164,7 +164,7 @@ class Evaluation:
                 count_freq[key] = dict4[key]
         return count_freq
 
-    def make_normalization_dict(self):
+    def make_normalization_phone_dict(self):
         """
         Gets a count of the total number of times a phone could have been syllabified
         Returns:
@@ -186,31 +186,87 @@ class Evaluation:
         #self.print_dict(normalize)
         return normalize
 
-    def average_len(self,wrong_or_right):
+    def common_missed_bigrams(self,order):
         """
-        Finds the average amount of syllables
+        Creates a dictionary to count the amount of bigrams that were missed
+        Param:
+             order: if order is one, then return an ordered list. Otherwise, return a dict
+        Returns:
+            A DESC list or a dictionary
         """
+        missed_dict = dict()
+        for bigram in self.short_list:
+            if(bigram in missed_dict):
+                missed_dict[bigram] +=1
+            else:
+                missed_dict[bigram] = 1
 
+        for bigram in self.extra_list:
+            if(bigram in missed_dict):
+                missed_dict[bigram] +=1
+            else:
+                missed_dict[bigram] = 1
 
-    def percentage_wrong(self):
+        if(order ==1):
+            return sorted(missed_dict.items(),reverse = True,key=operator.itemgetter(1))
+        else:
+            return missed_dict
+
+    def make_normalize_bigrams_dict(self,order):
+        """
+        Creates a dictionary that has all of the bigrams
+        Param:
+            order: 1 for an order list, anything else for the unordered list
+        Returns:
+            An orded list or a dictionary
+        """
+        normalize = {}
+        all_phones = self.SQLQuery.get_all_results()
+        inc = 1
+        for group in all_phones:
+            word = group[0].replace("-","")
+            print word
+            for index in range(len(word)-1):
+                bigram = word[index]+ word[index+1]
+                print bigram
+                #need to filter out all of the - in here
+                if(bigram in normalize):
+                    normalize[bigram] += inc
+                else:
+                    normalize[bigram] = inc
+        if(order==1):
+            return sorted(normalize.items(),reverse = True,key=operator.itemgetter(1))
+        else:
+            return normalize
+
+    def percentage_wrong(self,length):
         """
         Gets the reader an understanding of what phones were missed the most or least often
+        Param:
+            length: 1 for phone, 2 for bigram, 3 for trigram
         Returns:
             A dictionary full of words with their cooresponding missed rate.
             from the front and back of a bigram
 
         """
         percentage_dict = {}
-        wrong_dict = k.count_all()
-        all_dict = self.make_normalization_dict()
-
+        if(length == 1):
+            wrong_dict = k.count_all()
+            all_dict = self.make_normalization_phone_dict()
+        elif(length ==2):
+            wrong_dict = self.common_missed_bigrams(0)
+            all_dict = self.make_normalize_bigrams_dict(0)
+        else:
+            return -1
         #if the key is not in the all_dict, then it's being ignored here.
         for key in all_dict:
             if(key in wrong_dict):
                 percentage_dict[key] = float(wrong_dict[key]/float(all_dict[key]))
             else:
                 percentage_dict[key] = 0
-        return percentage_dict
+
+        lst = sorted(percentage_dict.items(),reverse = True,key=operator.itemgetter(1))
+        return lst
 
     def get_short_bigram_missed(self):
         return self.short_list
@@ -224,4 +280,3 @@ if __name__ == "__main__":
     #k.print_dict(k.count_all())
     #k.print_dict(k.make_normalization_dict())
     #k.print_dict(t)
-    k.percentage_wrong()
