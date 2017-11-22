@@ -136,6 +136,20 @@ class SQLQueryService(SQLiteClient):
         with closing(self.connection.cursor()) as cursor:
             cursor.execute(query)
             return cursor.fetchall()
+    def get_all_results(self):
+        """
+        :return: all columns for an correct syllabification.
+            selects all rows that are correct.
+            returns a unicode 4-tuple (word, probSyl, celexSylab, isSame)
+        """
+        self._check_permissions("read_permissions")
+        query = """
+            SELECT CSyl
+            FROM workingresults
+            """
+        with closing(self.connection.cursor()) as cursor:
+            cursor.execute(query)
+            return cursor.fetchall()
 
     def get_word_subset(self, number_of_words, word_blacklist=set()):
         """
