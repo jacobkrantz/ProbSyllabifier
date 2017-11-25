@@ -2,6 +2,8 @@ import sys
 from sqlQueryService import SQLQueryService
 import operator
 from collections import Counter
+
+
 class Evaluation:
     """
     In order to optimize the categorization scheme a way to
@@ -225,10 +227,8 @@ class Evaluation:
         inc = 1
         for group in all_phones:
             word = group[0].replace("-","")
-            print word
             for index in range(len(word)-1):
                 bigram = word[index]+ word[index+1]
-                print bigram
                 #need to filter out all of the - in here
                 if(bigram in normalize):
                     normalize[bigram] += inc
@@ -251,7 +251,7 @@ class Evaluation:
         """
         percentage_dict = {}
         if(length == 1):
-            wrong_dict = k.count_all()
+            wrong_dict = self.count_all()
             all_dict = self.make_normalization_phone_dict()
         elif(length ==2):
             wrong_dict = self.common_missed_bigrams(0)
