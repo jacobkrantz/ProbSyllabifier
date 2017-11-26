@@ -1,9 +1,0 @@
-monophthongs Q
-diphthongs i u 1 2 4 5 6 0
-r-colored vowels R 3
-stops p b t d k g
-affricates x J _ j
-fricatives f v T D s z S Z h
-nasals N m n r C F H
-liquids l P r
-semi-vowels w j

@@ -1,10 +1,11 @@
-Plosive p b t d k g
-Nasal m n N C F H
-Drill r
-Fricative f v T D s z S Z x h J _
-Approximant j P R l w
-Top i u 6 7
-Loose I U c
-Close @ 1 4 5 9 0
-Mid E { V $ 3 8 q
-Open Q # 2 ~ "
+p b t d k g
+m n N C F H
+r
+f v T D s z S Z x h J _
+j P R l w
+i u 6 7
+I U c
+@ 1 4 5 9 0
+E { V $ 3 8 q
+Q # 2 ~ "
+< >

@@ -1,10 +1,11 @@
-Nasal m F n N C H
-Plosive p b t d k g J _
-Fricative f v T D s z S Z x h
-Trill r R
-LateralApproximant l P
-Close i u 7
-Mid-Close I U 1 5 w
-Open-Mid E V Q 3 4 @ j
-Half-Full { 2 6 c q 0 ~
-r-colored # $ 3 8 9
+m F n N C H
+p b t d k g J _
+f v T D s z S Z x h
+r R
+l P
+i u 7
+I U 1 5 w
+E V Q 3 4 @ j
+{ 2 6 c q 0 ~
+# $ 3 8 9
+< >

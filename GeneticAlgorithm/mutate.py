@@ -29,7 +29,8 @@ def mutate(pop):
         pop (list of type Chromosome)
     """
     mut_factor = calculate_mutation_factor(pop)
-    return [pop[0]] + list(map(lambda x: mutate_chrom(x, mut_factor), pop[1:]))
+    save = config["NumChromsNotToMutate"]
+    return pop[:save] + list(map(lambda x: mutate_chrom(x, mut_factor), pop[save:]))
 
 
 def calculate_mutation_factor(pop):

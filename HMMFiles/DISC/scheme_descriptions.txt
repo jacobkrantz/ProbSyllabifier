@@ -1,0 +1,127 @@
+DISC2.txt
+	Categories:
+		Plosive
+		Nasal
+		Fricative
+		Zulu
+		Approximant
+		Yankee
+		Top
+		Loose
+		Close
+		Mid
+		Open
+		Accuracy:
+			train: 10k
+			test: 2k
+			results: 85.15%
+
+phoneCategoriesDISC.txt
+	Categories:
+		Plosive
+		Nasal
+		Drill
+		Fricative
+		Approximant
+		Top
+		Loose
+		Close
+		Mid
+		Open
+	Accuracy:
+		train: 10k
+		test: 2k
+		results: 83.45%
+
+phoneTranscriptionsDISC.txt
+	Categories:
+		Consonant
+		Affricate
+		SyllabicConsonant
+		LongVowel
+		VowelShort
+		BorrowedVowel
+		Diphthong
+		diacritic
+	Accuracy:
+		train: 10k
+		test: 2k
+		results: 62.70%
+
+phoneTranscriptionsDISC2.txt
+	Categories:
+		Nasal
+		Plosive
+		Fricative
+		Approximant
+		Trill
+		LateralApproximant
+		Top
+		Close
+		NearClose
+		CloseMid
+		Mid
+		OpenMid
+		NearOpen
+		Open
+	Accuracy:
+		train: 10k
+		test: 2k
+		results: 85.15%
+
+MaxDisc.txt
+	Categories:
+		Nasal
+		Plosive
+		Fricative
+		Approximant
+		Trill
+		1LateralApproximant
+		Close
+		Mid-Close
+		Open-Mid
+		Half-Full
+	Accuracy:
+		train: 10k
+		test: 2k
+		results: 85.40%
+
+RColored.txt
+	Categories:
+		Nasal
+		Plosive
+		Fricative
+		Trill
+		LateralApproximant
+		Close
+		Mid-Close
+		Open-Mid
+		Half-Full
+		r-colored
+	Accuracy:
+		train: 10k
+		test: 2k
+		results: 82.20%
+
+VanDam.txt
+	Accuracy:
+		train: 10k
+		test: 2k
+		results: 87.00%
+
+trans_evo_1600.txt
+	Accuracy:
+		train: 50k
+		test: 10k
+		results:91.96, 91.11, 91.84, 91.99, 91.34
+		average: 91.714%
+		---------
+		train: 20k
+		test: 5k
+		results: 91.08, 91.42, 91.28, 90.78, 91.34
+		average: 91.18%
+		---------
+		train: 70k
+		test: 5k
+		results: 91.49, 91.29, 91.42, 91.62, 91.38
+		average: 91.44%
