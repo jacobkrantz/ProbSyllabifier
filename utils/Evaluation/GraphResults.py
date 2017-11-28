@@ -1,10 +1,74 @@
 from ResultsEval import Evaluation
 import matplotlib.pyplot as plt
-
-
+import numpy as np
 class GraphResults:
+    """
+    The physical results of Evaluation being displayed visually in graphs
+    """
     def __init__(self):
         self.RE = Evaluation()
+
+    def graph_commonness(self,size):
+        """
+        Graphs the total amount of each phone or bigram in a bar graph
+        Param:
+            size: 1 for phone, 2 for bigram
+        Warning:
+            Bigram is a mess because of all the options
+        """
+        percentage = self.RE.percentage_wrong(1)
+        if(size == 1):
+            normalize = self.RE.make_normalization_phone_dict()
+            percentage = self.RE.percentage_wrong(1)
+        elif(size == 2):
+            normalize = self.RE.make_normalize_bigrams_dict(0)
+            percentage = self.RE.percentage_wrong(2)
+
+        y_axis = []
+        labels = []
+
+        for tup in percentage:
+            labels.append(tup[0])
+            y_axis.append(normalize[tup[0]])
+
+        y_pos = np.arange(len(y_axis))
+        plt.xticks(y_pos,labels)
+        plt.bar(y_pos,y_axis,align='center',alpha=0.5)
+        plt.show()
+
+    def graph_missed(self,size):
+        """
+        Creates a double bar graph of the ratio of a phones missed rate
+        vs the amount of times it appears
+        Param:
+            size: 1 for phone
+        """
+
+        percentage = self.RE.percentage_wrong(1)
+        if(size == 1):
+            normalize = self.RE.make_normalization_phone_dict() #overall count of phones
+            percentage = self.RE.percentage_wrong(1)
+            missed = self.RE.count_all() #count of missed phones
+
+        y_axis = []
+        missed_axis = []
+        labels = [] #phones to be displayed
+        for tup in percentage:
+            labels.append(tup[0])
+            y_axis.append(normalize[tup[0]])
+            #needs the try catch block in the situation
+            #that all of the phones have not been missed/seen
+            try:
+                missed_axis.append(missed[tup[0]])
+            except:
+                missed_axis.append(0)
+
+        y_pos = np.arange(len(y_axis))
+        plt.xticks(y_pos,labels)
+        plt.bar(y_pos,y_axis,align='center',alpha=0.5)
+        plt.bar(y_pos,missed_axis,align='center',alpha=0.5,color = 'red')
+        plt.show()
+
 
     def percentage_missed_phones(self,grasp):
         """
@@ -67,7 +131,6 @@ class GraphResults:
 
 if __name__ == "__main__":
     G = GraphResults()
+    G.percentage_missed_phones(0.3)
     G.percentage_missed_bigrams(0.3)
-
-
-main()
+    G.graph_missed(1)
