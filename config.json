@@ -20,11 +20,15 @@
         "read_permissions": true,
         "write_permissions": true
     },
+    "crossValidation": {
+      "KValue": 10,
+      "NValue": 60000
+    },
     "GeneticAlgorithm": {
       "MaxThreadCount": 6,
       "InitialPopulationSize": 50,
       "PopulationSize": 32,
-      "NumMatingPairs":8,
+      "NumMatingPairs": 8,
       "NumChromsNotToMutate": 8,
       "BaseMutationFactor": 0.025,
       "DesiredDeviation": 1.10,

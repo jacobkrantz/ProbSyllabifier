@@ -14,7 +14,7 @@ class Celex(AbstractSyllabRunner):
     def __init__(self):
         log.getLogger('')
         self.SQLQueryService = SQLQueryService()
-        self.__c_syl_results_dict = dict()
+        self._c_syl_results_dict = dict()
         self._pronunciationsDict = dict()
         self._syllabifiedLst = []
 
@@ -36,21 +36,22 @@ class Celex(AbstractSyllabRunner):
         testing_set = self._to_ascii(
             self.SQLQueryService.get_word_subset(testing_size, training_set)
         )
-        self.__c_syl_results_dict = (
-            self.SQLQueryService.get_many_syllabifications(training_set)
-        )
-        self._syllabifiedLst = self.__c_syl_results_dict.values()
         log.debug("Finished step: Building sets.")
-        log.debug("Starting step: Syllabify CELEX")
-        self.__c_syl_results_dict = (
-            self.SQLQueryService.get_many_syllabifications(testing_set)
-        )
-        self._pronunciationsDict = (
-            self.SQLQueryService.get_many_pronunciations(testing_set)
-        )
-        log.debug("Finished step: Syllabify CELEX")
+        log.debug("Starting step: populate training structures")
+        self._populate_training_structures(training_set, testing_set)
+        log.debug("Finished step: populate training structures")
 
     def train_hmm(self, transcription_scheme=[]):
+        """
+        Trains a Hidden Markov Model.
+        Args:
+            transcription_scheme (list<list<phone>>): optional. Defines a
+                categorization for all phones. Defaults to file specified
+                in `config.json`.
+        Returns:
+            hmmbo (HMMBO): Hidden Markov Model Business Object
+                holds trained matrices and lookups.
+        """
         log.debug("Starting step: Train HMM Model")
         self.hmm = HMM(
             2,  # lang hack: 2 is celex
@@ -61,17 +62,52 @@ class Celex(AbstractSyllabRunner):
         log.debug("Finished step: Train HMM Model")
         return hmmbo
 
-    # thread-safe when DB results is false.
     def test_hmm(self, hmmbo):
+        """
+        Runs the ProbSyllabifier on all testing examples.
+        Thread-safe when DB results is false.
+        Args:
+            hmmbo (HMMBO): Hidden Markov Model Business Object
+                holds trained matrices and lookups.
+        Returns:
+            float: percent same formatted to two decimal places.
+        """
         p_syl_results_dict = self._syllabify_testing(hmmbo)
         test_results_list = self._combine_results(p_syl_results_dict)
 
         if config["write_results_to_DB"]:
             self._fill_results_table(test_results_list)
 
-        self.__c_syl_results_dict = dict()
-        self.__p_syl_results_dict = dict()
+        self._c_syl_results_dict = dict()
         return self._compare(test_results_list)
+
+    def cross_validate(self):
+        """
+        Using k-fold cross-validation, determine the predicted
+        practical syllabification accuracy of the current system.
+        Outputs each run to logs. Outputs final accuracy to logs.
+        Returns:
+            float: cross validated ProbSyllabifier accuracy
+        """
+        n_value = config["crossValidation"]["NValue"]
+        k_value = config["crossValidation"]["KValue"]
+        subset_size = n_value / k_value
+        results_list = []
+
+        validation_list = list(self._to_ascii(
+            self.SQLQueryService.get_word_subset(n_value)
+        ))
+        for i in range(k_value):
+            lower_bound = i * subset_size
+            upper_bound = (i + 1) * subset_size
+            testing_set = set(validation_list[lower_bound:upper_bound])
+            training_set = set(validation_list) - set(testing_set)
+            self._populate_training_structures(training_set, testing_set)
+            results_list.append(float(self.test_hmm(self.train_hmm())))
+
+        accuracy = round(sum(results_list) / float(len(results_list)), 2)
+        log.info("Cross-validated accuracy: " + str(accuracy) + "%")
+        return accuracy
 
     # Where Psyl is different than Csyl,
     # Returns: [{ Word, PSyllab, CSyllab, isSame },{...}]
@@ -89,9 +125,36 @@ class Celex(AbstractSyllabRunner):
     #    "Private"     #
     # ---------------- #
 
-    # builds dictionary of {testWord:syllabification}
-    # for pSylResultsDict
+    def _populate_training_structures(self, training_set, testing_set):
+        """
+        Loads self._c_syl_results_dict with syllabification results
+        of the testing set. Loads self._syllabifiedLst with syllabified
+        training words. Loads self._pronunciationsDict with prnunciations
+        of the testing set.
+        Args:
+            training_set (set<string>) set for training HMM
+            testing_set (set<string>) set reserved for testing HMM
+        """
+        self._c_syl_results_dict = (
+            self.SQLQueryService.get_many_syllabifications(training_set)
+        )
+        self._syllabifiedLst = self._c_syl_results_dict.values()
+        self._c_syl_results_dict = (
+            self.SQLQueryService.get_many_syllabifications(testing_set)
+        )
+        self._pronunciationsDict = (
+            self.SQLQueryService.get_many_pronunciations(testing_set)
+        )
+
     def _syllabify_testing(self, hmmbo):
+        """
+        Syllabifies the test set using ProbSyllabifier.
+        Args:
+            hmmbo (HMMBO): Hidden Markov Model Business Object
+                holds trained matrices and lookups.
+        Returns:
+            dictionary <test word, syllabification>
+        """
         log.debug("Starting step: Syllabify ProbSyllabifier")
         self.ps = ProbSyllabifier(hmmbo)
         p_syl_results_dict = {}
@@ -110,7 +173,7 @@ class Celex(AbstractSyllabRunner):
         for word, p_syllab in p_results_dict.iteritems():
             if not p_syllab:
                 p_syllab = ""
-            c_syllab = self.__c_syl_results_dict[word]
+            c_syllab = self._c_syl_results_dict[word]
             is_same = int(c_syllab == p_syllab)
             test_results_line = {
                 "Word": word,
@@ -152,7 +215,7 @@ class Celex(AbstractSyllabRunner):
                 " skips: " + str(ignored_percent_same) + "%" + '\n')
 
         log.info(log_message)
-        return percent_same
+        return float(percent_same)
 
     # add all static tags to the incoming transcriptionScheme.
     # current use: include start and end tags for a word ('<', '>')

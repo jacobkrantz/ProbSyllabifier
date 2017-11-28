@@ -39,13 +39,6 @@ def run_s(nist, celex, comparator):
                 syl = celex.syllabify(obs.lower())
             print("Syllabification: " + syl)
 
-
-def help():
-    print "Running the Syllabifier:"
-    print "     To syllabify a word, enter phones separated by a space."
-    print "     To return to the main menu, hit enter with no input."
-
-
 # gets the type of syllabifaction that the user wants to do
 def get_comparator(config):
     comparator_id = 0
@@ -100,7 +93,7 @@ def main():
             2. Run the Syllabifier
             3. Test Results
             4. Switch Phonetic Languages
-            5. Help
+            5. Cross Validate on CELEX
             6. Quit\n"""
         )
 
@@ -132,7 +125,7 @@ def main():
             comparator = get_comparator(config)
 
         elif choice == 5:
-            help()
+            celex.cross_validate()
 
 
 if __name__ == '__main__':
