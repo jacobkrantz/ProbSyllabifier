@@ -21,7 +21,7 @@ class GraphResults:
             normalize = self.RE.make_normalization_phone_dict()
             percentage = self.RE.percentage_wrong(1)
         elif(size == 2):
-            normalize = self.RE.make_normalize_bigrams_dict(0)
+            normalize = self.RE.make_normalization_bigrams_dict(0)
             percentage = self.RE.percentage_wrong(2)
 
         y_axis = []
@@ -109,7 +109,7 @@ class GraphResults:
             of the graph
         """
         percentage = self.RE.percentage_wrong(2)
-        normalize = self.RE.make_normalize_bigrams_dict(0)
+        normalize = self.RE.make_normalization_bigrams_dict(0)
         x_axis =[]
         y_axis = []
         labels = []
@@ -131,6 +131,6 @@ class GraphResults:
 
 if __name__ == "__main__":
     G = GraphResults()
-    G.percentage_missed_phones(0.3)
+    G.percentage_missed_phones(1)
     G.percentage_missed_bigrams(0.3)
-    G.graph_missed(1)
+    #G.graph_missed(1)

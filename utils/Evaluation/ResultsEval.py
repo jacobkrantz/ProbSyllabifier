@@ -214,7 +214,7 @@ class Evaluation:
         else:
             return missed_dict
 
-    def make_normalize_bigrams_dict(self,order):
+    def make_normalization_bigrams_dict(self,order):
         """
         Creates a dictionary that has all of the bigrams
         Param:
@@ -277,6 +277,6 @@ class Evaluation:
 if __name__ == "__main__":
     k = Evaluation()
     #t = k.count_bigrams(1,1)
-    #k.print_dict(k.count_all())
-    #k.print_dict(k.make_normalization_dict())
+    k.print_dict(k.count_all())
+    k.print_dict(k.make_normalization_phone_dict())
     #k.print_dict(t)

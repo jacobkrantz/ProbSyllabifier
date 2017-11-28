@@ -1,6 +1,6 @@
 import json
 import textwrap
-
+from GeneticAlgorithm import PhoneOptimize
 from celex import Celex
 from nist import NIST
 
@@ -92,7 +92,7 @@ def main():
             1. Train the HMM
             2. Run the Syllabifier
             3. Test Results
-            4. Switch Phonetic Languages
+            4. Phone Optimization
             5. Cross Validate on CELEX
             6. Quit\n"""
         )
@@ -122,7 +122,13 @@ def main():
                 celex.test_hmm(hmmbo)
 
         elif choice == 4:
-            comparator = get_comparator(config)
+            optimize = PhoneOptimize()
+            #evo = input("Enter the evo you would like to test")
+            evo = 5
+            optimize.import_population(evo)
+            optimize.view_population()
+            optimize.strip_phones('s')
+            optimize.create_population_set(['s','t'])
 
         elif choice == 5:
             celex.cross_validate()
