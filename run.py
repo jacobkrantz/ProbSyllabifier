@@ -21,7 +21,7 @@ class Color:
 
 
 # runs the probabilistic syllabifier for either a phoneme or file.
-def run_s(nist, celex, comparator):
+def run_s(nist, celex, comparator, hmmbo=None):
     obs = " "
 
     while obs != '':
@@ -36,7 +36,7 @@ def run_s(nist, celex, comparator):
             if comparator == "NIST":
                 syl = nist.syllabify(obs.lower())
             else:
-                syl = celex.syllabify(obs.lower())
+                syl = celex.syllabify(hmmbo, obs.lower())
             print("Syllabification: " + syl)
 
 # gets the type of syllabifaction that the user wants to do
