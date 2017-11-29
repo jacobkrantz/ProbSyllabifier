@@ -37,21 +37,33 @@ class PhoneOptimize(GeneticAlgorithm):
 
         print(display_string)
 
+    def check_file_type(self):
+        """
+        Checks the population file type. Either a syllabifier .txt file or a GA evo file
+        Returns:
+            1 for a syllabifier file, 2 for a GA file
+        """
+        location = GAConfig["LogFileLocation"]
+        file_name = location + self.file_name
+
+        #this is not exact, but will work in most cases
+        with open(file_name, 'r') as in_file:
+            for line in in_file:
+                print(len(line))
+                if(len(line) >= 54):
+                    return 2
+                else:
+                    return 1
+
     def import_population(self):
         """
         Pulls an existing population from an evolution log file.
-        Args:
-            resume_from (int): evolution number to import from.
         """
         location = GAConfig["LogFileLocation"]
         file_name = location + self.file_name
 
         with open(file_name, 'r') as in_file:
             for line in in_file:
-                if len(line) < len(GAConfig["GeneList"]):
-                    self.population[-1].set_fitness(float(line))
-                    continue
-
                 genes = line.split('\t')
                 new_chromosome = Chromosome(GAConfig["NumCategories"])
                 for i in range(len(genes) - 1):
@@ -60,13 +72,52 @@ class PhoneOptimize(GeneticAlgorithm):
                 self.population.append(new_chromosome)
                 return
 
-        self._display_population()
+    def pick_scheme(self):
+        """
+        Runs the correct population import scheme
+        """
+        scheme = self.check_file_type()
+        if(scheme == 1):
+            self.import_population_scheme()
+        else:
+            self.import_population()
+
+    def import_population_scheme(self):
+        """
+        Imports a phonetic categorization scheme that relates to the syllablifier
+        """
+        location = GAConfig["LogFileLocation"]
+        file_name = location + self.file_name
+        chrom_list = []
+        categories = 0
+        with open(file_name, 'r') as in_file:
+            for line in in_file:
+                category_list = []
+                for char in line:
+                    print (char)
+                    if(char != ' ' and char != '\n' and  char !='\t'):
+                        category_list.append(char)
+                chrom_list.append(category_list)
+        chrom_list = chrom_list[:-1]
+
+        chrom = Chromosome(len(chrom_list))
+        spot = 0
+
+        for category in (chrom_list):
+            print (category)
+            for phone in category:
+                chrom.insert_into_category(spot,phone)
+            spot+=1
+        chrom.print_chrom()
+        self.population.append(chrom)
+        return
 
     def make_population(self):
         """
         Runs the process of creating a population with the specified phones changed
         """
-        self.import_population()
+
+        self.pick_scheme()
         #optimize.view_population()
         self.create_population_set()
         self.insert_phones()

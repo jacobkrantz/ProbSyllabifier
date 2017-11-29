@@ -51,8 +51,8 @@
       "LogFileLocation": "GeneticAlgorithm/EvolutionLogs/"
     },
       "PhoneOptimize":{
-          "phone_list":["s","t"],
-          "transcription_file": "evo5.log"
+          "phone_list":["s"],
+          "transcription_file": "test.txt"
       },
     "email": {
       "from_address": "jkrantz989@gmail.com",

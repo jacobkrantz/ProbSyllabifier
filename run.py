@@ -123,7 +123,6 @@ def main():
 
         elif choice == 4:
             optimize = PhoneOptimize()
-            #evo = input("Enter the evo you would like to test")
             optimize.make_population()
 
         elif choice == 5:
