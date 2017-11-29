@@ -143,5 +143,5 @@ class GraphResults:
 if __name__ == "__main__":
     G = GraphResults()
     G.percentage_missed_phones(0.3)
-    G.percentage_missed_bigrams(0.3)
+    #G.percentage_missed_bigrams(0.3)
     G.graph_missed(1)

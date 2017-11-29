@@ -82,24 +82,6 @@ class Evaluation:
                     count_freq[key] += dictionary[key]
                 else:
                     count_freq[key] = dictionary[key]
-
-        for key in dict2:
-            if(key in count_freq):
-                count_freq[key] +=dict2[key]
-            else:
-                count_freq[key] = dict2[key]
-
-        for key in dict3:
-            if(key in count_freq):
-                count_freq[key] +=dict3[key]
-            else:
-                count_freq[key] = dict3[key]
-
-        for key in dict4:
-            if(key in count_freq):
-                count_freq[key] +=dict4[key]
-            else:
-                count_freq[key] = dict4[key]
         return count_freq
 
     def make_normalization_phone_dict(self):
