@@ -22,21 +22,6 @@ class PhoneOptimize(GeneticAlgorithm):
         self.population = []
         self.celex = Celex()
 
-    def display_parameters(self):
-        """ Displays all configuation parameters to the console. """
-        noc = GAConfig["NumCategories"]
-        nog = len(GAConfig["GeneList"])
-
-
-        display_string = """
-    Genetic Algorithm Parameters
-    ----------------------------
-    Number of Categories     %s
-    Number of Genes          %s
-    """ % (noc, nog)
-
-        print(display_string)
-
     def check_file_type(self):
         """
         Checks the population file type. Either a syllabifier .txt file or a GA evo file
@@ -44,18 +29,17 @@ class PhoneOptimize(GeneticAlgorithm):
             1 for a syllabifier file, 2 for a GA file
         """
         location = GAConfig["LogFileLocation"]
-        file_name = location + self.file_name
+        self.file_name
 
-        #this is not exact, but will work in most cases
-        with open(file_name, 'r') as in_file:
-            for line in in_file:
-                print(len(line))
-                if(len(line) >= 54):
-                    return 2
-                else:
-                    return 1
+        exten = self.file_name[-4:]
+        if exten == ".txt": #syllabifier scheme
+            return 1
+        elif exten == ".log": #genetic Algorithm scheme
+            return 2
+        else:
+            assert(False)
 
-    def import_population(self):
+    def import_population_log(self):
         """
         Pulls an existing population from an evolution log file.
         """
@@ -77,12 +61,12 @@ class PhoneOptimize(GeneticAlgorithm):
         Runs the correct population import scheme
         """
         scheme = self.check_file_type()
-        if(scheme == 1):
-            self.import_population_scheme()
+        if(scheme == 2):
+            self.import_population_log()
         else:
-            self.import_population()
+            self.import_population_txt()
 
-    def import_population_scheme(self):
+    def import_population_txt(self):
         """
         Imports a phonetic categorization scheme that relates to the syllablifier
         """
@@ -94,7 +78,6 @@ class PhoneOptimize(GeneticAlgorithm):
             for line in in_file:
                 category_list = []
                 for char in line:
-                    print (char)
                     if(char != ' ' and char != '\n' and  char !='\t'):
                         category_list.append(char)
                 chrom_list.append(category_list)
@@ -104,11 +87,9 @@ class PhoneOptimize(GeneticAlgorithm):
         spot = 0
 
         for category in (chrom_list):
-            print (category)
             for phone in category:
                 chrom.insert_into_category(spot,phone)
             spot+=1
-        chrom.print_chrom()
         self.population.append(chrom)
         return
 
@@ -118,7 +99,7 @@ class PhoneOptimize(GeneticAlgorithm):
         """
 
         self.pick_scheme()
-        #optimize.view_population()
+        #self.view_population()
         self.create_population_set()
         self.insert_phones()
         self.compute_fitness()
@@ -149,7 +130,6 @@ class PhoneOptimize(GeneticAlgorithm):
         for num in range(GAConfig["NumCategories"]**len(self.phone_list)):
             new_chromosome = self.chrom_copy(self.population[0])
             self.population.append(new_chromosome)
-        #print (len(self.population))
 
     def insert_phones(self):
         """
@@ -159,8 +139,6 @@ class PhoneOptimize(GeneticAlgorithm):
         """
         permutations = self._create_list()
         pop_spot = 1 #beacause the first spot in population has the original
-        #print(permutations[55])
-        #print (self.population[56].print_chrom())
 
         for attempt in permutations:
 
@@ -208,3 +186,9 @@ class PhoneOptimize(GeneticAlgorithm):
             if(spot != None):
                 new_chromosome.insert_into_category(spot,phone)
         return new_chromosome
+
+    def output_into_file(self, schema):
+        """
+        Outputs the population to a file
+        """
+        pass
