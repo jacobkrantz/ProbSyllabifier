@@ -23,11 +23,22 @@ This will run the syllabifier on randomized words and print an output of its acc
 If `"write_results_to_DB": true` in `config.json`, you can query the results directly in `wordforms.db` using SQL commands.  
 Note: Do not run the NIST aspect of the project. It is the old system which has been completely replaced by the CELEX system.
 
+### Parameters 
+All of the parameters and configurations are grabbed from the config.json file. For example, the categorization scheme that is used for the syllabifier is specified under CelexTranscriptionFile. If this is changed, then the scheme being ran will change with it. If someone would like to change aspects of the project do not try digging through the rest of the project intially; attempt to use the extensive amount of tools already written and change the parameters inside of the config.json file.
+
 ### Computing For Optimization  
 Our Hidden Markov Model utilizes a dynamic, categorical tagset. To generate this tagset, the HMM needs to be given a scheme of how to convert the observations (DISC sounds) into their corresponding category. To do this autonomously, we start with random categories. Using a Genetic Algorithm, we are able to compute the optimal categorization (given enough time). To start optimizing from the beginning, run:  
 `$ python optimize.py `  
 If you wish to continue optimizing a previous run, use the command below but replace i with the evolution number to continue from. This evolution must have a log file in the `GeneticAlgorithm/EvolutionLogs/` folder. However, be sure to store the evolutions in another location for overwriting purposes.
-`$ python optimize.py  i `  
+`$ python optimize.py  i ` 
+
+If you love the scheme that you've been using but from some of the evaluation tools below that one or two phones is acting up, then `PhoneOptimization.py` is a fantastic tool to use. This tool will take the scheme and given phones you would like to optimize. Then run through every different permutation of the one or two phones being in the other categories. It will then output a percentage of each of the schemes. If a scheme (currently just using the .log format for the genetic evolution but this will have another categorization file type supported soon), has a phone or two not having the percentage that you would like, then run this file. To choose the file you'd like to run this on, go to config.json, go to PhoneOptimize", then change transcription_file to the file you would like to run. It's currently looking for files inside of the GeneticAlgorithm/Evolution folder. So, put your file inside of there to run it. Finally, to actually run this go to option 4 of the run.py file. 
+
+### Evaluation
+Inside of the utils folder there are two tools known as `graphingResults.py` and `evaluation.py`. The graphing results file is configured to show all of the missed phones and bigrams in a multitude of ways. The evaluation file has ways of understanding the data in a significant amount of ways. From understanding the most common phone, to grasping the most commonly missed backend of a bigram; there are quite a few tools set up in there. However, BE POSITIVE that the workingresults is turned to true in the configuration file, in order to actually check the results you're looking at. These will have a GUI shortly to make it runable with having to change any of the main function.
+Note: The workingresults will break the syllabifier(by locking the celex database) if it's attempted to be ran in the Genetic Algorithm or PhoneOptimize parts of the project. The database doesn't support writing to the database in a parallel computing manner. 
+
+
 ## Celex Code Example
 #### Process for measuring syllabification accuracy  
 `Celex.py` is the interface for ProbSyllabifier working with Celex.  
