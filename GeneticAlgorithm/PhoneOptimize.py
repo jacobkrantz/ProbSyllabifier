@@ -1,5 +1,5 @@
 from __future__ import print_function
-
+from itertools import permutations
 from datetime import datetime
 import multiprocessing
 import os
@@ -12,120 +12,76 @@ from Chromosome import Chromosome
 from Mating import Mating
 from activePool import ActivePool
 from celex import Celex
-from config import GAConfig as config
+from config import settings,GAConfig
 from GeneticAlgorithm import GeneticAlgorithm
 
-class PhoneOptimize:
+class PhoneOptimize(GeneticAlgorithm):
     def __init__(self):
+        self.phone_list = settings["PhoneOptimize"]["phone_list"]
+        self.file_name = settings["PhoneOptimize"]["transcription_file"]
         self.population = []
         self.celex = Celex()
 
     def display_parameters(self):
         """ Displays all configuation parameters to the console. """
-        noc = config["NumCategories"]
-        nog = len(config["GeneList"])
+        noc = GAConfig["NumCategories"]
+        nog = len(GAConfig["GeneList"])
+
 
         display_string = """
     Genetic Algorithm Parameters
     ----------------------------
     Number of Categories     %s
     Number of Genes          %s
-    """ % (ips, ps, nomp, mf, ne, noc, nog)
+    """ % (noc, nog)
 
         print(display_string)
 
-    def initialize_population(self):
-        """
-        Initializes the population to hold chromosomes that are
-        Generated from random gene-category selections.
-        Computes each chromosomes fitness.
-        """
-
-
-        self._compute_fitness()
-        self._sort()
-
-    def import_population(self, resume_from):
+    def import_population(self):
         """
         Pulls an existing population from an evolution log file.
         Args:
             resume_from (int): evolution number to import from.
         """
-        location = config["LogFileLocation"]
-        file_name = location + "evo" + str(resume_from) + ".log"
+        location = GAConfig["LogFileLocation"]
+        file_name = location + self.file_name
 
         with open(file_name, 'r') as in_file:
             for line in in_file:
-                if len(line) < len(config["GeneList"]):
+                if len(line) < len(GAConfig["GeneList"]):
                     self.population[-1].set_fitness(float(line))
                     continue
 
                 genes = line.split('\t')
-                new_chromosome = Chromosome(config["NumCategories"])
+                new_chromosome = Chromosome(GAConfig["NumCategories"])
                 for i in range(len(genes) - 1):
                     for gene in genes[i]:
                         new_chromosome.insert_into_category(i, gene)
                 self.population.append(new_chromosome)
                 return
 
-        self._display_population(resume_from)
+        self._display_population()
 
-    def _compute_fitness(self):
+    def make_population(self):
         """
-        Compute the fitness of all chromosomes in the population.
-        Updates the fitness value of all chromosomes.
-        Chromosome fitness calculation is done in separate processes.
-
+        Runs the process of creating a population with the specified phones changed
         """
-        sizes = (config["TrainingSizeHMM"], config["TestingSizeHMM"])
-        self.celex.load_sets(sizes[0], sizes[1])
+        self.import_population()
+        #optimize.view_population()
+        self.create_population_set()
+        self.insert_phones()
+        self.compute_fitness()
 
-        pool = ActivePool()
-        s = multiprocessing.Semaphore(config["MaxThreadCount"])
-        results_queue = multiprocessing.Queue()
-        jobs = [
-            multiprocessing.Process(target=self._compute_single_fitness,
-                                    name=str(i),
-                                    args=(i, s, pool, results_queue))
-            for i in range(len(self.population))
-        ]
-        for j in jobs:
-            j.start()
 
-        for j in jobs:
-            j.join()
-
-        for result in [results_queue.get() for j in jobs]:
-            self.population[result[0]].set_fitness(result[1])
-
-    def _compute_single_fitness(self, i, s, pool, results_queue):
-        """
-        Calculates and puts updated fitness on the results_queue.
-        Args:
-            i (int): process and population index
-            s (multiprocessing.Semaphore)
-            pool (ActivePool): manager of the pool and locks
-            results_queue (multiprocessing.Queue): communication
-                        between processes.
-        """
-        process_name = multiprocessing.current_process().name
-        with s:
-            pool.make_active(process_name)
-            genes = self.population[i].get_genes()
-            hmmbo = self.celex.train_hmm(genes)
-            fitness = self.celex.test_hmm(hmmbo)
-            hmmbo = None
-            results_queue.put((i, fitness))
-            pool.make_inactive(process_name)
-
-    def _display_population(self, evolution_number=0):
-        """ Displays the population and the current evolution number. """
-        print("Population after evolution #" + str(evolution_number))
+    def _display_population(self):
+        """ Displays the population"""
+        print("Chrom#   Percent Accuracy")
+        print("_________________________")
         for i in range(len(self.population)):
-            print("chrom{}\t{}".format(i, self.population[i].get_fitness()))
+            print("chrom{}     {}".format(i, self.population[i].get_fitness()))
         print()
 
-    def strip_phones(self,phone_strip):
+    def strip_phones(self, phone_strip):
         """
         Deletes a phone from the chromosome
         Returns:
@@ -135,21 +91,52 @@ class PhoneOptimize:
         chrom.remove_gene(phone_strip)
         return phone_strip
 
-    def create_population_set(self,phone_list):
+    def create_population_set(self):
         """
         Creates the base set of chromosomes to be modified with each phone given
         """
-
-        for num in range(config["NumCategories"]**len(phone_list)):
+        for num in range(GAConfig["NumCategories"]**len(self.phone_list)):
             new_chromosome = self.chrom_copy(self.population[0])
             self.population.append(new_chromosome)
-        self.view_population()
-        print (len(self.population))
+        #print (len(self.population))
 
-    def _insert_phones(self,phone_list):
+    def insert_phones(self):
+        """
+        Inserts the delted phones into the population"
+        Args:
+            phone_list: The list of phones that are to be added to the population
+        """
+        permutations = self._create_list()
+        pop_spot = 1 #beacause the first spot in population has the original
+        #print(permutations[55])
+        #print (self.population[56].print_chrom())
+
+        for attempt in permutations:
+
+            for spot in range(len(attempt)):
+                self.population[pop_spot].insert_into_category(attempt[spot],self.phone_list[spot])
+            pop_spot+=1
+        self.population.pop(0)
+
+    def _create_list(self):
+        """
+        Creates a list of all the possible permutations for a given a chromosomes set
+        Args:
+            phone_list: the phones that are going to be added in
+        Returns:
+            A list with all the different permutations
+        """
         spot_lst = []
-        for spot in range(config["NumCategories"]**len(phone_list)):
-            pass
+        if len(self.phone_list) == 0:
+            return
+        elif len(self.phone_list) == 1:
+            for spot in range(GAConfig["NumCategories"]):
+                spot_lst.append([spot])
+        elif(len(self.phone_list) == 2):
+            for spot in range(GAConfig["NumCategories"]):
+                for spot2 in range(GAConfig["NumCategories"]):
+                    spot_lst.append([spot,spot2])
+        return spot_lst
 
 
     def view_population(self):
@@ -157,15 +144,15 @@ class PhoneOptimize:
         for chrom in self.population:
             chrom.print_chrom()
 
-    def chrom_copy(self,chrom):
+    def chrom_copy(self, chrom):
         """
         Copies the value of the chromosome into a new chromosome
         Returns:
             A non references identical chromosome
         """
-        new_chromosome = Chromosome(config["NumCategories"])
+        new_chromosome = Chromosome(GAConfig["NumCategories"])
 
-        for phone in config["GeneList"]:
+        for phone in GAConfig["GeneList"]:
             spot = chrom.get_category(phone)
             if(spot != None):
                 new_chromosome.insert_into_category(spot,phone)

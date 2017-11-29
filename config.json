@@ -4,7 +4,7 @@
     "NistTranscriptionFile": "HMMFiles/phoneCategoriesArp.txt",
     "comparator": "CELEX",
     "NGramValue": 2,
-    "logLevel": "info",
+    "logLevel": "debug",
     "dataLoader": {
         "databaseContext": "wordformsDB"
     },
@@ -35,8 +35,8 @@
       "NumChromsInDeviation": 12,
       "NumEvolutions": 200,
       "NumCategories": 12,
-      "TrainingSizeHMM": 20000,
-      "TestingSizeHMM": 5000,
+      "TrainingSizeHMM": 50,
+      "TestingSizeHMM": 30,
       "GeneList": [ "m", "F", "n", "N", "C",
                     "H", "p", "b", "t", "d",
                     "k", "g", "J", "_", "f",
@@ -50,6 +50,10 @@
                     "2", "q", "0", "~"],
       "LogFileLocation": "GeneticAlgorithm/EvolutionLogs/"
     },
+      "PhoneOptimize":{
+          "phone_list":["s","t"],
+          "transcription_file": "evo5.log"
+      },
     "email": {
       "from_address": "jkrantz989@gmail.com",
       "to_addresses" : [
@@ -58,5 +62,5 @@
       "password": "",
       "smtp_server": "smtp.gmail.com",
       "smtp_port": 587
-    }
+  }
 }

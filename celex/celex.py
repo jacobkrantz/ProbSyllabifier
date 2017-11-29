@@ -109,16 +109,34 @@ class Celex(AbstractSyllabRunner):
         log.info("Cross-validated accuracy: " + str(accuracy) + "%")
         return accuracy
 
-    # Where Psyl is different than Csyl,
-    # Returns: [{ Word, PSyllab, CSyllab, isSame },{...}]
     def get_incorrect_results(self):
+        """
+        Gets the results set for incorrect syllabifications.
+        Returns:
+            [{ Word, PSyllab, CSyllab, isSame },{...}] for all
+                    incorrect syllabifications (Psyl different than Csyl).
+        """
         return self.SQLQueryService.get_incorrect_results()
 
-    # returns string of syllabified observation
-    def syllabify(self, observation):
+    def syllabify(self, hmmbo, observation):
+        """
+        Function call for single syllabification.
+        Args:
+            hmmbo (HMMBO): Hidden Markov Model Business Object
+                holds trained matrices and lookups.
+            observation (string): sequence of phones to be syllabified.
+        Returns:
+            string: observation syllabified where '-'
+                    represents syllable breaks.
+        """
+        self.ps = ProbSyllabifier(hmmbo)
         return self.ps.syllabify(observation, "CELEX")
 
     def syllabify_file(self, file_in, file_out):
+        """
+        Not currently maintained (11/27)
+        """
+        self.ps = ProbSyllabifier(hmmbo)
         self.ps.syllabify_file(file_in, file_out, "CELEX")
 
     # ---------------- #
