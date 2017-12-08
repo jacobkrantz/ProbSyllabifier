@@ -125,3 +125,17 @@ trans_evo_1600.txt
 		test: 5k
 		results: 91.49, 91.29, 91.42, 91.62, 91.38
 		average: 91.44%
+
+		10-fold cross validation (n = 60k): 91.20%
+
+trans_evo_1746.txt
+	Accuracy:
+		10-fold cross validation (n = 60k): 91.53%
+
+	trans_evo_1746.txt
+	Accuracy:
+		10-fold cross validation (n = 60k): 91.74%
+
+	trans_evo_2000.text
+	Accuracy:
+		10-fold cross validation (n = 60k): 91.68%

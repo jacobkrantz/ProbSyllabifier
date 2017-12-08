@@ -1,6 +1,6 @@
 {
     "environment" : "local",
-    "CelexTranscriptionFile": "HMMFiles/DISC/trans_evo_1600.txt",
+    "CelexTranscriptionFile": "HMMFiles/DISC/generated/trans_evo_1746.txt",
     "NistTranscriptionFile": "HMMFiles/phoneCategoriesArp.txt",
     "comparator": "CELEX",
     "NGramValue": 2,
@@ -51,7 +51,7 @@
       "LogFileLocation": "GeneticAlgorithm/EvolutionLogs/"
     },
     "email": {
-      "from_address": "jkrantz989@gmail.com",
+      "from_address": "cps.research.krantz@gmail.com",
       "to_addresses" : [
           "jkrantz@zagmail.gonzaga.edu"
       ],
