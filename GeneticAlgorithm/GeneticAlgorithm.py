@@ -61,7 +61,7 @@ class GeneticAlgorithm:
                 new_chromosome.insert_into_category(random_category, gene)
 
             self.population.append(new_chromosome)
-        self._compute_fitness()
+        self.compute_fitness()
         self._sort()
 
     def import_population(self, resume_from):
@@ -86,7 +86,7 @@ class GeneticAlgorithm:
                         new_chromosome.insert_into_category(i, gene)
                 self.population.append(new_chromosome)
 
-        self._display_population(resume_from)
+        self.display_population(resume_from)
 
     def archive_logs(self):
         """
@@ -151,17 +151,17 @@ class GeneticAlgorithm:
         for i in range(evolutions_to_run):
             self.population = self.mating.crossover(self.population)
             self.population = mutate.mutate(self.population)
-            self._compute_fitness()
+            self.compute_fitness()
             self._sort()
             self._save_all_chromosomes(evolution_count)
-            self._display_population(evolution_count)
+            self.display_population(evolution_count)
             evolution_count += 1
 
     # ---------------- #
     #    "Private"     #
     # ---------------- #
 
-    def _compute_fitness(self):
+    def compute_fitness(self):
         """
         Compute the fitness of all chromosomes in the population.
         Updates the fitness value of all chromosomes.
@@ -175,7 +175,7 @@ class GeneticAlgorithm:
         s = multiprocessing.Semaphore(config["MaxThreadCount"])
         results_queue = multiprocessing.Queue()
         jobs = [
-            multiprocessing.Process(target=self._compute_single_fitness,
+            multiprocessing.Process(target=self.compute_single_fitness,
                                     name=str(i),
                                     args=(i, s, pool, results_queue))
             for i in range(len(self.population))
@@ -189,7 +189,7 @@ class GeneticAlgorithm:
         for result in [results_queue.get() for j in jobs]:
             self.population[result[0]].set_fitness(result[1])
 
-    def _compute_single_fitness(self, i, s, pool, results_queue):
+    def compute_single_fitness(self, i, s, pool, results_queue):
         """
         Calculates and puts updated fitness on the results_queue.
         Args:
@@ -249,7 +249,7 @@ class GeneticAlgorithm:
                 '\n{}\n'.format(self.population[index].get_fitness())
             )
 
-    def _display_population(self, evolution_number=0):
+    def display_population(self, evolution_number=0):
         """ Displays the population and the current evolution number. """
         print("Population after evolution #" + str(evolution_number))
         for i in range(len(self.population)):

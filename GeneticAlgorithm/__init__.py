@@ -1,2 +1,3 @@
 from Chromosome import Chromosome
+from PhoneOptimize import PhoneOptimize
 from GeneticAlgorithm import GeneticAlgorithm

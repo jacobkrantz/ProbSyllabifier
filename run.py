@@ -1,6 +1,6 @@
 import json
 import textwrap
-
+from GeneticAlgorithm import PhoneOptimize
 from celex import Celex
 from nist import NIST
 
@@ -83,6 +83,7 @@ def main():
     comparator = config["comparator"]
     trained_comparator = config["comparator"]
     choice = 0
+    hmmbo = None
     while choice != 6:
         print("\n" + Color.BOLD + "Main Menu" + Color.END)
         print("Comparator: " + Color.YELLOW + comparator + Color.END)
@@ -92,7 +93,7 @@ def main():
             1. Train the HMM
             2. Run the Syllabifier
             3. Test Results
-            4. Switch Phonetic Languages
+            4. Phone Optimization
             5. Cross Validate on CELEX
             6. Quit\n"""
         )
@@ -113,16 +114,22 @@ def main():
             trained_comparator = comparator
 
         elif choice == 2:
-            run_s(nist, celex, comparator, hmmbo)
+            if(hmmbo == None):
+                print("Train the system before testing the system. \nPlease use option 1.")
+            else:
+                run_s(nist, celex, comparator, hmmbo)
 
         elif choice == 3:
             if comparator == "NIST":
                 nist.test_hmm()
+            elif(hmmbo == None):
+                print("Train the system before testing the system. \nPlease use option 1.")
             else:
                 celex.test_hmm(hmmbo)
 
         elif choice == 4:
-            comparator = get_comparator(config)
+            optimize = PhoneOptimize()
+            optimize.make_population()
 
         elif choice == 5:
             celex.cross_validate()

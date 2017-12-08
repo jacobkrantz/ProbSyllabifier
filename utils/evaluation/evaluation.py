@@ -1,3 +1,4 @@
+
 import operator
 
 from collections import Counter
@@ -23,6 +24,8 @@ class Evaluation:
 
     def count_bigrams(self, dict_type, front_back):
         """
+        Sets word_list, correct_list and wrong_list to
+        the three first pieces of the query
         Args:
             dict_type (int): 0 or 1, use the extra_list(0) or the short_list(1)
             front_back (int): 0 for front of the phone, 1 for back of the phone
@@ -79,7 +82,6 @@ class Evaluation:
                     count_freq[key] += dictionary[key]
                 else:
                     count_freq[key] = dictionary[key]
-
         return count_freq
 
     def make_normalization_phone_dict(self):

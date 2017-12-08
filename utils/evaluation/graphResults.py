@@ -1,3 +1,4 @@
+from evaluation import Evaluation
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -21,6 +22,7 @@ class GraphResults:
         percentage_wrong_dict = self.RE.percentage_wrong(1)
         if(size == 1):
             normalize = self.RE.make_normalization_phone_dict()
+            percentage = self.RE.percentage_wrong(1)
         elif(size == 2):
             normalize = self.RE.make_normalize_bigrams_dict(0)
             percentage_wrong_dict = self.RE.percentage_wrong(2)
@@ -51,6 +53,7 @@ class GraphResults:
         percentage_wrong_dict = self.RE.percentage_wrong(1)
         if(size == 1):
             normalize = self.RE.make_normalization_phone_dict() #overall count of phones
+            percentage = self.RE.percentage_wrong(1)
             missed = self.RE.count_all() #count of missed phones
         else:
             raise IndexError("`size` must be 1.")
@@ -61,6 +64,8 @@ class GraphResults:
         for tup in percentage_wrong_dict:
             labels.append(tup[0])
             y_axis.append(normalize[tup[0]])
+            #needs the try catch block in the situation
+            #that all of the phones have not been missed/seen
             try:
                 missed_axis.append(missed[tup[0]])
             except:
@@ -101,6 +106,7 @@ class GraphResults:
         plt.axis([0, grasp, 0, max_count + 30])
         plt.ylabel('Occurance of the phone')
         plt.xlabel('Percentage Wrong')
+
         plt.show()
 
     def percentage_missed_bigrams(self, grasp):
@@ -131,10 +137,11 @@ class GraphResults:
         plt.axis([0, grasp, 0, max_count + 30])
         plt.ylabel('Occurance of the phone')
         plt.xlabel('Percentage Wrong')
+
         plt.show()
 
 if __name__ == "__main__":
     G = GraphResults()
     G.percentage_missed_phones(0.3)
-    G.percentage_missed_bigrams(0.3)
+    #G.percentage_missed_bigrams(0.3)
     G.graph_missed(1)
