@@ -36,13 +36,15 @@ class TestCelex(unittest.TestCase):
 
     def test_with_transcription(self):
         hmmbo = self.celex.train_hmm(self.transcription_scheme)
-        percent_same = self.celex.test_hmm(hmmbo)
+        percent_same, test_results = self.celex.test_hmm(hmmbo)
         self.assertTrue(percent_same > 0.00)
+        self.assertIsNotNone(test_results)
 
     def test_without_transcription(self):
         hmmbo = self.celex.train_hmm()
-        percent_same = self.celex.test_hmm(hmmbo)
+        percent_same, test_results = self.celex.test_hmm(hmmbo)
         self.assertTrue(percent_same > 0.00)
+        self.assertIsNotNone(test_results)
 
 
 if __name__ == '__main__':

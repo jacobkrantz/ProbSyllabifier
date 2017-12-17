@@ -1,18 +1,16 @@
 from __future__ import print_function
 
 from datetime import datetime
-import multiprocessing
 import os
-import shutil
 from random import randint
+import shutil
 import zipfile
 
 import mutate
 from Chromosome import Chromosome
 from Mating import Mating
-from activePool import ActivePool
-from celex import Celex
-from config import GAConfig as config
+from config import GAConfig, settings
+from computeFitness import ComputeFitness
 
 
 class GeneticAlgorithm:
@@ -21,18 +19,18 @@ class GeneticAlgorithm:
     def __init__(self):
         # population holds a list of chromosomes
         self.population = []
-        self.celex = Celex()
         self.mating = Mating()
+        self.computeFitness = ComputeFitness()
 
     def display_parameters(self):
         """ Displays all GeneticAlgorithm parameters to the console. """
-        ips = config["InitialPopulationSize"]
-        ps = config["PopulationSize"]
-        nomp = config["NumMatingPairs"]
-        mf = config["BaseMutationFactor"]
-        ne = config["NumEvolutions"]
-        noc = config["NumCategories"]
-        nog = len(config["GeneList"])
+        ips = GAConfig["InitialPopulationSize"]
+        ps = GAConfig["PopulationSize"]
+        nomp = GAConfig["NumMatingPairs"]
+        mf = GAConfig["BaseMutationFactor"]
+        ne = GAConfig["NumEvolutions"]
+        noc = GAConfig["NumCategories"]
+        nog = len(GAConfig["GeneList"])
 
         display_string = """
     Genetic Algorithm Parameters
@@ -54,14 +52,15 @@ class GeneticAlgorithm:
         Generated from random gene-category selections.
         Computes each chromosomes fitness.
         """
-        for i in range(config["InitialPopulationSize"]):
-            new_chromosome = Chromosome(config["NumCategories"])
-            for gene in config["GeneList"]:
-                random_category = randint(0, config["NumCategories"] - 1)
+        for i in range(GAConfig["InitialPopulationSize"]):
+            new_chromosome = Chromosome(GAConfig["NumCategories"])
+            for gene in GAConfig["GeneList"]:
+                random_category = randint(0, GAConfig["NumCategories"] - 1)
                 new_chromosome.insert_into_category(random_category, gene)
 
             self.population.append(new_chromosome)
-        self.compute_fitness()
+
+        self.population = self.computeFitness.compute(self.population)
         self._sort()
 
     def import_population(self, resume_from):
@@ -70,17 +69,17 @@ class GeneticAlgorithm:
         Args:
             resume_from (int): evolution number to import from.
         """
-        location = config["LogFileLocation"]
+        location = GAConfig["LogFileLocation"]
         file_name = location + "evo" + str(resume_from) + ".log"
 
         with open(file_name, 'r') as in_file:
             for line in in_file:
-                if len(line) < len(config["GeneList"]):
+                if len(line) < len(GAConfig["GeneList"]):
                     self.population[-1].set_fitness(float(line))
                     continue
 
                 genes = line.split('\t')
-                new_chromosome = Chromosome(config["NumCategories"])
+                new_chromosome = Chromosome(GAConfig["NumCategories"])
                 for i in range(len(genes) - 1):
                     for gene in genes[i]:
                         new_chromosome.insert_into_category(i, gene)
@@ -94,7 +93,7 @@ class GeneticAlgorithm:
         Each run is kept under unique folder.
         Creates directories when necessary.
         """
-        source = config["LogFileLocation"]
+        source = GAConfig["LogFileLocation"]
         destination = source + "Archive/"
 
         if not os.path.exists(source):
@@ -119,7 +118,7 @@ class GeneticAlgorithm:
         Returns:
             string: fileName for the compressed files
         """
-        source = config["LogFileLocation"]
+        source = GAConfig["LogFileLocation"]
         for f in os.listdir(source):
             if ".log" in f:
                 break
@@ -139,7 +138,7 @@ class GeneticAlgorithm:
 
         return os.getcwd() + '/' + fileName
 
-    def evolve(self, evolutions_to_run, evolution_count=0):
+    def evolve(self, evolutions_to_run, evolution_count = 0):
         """
         Mate the population, mutate, and compare fitness.
         Sort by fitness and save the evolution to a log file.
@@ -151,7 +150,12 @@ class GeneticAlgorithm:
         for i in range(evolutions_to_run):
             self.population = self.mating.crossover(self.population)
             self.population = mutate.mutate(self.population)
-            self.compute_fitness()
+            self.population = self.computeFitness.compute(self.population)
+            self._sort()
+            self.population = self.optimize_best(
+                self.population,
+                evolution_count
+            )
             self._sort()
             self._save_all_chromosomes(evolution_count)
             self.display_population(evolution_count)
@@ -161,53 +165,26 @@ class GeneticAlgorithm:
     #    "Private"     #
     # ---------------- #
 
-    def compute_fitness(self):
+    def optimize_best(self, population, evo_num):
         """
-        Compute the fitness of all chromosomes in the population.
-        Updates the fitness value of all chromosomes.
-        Chromosome fitness calculation is done in separate processes.
-
-        """
-        sizes = (config["TrainingSizeHMM"], config["TestingSizeHMM"])
-        self.celex.load_sets(sizes[0], sizes[1])
-
-        pool = ActivePool()
-        s = multiprocessing.Semaphore(config["MaxThreadCount"])
-        results_queue = multiprocessing.Queue()
-        jobs = [
-            multiprocessing.Process(target=self.compute_single_fitness,
-                                    name=str(i),
-                                    args=(i, s, pool, results_queue))
-            for i in range(len(self.population))
-        ]
-        for j in jobs:
-            j.start()
-
-        for j in jobs:
-            j.join()
-
-        for result in [results_queue.get() for j in jobs]:
-            self.population[result[0]].set_fitness(result[1])
-
-    def compute_single_fitness(self, i, s, pool, results_queue):
-        """
-        Calculates and puts updated fitness on the results_queue.
+        Optimizes the best chromosome of the population.
+        Technique is to move worst gene to its relative best category.
+        Runs `PhoneOptimize` if proper evolution.
+        Sets each chromosome's results to `None` to save memory.
         Args:
-            i (int): process and population index
-            s (multiprocessing.Semaphore)
-            pool (ActivePool): manager of the pool and locks
-            results_queue (multiprocessing.Queue): communication
-                        between processes.
+            population (list<Chromosome>)
+            evo_num (int): the evolution number currently being ran.
+        Returns:
+            list<Chromosome>: population
         """
-        process_name = multiprocessing.current_process().name
-        with s:
-            pool.make_active(process_name)
-            genes = self.population[i].get_genes()
-            hmmbo = self.celex.train_hmm(genes)
-            fitness = self.celex.test_hmm(hmmbo)
-            hmmbo = None
-            results_queue.put((i, fitness))
-            pool.make_inactive(process_name)
+        evo_at_least = settings["PhoneOptimize"]["evo_at_least"]
+        evo_frequency = settings["PhoneOptimize"]["evo_frequency"]
+        if((evo_num >= evo_at_least) and (evo_num % evo_frequency == 0)):
+            # call main function in PhoneOptimize once ready.
+            pass
+
+        map(lambda c: c.set_results(None), population)
+        return population
 
     def _sort(self):
         """
@@ -223,7 +200,7 @@ class GeneticAlgorithm:
         Args:
             cur_evolution (int): which evolution for naming the log file.
         """
-        location = config["LogFileLocation"]
+        location = GAConfig["LogFileLocation"]
         name = "evo" + str(cur_evolution) + ".log"
         file_name = location + name
         map(lambda x: self._save_chromosome_at_index(x, file_name),

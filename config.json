@@ -1,66 +1,68 @@
 {
-    "environment" : "local",
-    "CelexTranscriptionFile": "HMMFiles/DISC/generated/trans_evo_1746.txt",
-    "NistTranscriptionFile": "HMMFiles/phoneCategoriesArp.txt",
-    "comparator": "CELEX",
-    "NGramValue": 2,
-    "logLevel": "debug",
-    "dataLoader": {
-        "databaseContext": "wordformsDB"
-    },
-    "write_results_to_DB": false,
-    "wordformsDB": {
-        "default_alphabet": "DISC",
-        "path": "../wordforms.db",
-        "protected_tables": [
-            "words",
-            "pronunciations",
-            "syllabifications"
-        ],
-        "read_permissions": true,
-        "write_permissions": true
-    },
-    "crossValidation": {
-      "KValue": 10,
-      "NValue": 60000
-    },
-    "GeneticAlgorithm": {
-      "MaxThreadCount": 6,
-      "InitialPopulationSize": 50,
-      "PopulationSize": 32,
-      "NumMatingPairs": 8,
-      "NumChromsNotToMutate": 8,
-      "BaseMutationFactor": 0.025,
-      "DesiredDeviation": 1.10,
-      "NumChromsInDeviation": 12,
-      "NumEvolutions": 200,
-      "NumCategories": 12,
-      "TrainingSizeHMM": 50,
-      "TestingSizeHMM": 30,
-      "GeneList": [ "m", "F", "n", "N", "C",
-                    "H", "p", "b", "t", "d",
-                    "k", "g", "J", "_", "f",
-                    "v", "T", "D", "s", "z",
-                    "S", "Z", "x", "h", "j",
-                    "w", "r", "R", "l", "P",
-                    "6", "7", "i", "u", "I",
-                    "U", "1", "5", "@", "E",
-                    "3", "V", "$", "9", "4",
-                    "8", "{", "c", "#", "Q",
-                    "2", "q", "0", "~"],
-      "LogFileLocation": "GeneticAlgorithm/EvolutionLogs/"
-    },
-      "PhoneOptimize":{
-          "phone_list":["s"],
-          "transcription_file": "test.txt"
-      },
-    "email": {
-      "from_address": "cps.research.krantz@gmail.com",
-      "to_addresses" : [
-          "jkrantz@zagmail.gonzaga.edu"
-      ],
-      "password": "",
-      "smtp_server": "smtp.gmail.com",
-      "smtp_port": 587
+  "environment" : "local",
+  "CelexTranscriptionFile": "HMMFiles/DISC/generated/trans_evo_1746.txt",
+  "NistTranscriptionFile": "HMMFiles/phoneCategoriesArp.txt",
+  "comparator": "CELEX",
+  "NGramValue": 2,
+  "logLevel": "info",
+  "dataLoader": {
+    "databaseContext": "wordformsDB"
+  },
+  "write_results_to_DB": false,
+  "wordformsDB": {
+    "default_alphabet": "DISC",
+    "path": "../wordforms.db",
+    "protected_tables": [
+      "words",
+      "pronunciations",
+      "syllabifications"
+    ],
+    "read_permissions": true,
+    "write_permissions": true
+  },
+  "crossValidation": {
+    "KValue": 10,
+    "NValue": 60000
+  },
+  "GeneticAlgorithm": {
+    "MaxThreadCount": 6,
+    "InitialPopulationSize": 50,
+    "PopulationSize": 32,
+    "NumMatingPairs": 8,
+    "NumChromsNotToMutate": 8,
+    "BaseMutationFactor": 0.025,
+    "DesiredDeviation": 1.10,
+    "NumChromsInDeviation": 12,
+    "NumEvolutions": 200,
+    "NumCategories": 12,
+    "TrainingSizeHMM": 20000,
+    "TestingSizeHMM": 5000,
+    "GeneList": [ "m", "F", "n", "N", "C",
+                  "H", "p", "b", "t", "d",
+                  "k", "g", "J", "_", "f",
+                  "v", "T", "D", "s", "z",
+                  "S", "Z", "x", "h", "j",
+                  "w", "r", "R", "l", "P",
+                  "6", "7", "i", "u", "I",
+                  "U", "1", "5", "@", "E",
+                  "3", "V", "$", "9", "4",
+                  "8", "{", "c", "#", "Q",
+                  "2", "q", "0", "~"],
+    "LogFileLocation": "GeneticAlgorithm/EvolutionLogs/"
+  },
+  "PhoneOptimize": {
+    "phone_list": ["s"],
+    "transcription_file": "test.txt",
+    "evo_frequency": 20,
+    "evo_at_least": 1500
+  },
+  "email": {
+    "from_address": "cps.research.krantz@gmail.com",
+    "to_addresses": [
+      "jkrantz@zagmail.gonzaga.edu"
+    ],
+    "password": "",
+    "smtp_server": "smtp.gmail.com",
+    "smtp_port": 587
   }
 }

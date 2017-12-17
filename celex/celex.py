@@ -71,6 +71,7 @@ class Celex(AbstractSyllabRunner):
                 holds trained matrices and lookups.
         Returns:
             float: percent same formatted to two decimal places.
+            list<tuple(p_syl_result, c_syl_result, same): entire test results
         """
         p_syl_results_dict = self._syllabify_testing(hmmbo)
         test_results_list = self._combine_results(p_syl_results_dict)
@@ -79,7 +80,13 @@ class Celex(AbstractSyllabRunner):
             self._fill_results_table(test_results_list)
 
         self._c_syl_results_dict = dict()
-        return self._compare(test_results_list)
+
+        percent_same = self._compare(test_results_list)
+        test_results_list = map(
+            lambda r: (r["ProbSyl"], r["CSyl"], r["Same"]),
+            test_results_list
+        )
+        return percent_same, test_results_list
 
     def cross_validate(self):
         """
