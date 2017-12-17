@@ -1,22 +1,22 @@
 This is the documentation of the Config.json file that controls all of the parameters throughout the whole syllabifier.
 
 ## File Setups:
-### Environment: 
+### Environment:
 Where the syllabifer is being phyiscally ran at.  
 `Local` standard environment settings.  
 `AWS` email notifications sent upon evolution run completion.  
-### CelexTranscriptionFile: 
+### CelexTranscriptionFile:
 A category scheme that is done in Celex's DISC form, which contains a single category per line.
-### NistTranscriptionFile: 
+### NistTranscriptionFile:
 A category scheme that is done with Arpabet.
 ### comparator:
 What the syllabifier is comparing and getting the words broken down into a group of phones from:  
 `CELEX` or `NIST`  
-### NGramValue: 
+### NGramValue:
 State and observation history for the Hidden Markov Model.  
 `2`: bigram assumption, first order.  
 `3`: trigram assumption, pseudo-second order.  
-### logLevel: 
+### logLevel:
 Standard output log verbosity:  
 `debug`: Shows all prints and testing outputs.  
 `info`: Shows results and warnings.  
@@ -27,7 +27,7 @@ databaseContext: The database that is being used for the system.
 write_results_to_DB: Write to the database or not in the program. `true` or `false`  
 default_alphabet: The phonetic alphabet in usage, which is in database. (Currently only using `DISC`)  
 path: Where the database is stored at locally.  
-#### protected_tables: A list of tables that cannot be wrote over.  
+protected_tables: A list of tables that cannot be wrote over.  
 read_permissions: Whether the database can be read by the user.  
 write_permissions: Whether the database can be written into by the user.  
 
@@ -54,13 +54,16 @@ GeneList: The list of phonetic characters in the language being used.
 LogFileLocation: The location to store the output of the genetic algorithm.  
 
 ## PhoneOptimize  
+
 phone_list: The phone/s(1 or 2) that are going to be ran through the testing state.  
-transcription_file: the categorization file that is being optimized.  
+transcription_file: The categorization file that is being optimized.  
+evo_frequency: Evolution frequency in which `PhoneOptimize` will automatically be called in `GeneticAlgorithm`.   
+evo_at_least: Current evolution must be at east this value in order to run `PhoneOptimize`.  
 
-email:
-from_address: what email address that the email is coming from.  
-to_address: what email addresses that the email is being sent to.  
+## Email  
 
+from_address: Sender address for end-of-run email notification.  
+to_address: Recipients of end-of-run email notification.  
 password:  
 smtp_server:  
 smtp_port:  		
