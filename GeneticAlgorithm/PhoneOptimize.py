@@ -6,21 +6,40 @@ import os
 import shutil
 from random import randint
 import zipfile
-
+import logging as log
 import mutate
 from Chromosome import Chromosome
 from Mating import Mating
 from activePool import ActivePool
 from celex import Celex
 from config import settings,GAConfig
-from GeneticAlgorithm import GeneticAlgorithm
+from computeFitness import ComputeFitness
+from evaluation import Evaluation
 
-class PhoneOptimize(GeneticAlgorithm):
+class PhoneOptimize:
     def __init__(self):
+        self.compute_fitness = ComputeFitness()
         self.phone_list = settings["PhoneOptimize"]["phone_list"]
         self.file_name = settings["PhoneOptimize"]["transcription_file"]
         self.population = []
+        self.opt_phone = ""
         self.celex = Celex()
+        self.Eval = Evaluation()
+
+    def run_genetic(self,scheme,spot):
+        """
+        Runs the whole optimization
+        """
+        self.population.append(scheme[spot])
+        self.phone_list = [self.Eval.set_data(self.population[0])]
+        log.info("The phone " + self.phone_list[0] + " was choosen for the scheme in slot " + str(spot)+ ".")
+
+        self.create_population_set()
+        self.insert_phones()
+        self.population = self.compute_fitness.compute(self.population)
+        self._sort()
+        scheme[spot] = self.population[0]
+        return scheme
 
     def check_file_type(self):
         """
@@ -99,11 +118,11 @@ class PhoneOptimize(GeneticAlgorithm):
         """
 
         self.pick_scheme()
+
         #self.view_population()
         self.create_population_set()
         self.insert_phones()
-        self.compute_fitness()
-
+        self.population = self.compute_fitness.compute(self.population)
 
     def _display_population(self):
         """ Displays the population"""
@@ -192,3 +211,11 @@ class PhoneOptimize(GeneticAlgorithm):
         Outputs the population to a file
         """
         pass
+
+    def _sort(self):
+        """
+        Sort self.population by fitness (syllabification accuracy)
+        Ordering: highest (self.population[0]) -> lowest
+        """
+        self.population.sort()
+        self.population.reverse()

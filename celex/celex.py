@@ -74,6 +74,7 @@ class Celex(AbstractSyllabRunner):
             list<tuple(p_syl_result, c_syl_result, same): entire test results
         """
         p_syl_results_dict = self._syllabify_testing(hmmbo)
+
         test_results_list = self._combine_results(p_syl_results_dict)
 
         if config["write_results_to_DB"]:
@@ -188,6 +189,7 @@ class Celex(AbstractSyllabRunner):
                 pronunciation,
                 "CELEX"
             )
+
         log.debug("Finished step: Syllabify ProbSyllabifier")
         return p_syl_results_dict
 
@@ -195,18 +197,22 @@ class Celex(AbstractSyllabRunner):
     # Returns: [{ Word, PSyllab, CSyllab, isSame },{...}]
     def _combine_results(self, p_results_dict):
         test_results_list = []
+        none_count = 0
         for word, p_syllab in p_results_dict.iteritems():
             if not p_syllab:
                 p_syllab = ""
-            c_syllab = self._c_syl_results_dict[word]
-            is_same = int(c_syllab == p_syllab)
-            test_results_line = {
-                "Word": word,
-                "ProbSyl": p_syllab,
-                "CSyl": c_syllab,
-                "Same": is_same
-            }
-            test_results_list.append(test_results_line)
+                none_count +=1
+            else:
+                c_syllab = self._c_syl_results_dict[word]
+
+                is_same = int(c_syllab == p_syllab)
+                test_results_line = {
+                    "Word": word,
+                    "ProbSyl": p_syllab,
+                    "CSyl": c_syllab,
+                    "Same": is_same
+                }
+                test_results_list.append(test_results_line)
         return test_results_list
 
     # given: [{ Word, PSyllab, CSyllab, isSame },{...}]

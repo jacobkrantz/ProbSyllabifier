@@ -1,3 +1,5 @@
+
+
 class Chromosome:
     """
     Chromosomes contain phone transcription schemes.
@@ -44,7 +46,7 @@ class Chromosome:
         """
         self.results = results
 
-    def get_results():
+    def get_results(self):
         return self.results
 
     def insert_into_category(self, category_number, gene):
