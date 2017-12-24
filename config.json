@@ -4,7 +4,7 @@
   "NistTranscriptionFile": "HMMFiles/phoneCategoriesArp.txt",
   "comparator": "CELEX",
   "NGramValue": 2,
-  "logLevel": "info",
+  "logLevel": "warning",
   "dataLoader": {
     "databaseContext": "wordformsDB"
   },
