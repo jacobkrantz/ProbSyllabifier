@@ -1,9 +1,4 @@
-
-import operator
-
-from collections import Counter
-
-
+import operator 
 class Evaluation:
     """
     In order to optimize the categorization scheme a way to
@@ -27,6 +22,8 @@ class Evaluation:
         Args:
             chrom(Chromosome): a scheme being tested
                 which holds the data for the evaluation.
+        Returns:
+            phone(string): the phone that needs to be optimized.
         """
         self.data = chrom.get_results()
         self.parse_list_gen()

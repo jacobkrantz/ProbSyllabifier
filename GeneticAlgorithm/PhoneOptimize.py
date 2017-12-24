@@ -4,13 +4,10 @@ from datetime import datetime
 import multiprocessing
 import os
 import shutil
-from random import randint
 import zipfile
 import logging as log
 import mutate
 from Chromosome import Chromosome
-from Mating import Mating
-from activePool import ActivePool
 from celex import Celex
 from config import settings,GAConfig
 from computeFitness import ComputeFitness
@@ -24,14 +21,22 @@ class PhoneOptimize:
         self.population = []
         self.opt_phone = ""
         self.celex = Celex()
-        self.Eval = Evaluation()
+        self.eval = Evaluation()
 
     def run_genetic(self,scheme,spot):
         """
-        Runs the whole optimization
+        Runs the whole optimization.
+        This
+        1. Gets the best scheme from the population.
+        2. Finds the most needed phone to be optimized.
+        3. Creates the population set.
+        4. Inserts the phone into the correct category.
+        5. Computes the accuracy of each scheme.
+        6. Returns the best scheme.
         """
+
         self.population.append(scheme[spot])
-        self.phone_list = [self.Eval.set_data(self.population[0])]
+        self.phone_list = [self.eval.set_data(self.population[0])]
         log.info("The phone " + self.phone_list[0] + " was choosen for the scheme in slot " + str(spot)+ ".")
 
         self.create_population_set()
@@ -41,9 +46,9 @@ class PhoneOptimize:
         scheme[spot] = self.population[0]
         return scheme
 
-    def check_file_type(self):
+    def _check_file_type(self):
         """
-        Checks the population file type. Either a syllabifier .txt file or a GA evo file
+        _checks the population file type. Either a syllabifier .txt file or a GA evo file
         Returns:
             1 for a syllabifier file, 2 for a GA file
         """
@@ -58,7 +63,7 @@ class PhoneOptimize:
         else:
             assert(False)
 
-    def import_population_log(self):
+    def _import_population_log(self):
         """
         Pulls an existing population from an evolution log file.
         """
@@ -79,13 +84,13 @@ class PhoneOptimize:
         """
         Runs the correct population import scheme
         """
-        scheme = self.check_file_type()
+        scheme = self._check_file_type()
         if(scheme == 2):
-            self.import_population_log()
+            self._import_population_log()
         else:
-            self.import_population_txt()
+            self._import_population_txt()
 
-    def import_population_txt(self):
+    def _import_population_txt(self):
         """
         Imports a phonetic categorization scheme that relates to the syllablifier
         """
