@@ -35,16 +35,37 @@ class PhoneOptimize:
         6. Returns the best scheme.
         """
 
+        self.population = []
         self.population.append(scheme[spot])
         self.phone_list = [self.eval.set_data(self.population[0])]
+        #Gets the phone that will be evaluated.
         log.info("The phone " + self.phone_list[0] + " was choosen for the scheme in slot " + str(spot)+ ".")
 
-        self.create_population_set()
-        self.insert_phones()
+        self._create_population_set()
+        self._insert_phones()
         self.population = self.compute_fitness.compute(self.population)
         self._sort()
         scheme[spot] = self.population[0]
         return scheme
+
+    def make_population(self):
+        """
+        Runs the process of creating a population with the specified phones changed
+        For individual runs of the evaluator without the Genetic Algorithm
+        """
+        self.pick_scheme()
+        self._create_population_set()
+        self._insert_phones()
+        self.population = self.compute_fitness.compute(self.population)
+
+    def view_population(self):
+        """Displays the chromosome with its phones, in each category"""
+        for chrom in self.population:
+            chrom.print_chrom()
+
+    ##########
+    #Private#
+    #########
 
     def _check_file_type(self):
         """
@@ -80,7 +101,7 @@ class PhoneOptimize:
                 self.population.append(new_chromosome)
                 return
 
-    def pick_scheme(self):
+    def _pick_scheme(self):
         """
         Runs the correct population import scheme
         """
@@ -117,17 +138,7 @@ class PhoneOptimize:
         self.population.append(chrom)
         return
 
-    def make_population(self):
-        """
-        Runs the process of creating a population with the specified phones changed
-        """
 
-        self.pick_scheme()
-
-        #self.view_population()
-        self.create_population_set()
-        self.insert_phones()
-        self.population = self.compute_fitness.compute(self.population)
 
     def _display_population(self):
         """ Displays the population"""
@@ -137,25 +148,15 @@ class PhoneOptimize:
             print("chrom{}     {}".format(i, self.population[i].get_fitness()))
         print()
 
-    def strip_phones(self, phone_strip):
-        """
-        Deletes a phone from the chromosome
-        Returns:
-            The phone that has been deleted
-        """
-        chrom = self.population[0]
-        chrom.remove_gene(phone_strip)
-        return phone_strip
-
-    def create_population_set(self):
+    def _create_population_set(self):
         """
         Creates the base set of chromosomes to be modified with each phone given
         """
         for num in range(GAConfig["NumCategories"]**len(self.phone_list)):
-            new_chromosome = self.chrom_copy(self.population[0])
+            new_chromosome = self._chrom_copy(self.population[0])
             self.population.append(new_chromosome)
 
-    def insert_phones(self):
+    def _insert_phones(self):
         """
         Inserts the delted phones into the population"
         Args:
@@ -192,12 +193,8 @@ class PhoneOptimize:
         return spot_lst
 
 
-    def view_population(self):
-        """Displays the chromosome with its phones, in each category"""
-        for chrom in self.population:
-            chrom.print_chrom()
 
-    def chrom_copy(self, chrom):
+    def _chrom_copy(self, chrom):
         """
         Copies the value of the chromosome into a new chromosome
         Returns:

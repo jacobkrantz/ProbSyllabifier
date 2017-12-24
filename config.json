@@ -53,13 +53,13 @@
   "PhoneOptimize": {
     "phone_list": ["s"],
     "transcription_file": "test.txt",
-    "evo_frequency": 20,
+    "evo_frequency": 10,
     "evo_at_least": 1500
   },
   "email": {
     "from_address": "cps.research.krantz@gmail.com",
     "to_addresses": [
-      "jkrantz@zagmail.gonzaga.edu"
+      "jkrantz@zagmail.gonzaga.edu","mdulin@zagmail.gonzaga.edu"
     ],
     "password": "",
     "smtp_server": "smtp.gmail.com",

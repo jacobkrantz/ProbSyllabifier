@@ -1,11 +1,9 @@
 from __future__ import print_function
-
 from datetime import datetime
 import os
 from random import randint
 import shutil
 import zipfile
-
 import mutate
 from Chromosome import Chromosome
 from Mating import Mating
@@ -22,6 +20,7 @@ class GeneticAlgorithm:
         self.population = []
         self.mating = Mating()
         self.computeFitness = ComputeFitness()
+        self.phone_opt = PhoneOptimize()
 
     def display_parameters(self):
         """ Displays all GeneticAlgorithm parameters to the console. """
@@ -182,11 +181,7 @@ class GeneticAlgorithm:
         evo_at_least = settings["PhoneOptimize"]["evo_at_least"]
         evo_frequency = settings["PhoneOptimize"]["evo_frequency"]
         if((evo_num >= evo_at_least) and (evo_num % evo_frequency == 0)):
-            phone_opt = PhoneOptimize()
-            self.population = phone_opt.run_genetic(self.population,0)# call main function in PhoneOptimize once ready.
-            # passed information to evaluation for to find phone to optimize
-            # then, optimized by phone optimize
-
+            self.population = self.phone_opt.run_genetic(self.population,0)# call main function in PhoneOptimize once ready.
         map(lambda c: c.set_results(None), population)
         return population
 
