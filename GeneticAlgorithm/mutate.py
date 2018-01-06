@@ -91,5 +91,7 @@ def stddev(lst):
     Returns:
         float: resulting standard dev of list
     """
+    if(len(lst) == 0):
+        return 0
     mean = float(sum(lst)) / len(lst)
     return sqrt(float(reduce(lambda x,y: x+y, map(lambda x: (x-mean) **2, lst))) / len(lst))

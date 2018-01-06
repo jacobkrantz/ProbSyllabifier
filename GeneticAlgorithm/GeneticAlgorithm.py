@@ -149,7 +149,7 @@ class GeneticAlgorithm:
                     number to continue from.
         """
         for i in range(evolutions_to_run):
-            self.population = self.mating.crossover(self.population)
+            self.population = self.mating.mate(self.population)
             self.population = mutate.mutate(self.population)
             self.population = self.computeFitness.compute(self.population)
             self._sort()
