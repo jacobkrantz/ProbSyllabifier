@@ -1,5 +1,5 @@
 {
-  "environment" : "local",
+  "environment" : "AWS",
   "CelexTranscriptionFile": "HMMFiles/DISC/generated/trans_evo_1746.txt",
   "NistTranscriptionFile": "HMMFiles/phoneCategoriesArp.txt",
   "comparator": "CELEX",
@@ -11,7 +11,7 @@
   "write_results_to_DB": false,
   "wordformsDB": {
     "default_alphabet": "DISC",
-    "path": "../wordforms.db",
+    "path": "./wordforms.db",
     "protected_tables": [
       "words",
       "pronunciations",
@@ -25,16 +25,16 @@
     "NValue": 60000
   },
   "GeneticAlgorithm": {
-    "MaxThreadCount": 6,
+    "MaxThreadCount": 4,
     "InitialPopulationSize": 50,
     "PopulationSize": 32,
     "NumMatingPairs": 8,
-    "NumChromsNotToMutate": 8,
-    "BaseMutationFactor": 0.025,
-    "DesiredDeviation": 1.10,
-    "NumChromsInDeviation": 12,
-    "NumEvolutions": 200,
-    "NumCategories": 12,
+    "NumChromsNotToMutate": 6,
+    "BaseMutationFactor": 0.040,
+    "DesiredDeviation": 1.50,
+    "NumChromsInDeviation": 8,
+    "NumEvolutions": 500,
+    "NumCategories": 11,
     "TrainingSizeHMM": 20000,
     "TestingSizeHMM": 5000,
     "GeneList": [ "m", "F", "n", "N", "C",
@@ -54,12 +54,12 @@
     "phone_list": ["s"],
     "transcription_file": "test.txt",
     "evo_frequency": 10,
-    "evo_at_least": 1500
+    "evo_at_least": 200
   },
   "email": {
     "from_address": "cps.research.krantz@gmail.com",
     "to_addresses": [
-      "jkrantz@zagmail.gonzaga.edu","mdulin@zagmail.gonzaga.edu"
+      "jkrantz@zagmail.gonzaga.edu","mdulin2@zagmail.gonzaga.edu"
     ],
     "password": "",
     "smtp_server": "smtp.gmail.com",
