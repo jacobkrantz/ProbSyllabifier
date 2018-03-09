@@ -48,6 +48,8 @@ DesiredDeviation: The wanted standard deviation for the percentage's of the chro
 NumChromsInDeviation: number of top chromosome fitness values to be included in the deviation calculation.  
 NumEvolutions: The amount of generations to run the genetic algorithm for.  
 NumCategories: The amount of categories in the phonetic categorization scheme.  
+CategoryRestriction: Do categories have a minimum occupancy? True or False.  
+CategoryRestrictionCount: If CategoryRestriction is on, what's the minimum amount per category allowed.
 TrainingSizeHMM: The amount of words to train the HMM on.  
 TestingSizeHMM: The amount of words to test the accuracy of the scheme on.  
 GeneList: The list of phonetic characters in the language being used.  

@@ -10,6 +10,7 @@ from Mating import Mating
 from config import GAConfig, settings
 from computeFitness import ComputeFitness
 from PhoneOptimize import PhoneOptimize
+import random as rand
 
 
 class GeneticAlgorithm:
@@ -57,11 +58,45 @@ class GeneticAlgorithm:
             for gene in GAConfig["GeneList"]:
                 random_category = randint(0, GAConfig["NumCategories"] - 1)
                 new_chromosome.insert_into_category(random_category, gene)
+                #need to make sure that the chromosome has all categories fixed here.
+
+            #adds the restrictions to the categories
+            if(GAConfig["CategoryRestriction"] == "True"):
+                new_chromosome = self.space_chrom(new_chromosome)
 
             self.population.append(new_chromosome)
 
         self.population = self.computeFitness.compute(self.population)
         self._sort()
+
+    def space_chrom(self,chrom):
+        """
+        Spaces the chromosome so that every category has at least one gene
+        Args:
+            chrom(chromosome): the chromosome to be spaced correctly.
+        Returns:
+            chrom(chromosome): the spaced out chromosome
+        """
+
+        #actual value/number of actegory
+        for spot in range(GAConfig["NumCategories"]):
+            while(True):
+                if(chrom.amount_of_genes(spot) < int(GAConfig["CategoryRestrictionCount"])):
+                    go = True
+                    #grabs a category that can be take from.
+                    while(go):
+                        random_cat= self.get_rand_cat()
+                        if(chrom.can_move(random_cat,int(GAConfig["CategoryRestrictionCount"]))):
+                            go = False
+                    genes = chrom.get_genes()
+                    remove_gene = genes[random_cat].pop() #just takes the back value
+                    chrom.remove_gene(remove_gene)
+                    chrom.insert_into_category(spot,remove_gene)
+                else:
+                    break
+
+
+        return chrom
 
 
     def import_population(self, resume_from):
@@ -148,9 +183,12 @@ class GeneticAlgorithm:
             evolution_count (int): if resuming a run, this is the evolution
                     number to continue from.
         """
+
+
         for i in range(evolutions_to_run):
             self.population = self.mating.mate(self.population)
             self.population = mutate.mutate(self.population)
+
             self.population = self.computeFitness.compute(self.population)
             self._sort()
             self.population = self.optimize_best(
@@ -231,3 +269,10 @@ class GeneticAlgorithm:
         for i in range(len(self.population)):
             print("chrom{}\t{}".format(i, self.population[i].get_fitness()))
         print()
+
+
+    def get_rand_cat(self):
+        """
+        Returns a random number between 0 and the number of categories
+        """
+        return rand.randint(0,GAConfig["NumCategories"]-1)

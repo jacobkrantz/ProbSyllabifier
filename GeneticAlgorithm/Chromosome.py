@@ -60,9 +60,23 @@ class Chromosome:
         self.remove_gene(gene)
         self.genes[category_number].add(gene)
 
+    def grab_category(self,category):
+        """
+        Args:
+            category(int): the spot of the genes ot take
+        Returns:
+            a set of phones
+        """
+        return self.genes[category]
     # ---------------- #
     #    "Private"     #
     # ---------------- #
+
+    def find_category(self,gene):
+        for i in range(len(self.genes)):
+            if gene in self.genes[i]:
+                return True
+        return False
 
     def remove_gene(self, gene):
         """
@@ -87,6 +101,8 @@ class Chromosome:
         for i in range(len(self.genes)):
             if gene in self.genes[i]:
                 return i
+        print("No gene: " + gene + " in the feature set.")
+        assert(False)
 
     def print_chrom(self):
         """prints the genes out in a nicer manner"""
@@ -97,3 +113,26 @@ class Chromosome:
                 print gene,
             count = count + 1
             print
+
+    def can_move(self,category,amount):
+        """
+        Discovers if a gene can be taken from this category
+        Args:
+            category(int): the category being checked on
+            amount(int): the amount required for a category
+        Returns:
+            bool: True if a gene can be taken, false otherwise
+        """
+        if(self.amount_of_genes(category) > amount):
+            return True
+        return False
+
+    def amount_of_genes(self,category):
+        """
+        Gets the amount of genes in a category
+        Args:
+            category(int): the category number in the genes
+        Returns:
+            int: the amount of genes in the category
+        """
+        return len(self.genes[category])

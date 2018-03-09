@@ -24,6 +24,11 @@ def optimize():
     ga.display_parameters()
 
     assert(GAConfig["PopulationSize"]/4 == GAConfig["NumMatingPairs"])
+
+    #Can not have more genes per category than genes available
+    if(GAConfig["CategoryRestriction"] == "True"):
+        assert(int(GAConfig["CategoryRestrictionCount"])* int(GAConfig["NumCategories"])<= len(GAConfig["GeneList"]))
+    #configure constraints for amount of genes vs amount of categories
     evolution_number = 0
     if len(sys.argv) > 1:
         evolution_number = int(sys.argv[1])
@@ -42,5 +47,9 @@ def optimize():
         for to_address in settings["email"]["to_addresses"]:
             email_client.notify_run_complete(to_address, zip_file_name)
 
-
+def test():
+    ga = GeneticAlgorithm()
+    ga.initialize_population()
+    ga.evolve(1,1)
 optimize()
+#test()
