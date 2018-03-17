@@ -31,7 +31,9 @@ class Utils:
         """
         parses a syllabified word into two lists for the HMM.
         Args:
-            word (string)
+            word (string) word as a sequence of phones to be parsed.
+            trans_scheme (list<list<phone>>) must provide a transcription
+                scheme for phone-category replacement.
         Returns:
             list<string> observation list
             list<string> state list
