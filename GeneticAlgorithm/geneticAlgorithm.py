@@ -1,16 +1,17 @@
 from __future__ import print_function
+
 from datetime import datetime
 import os
 from random import randint
 import shutil
 import zipfile
-import mutate
-from Chromosome import Chromosome
-from Mating import Mating
-from config import GAConfig, settings
+
+from chromosome import Chromosome
 from computeFitness import ComputeFitness
-from PhoneOptimize import PhoneOptimize
-import random as rand
+from config import GAConfig, settings
+from mating import Mating
+import mutate
+from phoneOptimize import PhoneOptimize
 
 
 class GeneticAlgorithm:
@@ -275,4 +276,4 @@ class GeneticAlgorithm:
         """
         Returns a random number between 0 and the number of categories
         """
-        return rand.randint(0,GAConfig["NumCategories"]-1)
+        return randint(0,GAConfig["NumCategories"]-1)

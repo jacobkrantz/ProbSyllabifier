@@ -1,4 +1,7 @@
-import operator 
+
+import operator
+
+
 class Evaluation:
     """
     In order to optimize the categorization scheme a way to

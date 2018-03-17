@@ -1,8 +1,9 @@
 from math import sqrt
 from random import randint
-from Chromosome import Chromosome
+
+from chromosome import Chromosome
 from config import GAConfig as config
-import random as rand
+
 '''
 fileName:       mutate.py
 Authors:        Jacob Krantz, Maxwell Dulin
@@ -107,7 +108,7 @@ def organize(chrom):
                         go = False
                 genes = chrom.get_genes()
                 #select random gene
-                random_gene = rand.randint(0,len(genes[random_cat])-1)
+                random_gene = randint(0,len(genes[random_cat])-1)
                 remove_gene = list(genes[random_cat])[random_gene]
                 remove_gene = genes[random_cat].pop() #just takes the back value
                 chrom.remove_gene(remove_gene)
@@ -120,7 +121,7 @@ def get_rand_cat():
     """
     Returns a random category number
     """
-    return rand.randint(0,config["NumCategories"]-1)
+    return randint(0,config["NumCategories"]-1)
 
 def stddev(lst):
     """

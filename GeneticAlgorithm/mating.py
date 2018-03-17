@@ -1,6 +1,8 @@
+
 import copy
 from random import randint
-from Chromosome import Chromosome
+
+from chromosome import Chromosome
 from config import GAConfig as config
 
 '''

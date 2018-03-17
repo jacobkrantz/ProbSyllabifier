@@ -1,17 +1,19 @@
 from __future__ import print_function
-from itertools import permutations
+
 from datetime import datetime
+from itertools import permutations
+import logging as log
 import multiprocessing
 import os
 import shutil
 import zipfile
-import logging as log
-import mutate
-from Chromosome import Chromosome
+
 from celex import Celex
-from config import settings,GAConfig
+from chromosome import Chromosome
 from computeFitness import ComputeFitness
+from config import settings,GAConfig
 from evaluation import Evaluation
+import mutate
 
 class PhoneOptimize:
     def __init__(self):

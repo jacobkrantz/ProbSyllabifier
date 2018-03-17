@@ -4,7 +4,7 @@
   "NistTranscriptionFile": "HMMFiles/phoneCategoriesArp.txt",
   "comparator": "CELEX",
   "NGramValue": 2,
-  "logLevel": "warning",
+  "logLevel": "info",
   "dataLoader": {
     "databaseContext": "wordformsDB"
   },
@@ -12,7 +12,7 @@
     "use_start_tags": true,
     "k_smoothing": 0.0
   },
-  "write_results_to_DB": true,
+  "write_results_to_DB": false,
   "wordformsDB": {
     "default_alphabet": "DISC",
     "path": "../wordforms.db",

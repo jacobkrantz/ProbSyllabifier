@@ -1,5 +1,4 @@
 import multiprocessing
-import Queue
 import time
 
 from activePool import ActivePool
@@ -76,8 +75,8 @@ class ComputeFitness:
         process_name = multiprocessing.current_process().name
         with s:
             pool.make_active(process_name)
-            hmmbo = self.celex.train_hmm(genes)
-            fitness, all_results = self.celex.test_hmm(hmmbo)
-            hmmbo = None
+            ps_model = self.celex.train_hmm(genes)
+            fitness, all_results = self.celex.test_hmm(ps_model)
+            ps_model = None
             results_queue.put((i, fitness, all_results))
             pool.make_inactive(process_name)
