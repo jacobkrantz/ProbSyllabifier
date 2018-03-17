@@ -4,15 +4,15 @@ import logging as log
 
 with open('config.json') as json_data_file:
     settings = json.load(json_data_file)
-    GAConfig = settings["GeneticAlgorithm"]
+    GAConfig = settings["genetic_algorithm"]
 
 
 
 # set global logging utility
 
-if(settings["logLevel"] == "info"):
+if(settings["log_level"] == "info"):
     log_level = log.INFO
-elif(settings["logLevel"] == "warning"):
+elif(settings["log_level"] == "warning"):
     log_level = log.WARNING
 else:
     log_level = log.DEBUG

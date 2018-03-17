@@ -26,13 +26,13 @@ class GeneticAlgorithm:
 
     def display_parameters(self):
         """ Displays all GeneticAlgorithm parameters to the console. """
-        ips = GAConfig["InitialPopulationSize"]
-        ps = GAConfig["PopulationSize"]
-        nomp = GAConfig["NumMatingPairs"]
-        mf = GAConfig["BaseMutationFactor"]
-        ne = GAConfig["NumEvolutions"]
-        noc = GAConfig["NumCategories"]
-        nog = len(GAConfig["GeneList"])
+        ips = GAConfig["initial_population_size"]
+        ps = GAConfig["population_size"]
+        nomp = GAConfig["num_mating_pairs"]
+        mf = GAConfig["base_mutation_factor"]
+        ne = GAConfig["num_evolutions"]
+        noc = GAConfig["num_categories"]
+        nog = len(GAConfig["gene_list"])
 
         display_string = """
     Genetic Algorithm Parameters
@@ -40,7 +40,7 @@ class GeneticAlgorithm:
     Initial Population Size  %s
     Population Size          %s
     Number of Mating Pairs   %s
-    BaseMutationFactor       %s
+    Base Mutation Factor     %s
     Number of Evolutions     %s
     Number of Categories     %s
     Number of Genes          %s
@@ -54,15 +54,15 @@ class GeneticAlgorithm:
         Generated from random gene-category selections.
         Computes each chromosomes fitness.
         """
-        for i in range(GAConfig["InitialPopulationSize"]):
-            new_chromosome = Chromosome(GAConfig["NumCategories"])
-            for gene in GAConfig["GeneList"]:
-                random_category = randint(0, GAConfig["NumCategories"] - 1)
+        for i in range(GAConfig["initial_population_size"]):
+            new_chromosome = Chromosome(GAConfig["num_categories"])
+            for gene in GAConfig["gene_list"]:
+                random_category = randint(0, GAConfig["num_categories"] - 1)
                 new_chromosome.insert_into_category(random_category, gene)
                 #need to make sure that the chromosome has all categories fixed here.
 
             #adds the restrictions to the categories
-            if(GAConfig["CategoryRestriction"] == "True"):
+            if(GAConfig["category_restriction"] == "True"):
                 new_chromosome = self.space_chrom(new_chromosome)
 
             self.population.append(new_chromosome)
@@ -80,14 +80,14 @@ class GeneticAlgorithm:
         """
 
         #actual value/number of actegory
-        for spot in range(GAConfig["NumCategories"]):
+        for spot in range(GAConfig["num_categories"]):
             while(True):
-                if(chrom.amount_of_genes(spot) < int(GAConfig["CategoryRestrictionCount"])):
+                if(chrom.amount_of_genes(spot) < int(GAConfig["category_restriction_count"])):
                     go = True
                     #grabs a category that can be take from.
                     while(go):
                         random_cat= self.get_rand_cat()
-                        if(chrom.can_move(random_cat,int(GAConfig["CategoryRestrictionCount"]))):
+                        if(chrom.can_move(random_cat,int(GAConfig["category_restriction_count"]))):
                             go = False
                     genes = chrom.get_genes()
                     remove_gene = genes[random_cat].pop() #just takes the back value
@@ -106,17 +106,17 @@ class GeneticAlgorithm:
         Args:
             resume_from (int): evolution number to import from.
         """
-        location = GAConfig["LogFileLocation"]
+        location = GAConfig["log_file_location"]
         file_name = location + "evo" + str(resume_from) + ".log"
 
         with open(file_name, 'r') as in_file:
             for line in in_file:
-                if len(line) < len(GAConfig["GeneList"]):
+                if len(line) < len(GAConfig["gene_list"]):
                     self.population[-1].set_fitness(float(line))
                     continue
 
                 genes = line.split('\t')
-                new_chromosome = Chromosome(GAConfig["NumCategories"])
+                new_chromosome = Chromosome(GAConfig["num_categories"])
                 for i in range(len(genes) - 1):
                     for gene in genes[i]:
                         new_chromosome.insert_into_category(i, gene)
@@ -130,7 +130,7 @@ class GeneticAlgorithm:
         Each run is kept under unique folder.
         Creates directories when necessary.
         """
-        source = GAConfig["LogFileLocation"]
+        source = GAConfig["log_file_location"]
         destination = source + "Archive/"
 
         if not os.path.exists(source):
@@ -155,7 +155,7 @@ class GeneticAlgorithm:
         Returns:
             string: fileName for the compressed files
         """
-        source = GAConfig["LogFileLocation"]
+        source = GAConfig["log_file_location"]
         for f in os.listdir(source):
             if ".log" in f:
                 break
@@ -217,8 +217,8 @@ class GeneticAlgorithm:
         Returns:
             list<Chromosome>: population
         """
-        evo_at_least = settings["PhoneOptimize"]["evo_at_least"]
-        evo_frequency = settings["PhoneOptimize"]["evo_frequency"]
+        evo_at_least = settings["phone_optimize"]["evo_at_least"]
+        evo_frequency = settings["phone_optimize"]["evo_frequency"]
         if((evo_num >= evo_at_least) and (evo_num % evo_frequency == 0)):
             self.population = self.phone_opt.run_genetic(self.population,0)# call main function in PhoneOptimize once ready.
         map(lambda c: c.set_results(None), population)
@@ -238,7 +238,7 @@ class GeneticAlgorithm:
         Args:
             cur_evolution (int): which evolution for naming the log file.
         """
-        location = GAConfig["LogFileLocation"]
+        location = GAConfig["log_file_location"]
         name = "evo" + str(cur_evolution) + ".log"
         file_name = location + name
         map(lambda x: self._save_chromosome_at_index(x, file_name),
@@ -276,4 +276,4 @@ class GeneticAlgorithm:
         """
         Returns a random number between 0 and the number of categories
         """
-        return randint(0,GAConfig["NumCategories"]-1)
+        return randint(0,GAConfig["num_categories"]-1)

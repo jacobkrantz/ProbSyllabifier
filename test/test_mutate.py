@@ -81,7 +81,7 @@ class TestMutate(unittest.TestCase):
             self.populationLow
             self.populationHigh
         """
-        self.init_mut_factor = float(config["BaseMutationFactor"])
+        self.init_mut_factor = float(config["base_mutation_factor"])
 
         self.population_zero = []  # dev: 0.00
         for fitness in [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]:
@@ -117,8 +117,8 @@ class TestMutate(unittest.TestCase):
             ['J', 'w', 'g', 'f']
         ]
         self.population = []
-        for j in range(config["NumChromsInDeviation"]):
-            new_chromosome = Chromosome(config["NumCategories"])
+        for j in range(config["num_chroms_in_deviation"]):
+            new_chromosome = Chromosome(config["num_categories"])
             new_chromosome.set_fitness(88.9)
             for i in range(len(self.genes) - 1):
                 for gene in self.genes[i]:

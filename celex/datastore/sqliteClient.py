@@ -9,9 +9,9 @@ from config import settings as config
 class SQLiteClient:
 
     def __init__(self):
-        self._databaseContext = config["dataLoader"]["databaseContext"]
+        self._database_context = config["data_loader"]["database_context"]
         self.connection = sqlite3.connect(
-            config[self._databaseContext]["path"]
+            config[self._database_context]["path"]
         )
 
     def create_table(self, table_name, columns_and_types):
@@ -88,7 +88,7 @@ class SQLiteClient:
         :raises PermissionsException
         :return: True
         """
-        if not config[self._databaseContext][which_permission]:
+        if not config[self._database_context][which_permission]:
             raise PermissionsException(
                 "User does not have permission: " + which_permission
             )
@@ -101,7 +101,7 @@ class SQLiteClient:
         :raises PermissionsException
         :return: True
         """
-        if table_name in config[self._databaseContext]["protected_tables"]:
+        if table_name in config[self._database_context]["protected_tables"]:
             raise PermissionsException(
                 "Cannot execute: %s is a protected table" % table_name
             )

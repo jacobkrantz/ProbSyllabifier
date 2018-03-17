@@ -26,7 +26,11 @@ class ProbSyllabifier:
         obs, states = self._split_training_set(training_set)
         builder = Builder()
         builder.add_batch_training_examples(obs, states)
-        self._model = builder.build(synthesize_states=True, k_smoothing=0.0)
+        self._model = builder.build(
+            highest_order = config["hmm_order"],
+            synthesize_states = True,
+            k_smoothing = 0.0
+        )
 
     def learn(self, model, sequences):
         """

@@ -18,11 +18,11 @@ class ComputeFitness:
         Updates the fitness value of all chromosomes.
         Chromosome fitness calculation is done in separate processes.
         """
-        sizes = (GAConfig["TrainingSizeHMM"], GAConfig["TestingSizeHMM"])
+        sizes = (GAConfig["training_size_hmm"], GAConfig["testing_size_hmm"])
         self.celex.load_sets(sizes[0], sizes[1])
 
         pool = ActivePool()
-        s = multiprocessing.Semaphore(GAConfig["MaxThreadCount"])
+        s = multiprocessing.Semaphore(GAConfig["max_thread_count"])
         results_queue = multiprocessing.Queue(len(population) + 1)
         jobs = [
             multiprocessing.Process(

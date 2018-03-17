@@ -32,5 +32,5 @@ class DataLoader(SQLiteClient):
 
 
 if __name__ == "__main__":
-    dl = DataLoader("wordformsDB")  # TODO unexpected argument...
+    dl = DataLoader("wordforms_db")  # TODO unexpected argument...
     dl.truncate_table("workingresults")

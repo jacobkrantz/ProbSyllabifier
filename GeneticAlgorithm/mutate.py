@@ -31,7 +31,7 @@ def mutate(pop):
     mutate_chrom(pop[0],1)
 
     mut_factor = calculate_mutation_factor(pop)
-    save = config["NumChromsNotToMutate"]
+    save = config["num_chroms_not_to_mutate"]
     return pop[:save] + list(map(lambda x: mutate_chrom(x, mut_factor), pop[save:]))
 
 
@@ -48,10 +48,10 @@ def calculate_mutation_factor(pop):
     """
     stdev = stddev(list(map(
         lambda x: x.get_fitness(),
-        pop[:config["NumChromsInDeviation"]]
+        pop[:config["num_chroms_in_deviation"]]
     )))
-    desired_dev = float(config["DesiredDeviation"])
-    mutation_factor = float(config["BaseMutationFactor"])
+    desired_dev = float(config["desired_deviation"])
+    mutation_factor = float(config["base_mutation_factor"])
 
     if stdev <= desired_dev:
         mutation_factor -= (stdev - desired_dev) / float((desired_dev * 10))
@@ -71,19 +71,19 @@ def mutate_chrom(chromosome, mutation_factor):
     Returns:
         Chromosome: the provided chromosome with mutations made
     """
-    new_chromosome = Chromosome(config["NumCategories"])
+    new_chromosome = Chromosome(config["num_categories"])
     count = 0
     for cat_index, category in enumerate(chromosome.get_genes()):
         for gene in category:
             new_category = cat_index
             if float(randint(0, 99)) / 100. <= mutation_factor:
                 while new_category == cat_index:
-                    new_category = randint(0, config["NumCategories"] - 1)
+                    new_category = randint(0, config["num_categories"] - 1)
             new_chromosome.insert_into_category(new_category, gene)
             count+=1
 
     #implements the category restriction for the chromosome
-    if(config["CategoryRestriction"] == "True"):
+    if(config["category_restriction"] == "True"):
         return organize(new_chromosome)
     return new_chromosome
 
@@ -97,14 +97,14 @@ def organize(chrom):
 
     """
     #actual value/number of actegory
-    for spot in range(config["NumCategories"]):
+    for spot in range(config["num_categories"]):
         while(True):
-            if(chrom.amount_of_genes(spot) < int(config["CategoryRestrictionCount"])):
+            if(chrom.amount_of_genes(spot) < int(config["category_restriction_count"])):
                 go = True
                 #grabs a category that can be take from.
                 while(go):
                     random_cat= get_rand_cat()
-                    if(chrom.can_move(random_cat,int(config["CategoryRestrictionCount"]))):
+                    if(chrom.can_move(random_cat,int(config["category_restriction_count"]))):
                         go = False
                 genes = chrom.get_genes()
                 #select random gene
@@ -121,7 +121,7 @@ def get_rand_cat():
     """
     Returns a random category number
     """
-    return randint(0,config["NumCategories"]-1)
+    return randint(0,config["num_categories"]-1)
 
 def stddev(lst):
     """

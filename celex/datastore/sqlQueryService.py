@@ -223,7 +223,7 @@ class SQLQueryService(SQLiteClient):
                     for key, value in syllabifications.items()}
 
     def _get_alphabet_column(self, prefix):
-        return prefix + config[self._databaseContext]["default_alphabet"]
+        return prefix + config[self._database_context]["default_alphabet"]
 
 
 class IndexException(Exception):

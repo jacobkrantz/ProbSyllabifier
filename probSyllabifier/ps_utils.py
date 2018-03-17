@@ -14,9 +14,9 @@ class Utils:
                 a category containing phones
         """
         if lang == 1:
-            in_file = "NistTranscriptionFile"
+            in_file = "nist_transcription_file"
         else:
-            in_file = "CelexTranscriptionFile"
+            in_file = "celex_transcription_file"
 
         with open(config[in_file], 'r') as file:
             transcription_scheme = []

@@ -25,7 +25,7 @@ class TestSyllabParser(unittest.TestCase):
         self.assertIsNotNone(self.scheme)
 
         # ensure all phones are in transcription scheme
-        gene_set = set(config["GeneticAlgorithm"]["GeneList"])
+        gene_set = set(config["genetic_algorithm"]["gene_list"])
         trans_set = set()
         map(lambda c: trans_set.update(set(c)), self.scheme)
         trans_set.discard('<')

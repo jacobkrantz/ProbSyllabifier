@@ -2,7 +2,7 @@ from __future__ import print_function
 
 from collections import OrderedDict
 
-dl = DataLoader('wordformsDB')
+dl = data_loader('wordforms_db')
 # these commands were run in other locations. Pooled together for history.
 
 # 1st on 6/17
@@ -34,7 +34,7 @@ dl.create_table('syllabifications', cols_and_types)
 
 base_dir = 'C:\Users\Jacob\Desktop\wordforms'
 
-# 1-3 ran in dataLoader.py
+# 1-3 ran in data_loader.py
 # 1st on 6/18       load the words table
 # 2nd on 6/18       load the pronunciations table
 # 3rd on 6/18       load the syllabifications table

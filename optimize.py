@@ -23,11 +23,11 @@ def optimize():
     ga = GeneticAlgorithm()
     ga.display_parameters()
 
-    assert(GAConfig["PopulationSize"]/4 == GAConfig["NumMatingPairs"])
+    assert(GAConfig["population_size"]/4 == GAConfig["num_mating_pairs"])
 
     #Can not have more genes per category than genes available
-    if(GAConfig["CategoryRestriction"] == "True"):
-        assert(int(GAConfig["CategoryRestrictionCount"])* int(GAConfig["NumCategories"])<= len(GAConfig["GeneList"]))
+    if(GAConfig["category_restriction"] == "True"):
+        assert(int(GAConfig["category_restriction_count"])* int(GAConfig["num_categories"])<= len(GAConfig["gene_list"]))
     #configure constraints for amount of genes vs amount of categories
     evolution_number = 0
     if len(sys.argv) > 1:
@@ -38,7 +38,7 @@ def optimize():
         ga.archive_logs()
         ga.initialize_population()
 
-    evolutions_to_run = GAConfig["NumEvolutions"]
+    evolutions_to_run = GAConfig["num_evolutions"]
     ga.evolve(evolutions_to_run, evolution_number)
 
     if(settings["environment"] == "AWS"):

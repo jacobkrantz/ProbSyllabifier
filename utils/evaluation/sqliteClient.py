@@ -8,7 +8,7 @@ from contextlib import closing
 class SQLiteClient:
 
     def __init__(self):
-        self._databaseContext = "wordformsDB"
+        self._database_context = "wordforms_db"
         self.connection = sqlite3.connect(
             "../../../wordforms.db"
         )

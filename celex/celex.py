@@ -70,7 +70,7 @@ class Celex(AbstractSyllabRunner):
         p_syl_results_dict = self._syllabify_testing(ps_model)
         test_results_list = self._combine_results(p_syl_results_dict)
 
-        if config["write_results_to_DB"]:
+        if config["write_results_to_db"]:
             self._fill_results_table(test_results_list)
 
         self._c_syl_results_dict = dict()
@@ -90,8 +90,8 @@ class Celex(AbstractSyllabRunner):
         Returns:
             float: cross validated ProbSyllabifier accuracy
         """
-        n_value = config["crossValidation"]["NValue"]
-        k_value = config["crossValidation"]["KValue"]
+        n_value = config["cross_validation"]["n_value"]
+        k_value = config["cross_validation"]["k_value"]
         subset_size = n_value / k_value
         results_list = []
 

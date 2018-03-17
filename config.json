@@ -1,19 +1,19 @@
 {
   "environment" : "Local",
-  "CelexTranscriptionFile": "HMMFiles/DISC/generated/trans_evo_1746.txt",
-  "NistTranscriptionFile": "HMMFiles/phoneCategoriesArp.txt",
+  "celex_transcription_file": "HMMFiles/DISC/generated/trans_evo_1746.txt",
+  "nist_transcription_file": "HMMFiles/phoneCategoriesArp.txt",
   "comparator": "CELEX",
-  "NGramValue": 2,
-  "logLevel": "info",
-  "dataLoader": {
-    "databaseContext": "wordformsDB"
+  "hmm_order": 1,
+  "log_level": "info",
+  "data_loader": {
+    "database_context": "wordforms_db"
   },
   "model": {
     "use_start_tags": true,
     "k_smoothing": 0.0
   },
-  "write_results_to_DB": false,
-  "wordformsDB": {
+  "write_results_to_db": false,
+  "wordforms_db": {
     "default_alphabet": "DISC",
     "path": "../wordforms.db",
     "protected_tables": [
@@ -24,26 +24,26 @@
     "read_permissions": true,
     "write_permissions": true
   },
-  "crossValidation": {
-    "KValue": 10,
-    "NValue": 60000
+  "cross_validation": {
+    "k_value": 10,
+    "n_value": 60000
   },
-  "GeneticAlgorithm": {
-    "MaxThreadCount": 4,
-    "InitialPopulationSize": 4,
-    "PopulationSize": 4,
-    "NumMatingPairs": 1,
-    "NumChromsNotToMutate": 1,
-    "BaseMutationFactor": 0.040,
-    "DesiredDeviation": 1.50,
-    "NumChromsInDeviation": 8,
-    "NumEvolutions": 10,
-    "NumCategories": 15,
-    "CategoryRestriction": "True",
-    "CategoryRestrictionCount": 3,
-    "TrainingSizeHMM": 10000,
-    "TestingSizeHMM": 1000,
-    "GeneList": [ "m", "F", "n", "N", "C",
+  "genetic_algorithm": {
+    "max_thread_count": 4,
+    "initial_population_size": 4,
+    "population_size": 4,
+    "num_mating_pairs": 1,
+    "num_chroms_not_to_mutate": 1,
+    "base_mutation_factor": 0.040,
+    "desired_deviation": 1.50,
+    "num_chroms_in_deviation": 8,
+    "num_evolutions": 10,
+    "num_categories": 15,
+    "category_restriction": "True",
+    "category_restriction_count": 3,
+    "training_size_hmm": 10000,
+    "testing_size_hmm": 1000,
+    "gene_list": [ "m", "F", "n", "N", "C",
                   "H", "p", "b", "t", "d",
                   "k", "g", "J", "_", "f",
                   "v", "T", "D", "s", "z",
@@ -54,9 +54,9 @@
                   "3", "V", "$", "9", "4",
                   "8", "{", "c", "#", "Q",
                   "2", "q", "0", "~"],
-    "LogFileLocation": "GeneticAlgorithm/EvolutionLogs/"
+    "log_file_location": "GeneticAlgorithm/EvolutionLogs/"
   },
-  "PhoneOptimize": {
+  "phone_optimize": {
     "phone_list": ["s"],
     "transcription_file": "test.txt",
     "evo_frequency": 10,

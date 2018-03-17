@@ -18,8 +18,8 @@ import mutate
 class PhoneOptimize:
     def __init__(self):
         self.compute_fitness = ComputeFitness()
-        self.phone_list = settings["PhoneOptimize"]["phone_list"]
-        self.file_name = settings["PhoneOptimize"]["transcription_file"]
+        self.phone_list = settings["phone_optimize"]["phone_list"]
+        self.file_name = settings["phone_optimize"]["transcription_file"]
         self.population = []
         self.opt_phone = ""
         self.celex = Celex()
@@ -75,7 +75,7 @@ class PhoneOptimize:
         Returns:
             1 for a syllabifier file, 2 for a GA file
         """
-        location = GAConfig["LogFileLocation"]
+        location = GAConfig["log_file_location"]
         self.file_name
 
         exten = self.file_name[-4:]
@@ -90,13 +90,13 @@ class PhoneOptimize:
         """
         Pulls an existing population from an evolution log file.
         """
-        location = GAConfig["LogFileLocation"]
+        location = GAConfig["log_file_location"]
         file_name = location + self.file_name
 
         with open(file_name, 'r') as in_file:
             for line in in_file:
                 genes = line.split('\t')
-                new_chromosome = Chromosome(GAConfig["NumCategories"])
+                new_chromosome = Chromosome(GAConfig["num_categories"])
                 for i in range(len(genes) - 1):
                     for gene in genes[i]:
                         new_chromosome.insert_into_category(i, gene)
@@ -117,7 +117,7 @@ class PhoneOptimize:
         """
         Imports a phonetic categorization scheme that relates to the syllablifier
         """
-        location = GAConfig["LogFileLocation"]
+        location = GAConfig["log_file_location"]
         file_name = location + self.file_name
         chrom_list = []
         categories = 0
@@ -154,7 +154,7 @@ class PhoneOptimize:
         """
         Creates the base set of chromosomes to be modified with each phone given
         """
-        for num in range(GAConfig["NumCategories"]**len(self.phone_list)):
+        for num in range(GAConfig["num_categories"]**len(self.phone_list)):
             new_chromosome = self._chrom_copy(self.population[0])
             self.population.append(new_chromosome)
 
@@ -186,11 +186,11 @@ class PhoneOptimize:
         if len(self.phone_list) == 0:
             return
         elif len(self.phone_list) == 1:
-            for spot in range(GAConfig["NumCategories"]):
+            for spot in range(GAConfig["num_categories"]):
                 spot_lst.append([spot])
         elif(len(self.phone_list) == 2):
-            for spot in range(GAConfig["NumCategories"]):
-                for spot2 in range(GAConfig["NumCategories"]):
+            for spot in range(GAConfig["num_categories"]):
+                for spot2 in range(GAConfig["num_categories"]):
                     spot_lst.append([spot,spot2])
         return spot_lst
 
@@ -202,9 +202,9 @@ class PhoneOptimize:
         Returns:
             A non references identical chromosome
         """
-        new_chromosome = Chromosome(GAConfig["NumCategories"])
+        new_chromosome = Chromosome(GAConfig["num_categories"])
 
-        for phone in GAConfig["GeneList"]:
+        for phone in GAConfig["gene_list"]:
             spot = chrom.get_category(phone)
             if(spot != None):
                 new_chromosome.insert_into_category(spot,phone)

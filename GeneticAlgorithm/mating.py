@@ -103,7 +103,7 @@ class Mating:
         total = 0
         fit_list = list()
         fit_list.append(0)
-        amount = config["PopulationSize"]
+        amount = config["population_size"]
         count = 0
         for chrom in population:
             #should do something to make this more dramatic
@@ -130,9 +130,9 @@ class Mating:
         """
 
         for spot in range(len(range_list)):
-            range_list[spot] = range_list[spot] + config["PopulationSize"]/4
+            range_list[spot] = range_list[spot] + config["population_size"]/4
 
-        for num in range(config["PopulationSize"]/4):
+        for num in range(config["population_size"]/4):
             range_list.append(num)
         return range_list
 
@@ -144,7 +144,7 @@ class Mating:
         Returns:
 
         """
-        amount = config["PopulationSize"]/4
+        amount = config["population_size"]/4
         interval = int(1/(float(amount))*10000)
         keep_list = list()
         for spot in range(amount):
@@ -173,7 +173,7 @@ class Mating:
         amount = len(population)
         used_list = []
 
-        for i in range(config["NumMatingPairs"]):
+        for i in range(config["num_mating_pairs"]):
             #currently random
             spot1 = randint(0, amount - 1)
             while spot1 in used_list:
@@ -203,7 +203,7 @@ class Mating:
             A vector of 0's and 1's.
         """
         vector = list()
-        amount = len(config["GeneList"])
+        amount = len(config["gene_list"])
         for count in range(amount):
             rand_num = randint(0,1)
             vector.append(rand_num)
@@ -221,11 +221,11 @@ class Mating:
         """
 
         vector = self._create_vector()
-        child1 = Chromosome(config["NumCategories"])
+        child1 = Chromosome(config["num_categories"])
         child1.set_fitness(0)
-        child2 = Chromosome(config["NumCategories"])
+        child2 = Chromosome(config["num_categories"])
         child2.set_fitness(0)
-        gene_list = config["GeneList"]
+        gene_list = config["gene_list"]
 
         # exchanging the phones into their new, mated categories
         for index in range(len(gene_list)):
@@ -258,7 +258,7 @@ class Mating:
         child1.set_fitness(0)
 
         # exchanging the phones into their new, mated categories
-        for phone in config["GeneList"]:
+        for phone in config["gene_list"]:
             rand_num = randint(0, 100)
             # father
             if 0 <= rand_num <= father_range:

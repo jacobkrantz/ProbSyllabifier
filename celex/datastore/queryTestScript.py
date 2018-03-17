@@ -7,7 +7,7 @@ from sqlQueryService import SQLQueryService
 # 2) to ensure it works.
 
 print "Running Query Test..."
-qs = SQLQueryService("wordformsDB")
+qs = SQLQueryService("wordforms_db")
 
 
 def pronunciation_test():
