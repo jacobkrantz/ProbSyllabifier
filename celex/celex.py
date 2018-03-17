@@ -104,7 +104,8 @@ class Celex(AbstractSyllabRunner):
             testing_set = set(validation_list[lower_bound:upper_bound])
             training_set = set(validation_list) - set(testing_set)
             self._populate_training_structures(training_set, testing_set)
-            results_list.append(float(self.test_hmm(self.train_hmm())))
+            accuracy, ignore = self.test_hmm(self.train_hmm())
+            results_list.append(float(accuracy))
 
         accuracy = round(sum(results_list) / float(len(results_list)), 2)
         log.info("Cross-validated accuracy: " + str(accuracy) + "%")

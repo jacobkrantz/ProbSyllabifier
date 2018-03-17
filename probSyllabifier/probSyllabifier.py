@@ -52,7 +52,11 @@ class ProbSyllabifier:
             string: observation string with '-'
                             representing syllable boundaries.
         """
-        states = self._model.decode(self._format_obs(observation))
+        try:
+            states = self._model.decode(self._format_obs(observation))
+        except ValueError:
+            # observation was OOV, so no HMM output
+            return ""
         return self._combine(observation, states)
 
     # ---------------- #
