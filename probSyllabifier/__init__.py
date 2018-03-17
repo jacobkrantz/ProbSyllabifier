@@ -1,3 +1,1 @@
-from HMMBO import HMMBO
-from hmm import HMM
-from probSyllabifier import ProbSyllabifier
+from probSyllabifier_new import ProbSyllabifier as ProbSyllabifierNew

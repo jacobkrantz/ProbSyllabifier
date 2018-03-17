@@ -4,8 +4,8 @@ import logging as log
 
 from config import settings as config
 from datastore import SQLQueryService
-from probSyllabifier import ProbSyllabifier, HMM
 from utils import AbstractSyllabRunner
+from probSyllabifier import ProbSyllabifierNew as psn
 
 
 # transcriptionSchemes passed in will be modified to include
@@ -43,38 +43,31 @@ class Celex(AbstractSyllabRunner):
 
     def train_hmm(self, transcription_scheme=[]):
         """
-        Trains a Hidden Markov Model.
+        Trains a ProbSyllabifier model.
         Args:
             transcription_scheme (list<list<phone>>): optional. Defines a
                 categorization for all phones. Defaults to file specified
                 in `config.json`.
         Returns:
-            hmmbo (HMMBO): Hidden Markov Model Business Object
-                holds trained matrices and lookups.
+            ps_model (ProbSyllabifier): A fully trained model.
         """
         log.debug("Starting step: Train HMM Model")
-        self.hmm = HMM(
-            2,  # lang hack: 2 is celex
-            self.add_static_tags(transcription_scheme),
-            self._syllabifiedLst
-        )
-        hmmbo = self.hmm.train()
+        ps_model = psn(transcription_scheme)
+        ps_model.train(self._syllabifiedLst)
         log.debug("Finished step: Train HMM Model")
-        return hmmbo
+        return ps_model
 
-    def test_hmm(self, hmmbo):
+    def test_hmm(self, ps_model):
         """
         Runs the ProbSyllabifier on all testing examples.
         Thread-safe when DB results is false.
         Args:
-            hmmbo (HMMBO): Hidden Markov Model Business Object
-                holds trained matrices and lookups.
+            ps_model (ProbSyllabifier): A fully trained model.
         Returns:
             float: percent same formatted to two decimal places.
             list<tuple(p_syl_result, c_syl_result, same): entire test results
         """
-        p_syl_results_dict = self._syllabify_testing(hmmbo)
-
+        p_syl_results_dict = self._syllabify_testing(ps_model)
         test_results_list = self._combine_results(p_syl_results_dict)
 
         if config["write_results_to_DB"]:
@@ -126,26 +119,23 @@ class Celex(AbstractSyllabRunner):
         """
         return self.SQLQueryService.get_incorrect_results()
 
-    def syllabify(self, hmmbo, observation):
+    def syllabify(self, ps_model, observation):
         """
         Function call for single syllabification.
         Args:
-            hmmbo (HMMBO): Hidden Markov Model Business Object
-                holds trained matrices and lookups.
+            ps_model (ProbSyllabifier): A fully trained model.
             observation (string): sequence of phones to be syllabified.
         Returns:
             string: observation syllabified where '-'
                     represents syllable breaks.
         """
-        self.ps = ProbSyllabifier(hmmbo)
-        return self.ps.syllabify(observation, "CELEX")
+        return ps_model.syllabify(observation, "CELEX")
 
     def syllabify_file(self, file_in, file_out):
         """
         Not currently maintained (11/27)
         """
-        self.ps = ProbSyllabifier(hmmbo)
-        self.ps.syllabify_file(file_in, file_out, "CELEX")
+        raise NotImplementedError
 
     # ---------------- #
     #    "Private"     #
@@ -172,23 +162,18 @@ class Celex(AbstractSyllabRunner):
             self.SQLQueryService.get_many_pronunciations(testing_set)
         )
 
-    def _syllabify_testing(self, hmmbo):
+    def _syllabify_testing(self, ps_model):
         """
         Syllabifies the test set using ProbSyllabifier.
         Args:
-            hmmbo (HMMBO): Hidden Markov Model Business Object
-                holds trained matrices and lookups.
+            ps_model (ProbSyllabifier): A fully trained model.
         Returns:
             dictionary <test word, syllabification>
         """
         log.debug("Starting step: Syllabify ProbSyllabifier")
-        self.ps = ProbSyllabifier(hmmbo)
         p_syl_results_dict = {}
         for word, pronunciation in self._pronunciationsDict.iteritems():
-            p_syl_results_dict[word] = self.ps.syllabify(
-                pronunciation,
-                "CELEX"
-            )
+            p_syl_results_dict[word] = ps_model.syllabify(pronunciation)
 
         log.debug("Finished step: Syllabify ProbSyllabifier")
         return p_syl_results_dict

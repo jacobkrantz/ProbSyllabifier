@@ -49,6 +49,7 @@ class ProbSyllabifier:
             string: observation string with '-'
                             representing syllable boundaries.
         """
+        print observation
         self.comparator = comparator
         obs_lst = self.__make_obs_lst(observation)
 

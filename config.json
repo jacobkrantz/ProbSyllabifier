@@ -8,7 +8,7 @@
   "dataLoader": {
     "databaseContext": "wordformsDB"
   },
-  "write_results_to_DB": false,
+  "write_results_to_DB": true,
   "wordformsDB": {
     "default_alphabet": "DISC",
     "path": "../wordforms.db",

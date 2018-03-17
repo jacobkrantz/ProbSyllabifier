@@ -1,7 +1,6 @@
 from __future__ import print_function
 
 from nistClient import NISTClient
-from probSyllabifier import HMM, ProbSyllabifier
 from testing import CompareNIST
 from utils import AbstractSyllabRunner, FrequentWords as FW
 
