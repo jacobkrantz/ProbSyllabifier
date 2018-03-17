@@ -54,22 +54,14 @@ class AbstractHmmUtils(object):
         Returns:
             character: unique name of category that the phone belongs to.
         """
-        if transcription_scheme:
-            for category in transcription_scheme:
-                if phone in category:
-                    # return an ascii character starting at 'a'
-                    return chr(transcription_scheme.index(category) + 97)
-            raise LookupError(phone + " not found in tagset.")
+        phone = phone.upper() if(lang == 1) else phone
+        if not transcription_scheme:
+            transcription_scheme = self.get_tag_names(lang)
 
-        cat = ""
-        tag_names = self.get_tag_names(lang)
-        if lang == 1:
-            phone = phone.upper()
-
-        for category in tag_names:
+        for category in transcription_scheme:
             if phone in category:
-                cat = category[0]
-                return cat[0]  # remove trailing unique ID
+                # return an ascii character starting at 'a'
+                return chr(transcription_scheme.index(category) + 97)
         raise LookupError(phone + " not found in tagset.")
 
     # imports the tags from a specific file.
