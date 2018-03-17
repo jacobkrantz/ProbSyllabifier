@@ -5,7 +5,7 @@ import logging as log
 from config import settings as config
 from datastore import SQLQueryService
 from utils import AbstractSyllabRunner
-from probSyllabifier import ProbSyllabifierNew as psn
+from probSyllabifier import ProbSyllabifier as ps
 
 
 # transcriptionSchemes passed in will be modified to include
@@ -52,7 +52,7 @@ class Celex(AbstractSyllabRunner):
             ps_model (ProbSyllabifier): A fully trained model.
         """
         log.debug("Starting step: Train HMM Model")
-        ps_model = psn(transcription_scheme)
+        ps_model = ps(transcription_scheme)
         ps_model.train(self._syllabifiedLst)
         log.debug("Finished step: Train HMM Model")
         return ps_model

@@ -1,15 +1,15 @@
 from __future__ import print_function
 
 from nistClient import NISTClient
-from testing import CompareNIST
-from utils import AbstractSyllabRunner, FrequentWords as FW
+# from testing import CompareNIST
+from utils import AbstractSyllabRunner#, FrequentWords as FW
 
 
 class NIST(AbstractSyllabRunner):
 
     def __init__(self):
         self.nist_client = NISTClient()
-        self.c_nist = CompareNIST()
+        # self.c_nist = CompareNIST()
         self._lang = 1  # 1 == NIST, needed for HMM. outdated.
 
     def train_hmm(self):
@@ -86,14 +86,15 @@ class NIST(AbstractSyllabRunner):
 
     # builds word set files to be used in NIST syllabification
     def _generate_words(self, file_in, test_file_in):
-        fw = FW()
-        num_words = int(raw_input("Enter number of words to syllabify: "))
-        num_test_words = int(raw_input("Enter number of words to test on: "))
-
-        # pulling from entire corpus or editorials
-        file_in = "./corpusFiles/brown_words.txt"  # /editorial_words.txt
-        fw_out = "./corpusFiles/freqWords.txt"
-
-        fw.generate_most_freq(file_in, fw_out, num_words)
-        # testFileIn is outfile
-        fw.generate_testing(file_in, test_file_in, num_test_words)
+        # fw = FW()
+        # num_words = int(raw_input("Enter number of words to syllabify: "))
+        # num_test_words = int(raw_input("Enter number of words to test on: "))
+        #
+        # # pulling from entire corpus or editorials
+        # file_in = "./corpusFiles/brown_words.txt"  # /editorial_words.txt
+        # fw_out = "./corpusFiles/freqWords.txt"
+        #
+        # fw.generate_most_freq(file_in, fw_out, num_words)
+        # # testFileIn is outfile
+        # fw.generate_testing(file_in, test_file_in, num_test_words)
+        pass

@@ -10,12 +10,12 @@ Contains classes for testing the performance of Syllabifiers.
 """
 from __future__ import print_function
 
-from utils import SyllabParser
+# from utils import SyllabParser
 
 
 class CompareNIST:
     def __init__(self):
-        self.s_parser = SyllabParser()
+        # self.s_parser = SyllabParser()
         self.__dif_lst = []
         self.__n_syllabs = []
         self.__c_syllabs = []
@@ -67,7 +67,8 @@ class CompareNIST:
         :param file_name:
         :return:
         """
-        return self.s_parser.make_nist_phoneme_lst(file_name)
+        # return self.s_parser.make_nist_phoneme_lst(file_name)
+        pass
 
     def __run_comparison(self):
         """

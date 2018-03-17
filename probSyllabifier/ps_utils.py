@@ -39,6 +39,8 @@ class Utils:
             ValueError when the word parameter is not
                 a legal syllabification.
         """
+        if config["model"]["use_start_tags"]:
+            word = '<' + word + '>'
         word = list(word.encode('utf-8'))
         word_len = len(word)
         obs = []

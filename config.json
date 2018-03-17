@@ -8,6 +8,10 @@
   "dataLoader": {
     "databaseContext": "wordformsDB"
   },
+  "model": {
+    "use_start_tags": true,
+    "k_smoothing": 0.0
+  },
   "write_results_to_DB": true,
   "wordformsDB": {
     "default_alphabet": "DISC",

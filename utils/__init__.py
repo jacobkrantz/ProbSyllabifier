@@ -1,7 +1,2 @@
 from abstractSyllabRunner import AbstractSyllabRunner
-from bigramHmmUtils import BigramHmmUtils
 from emailClient import EmailClient
-from freqLst import FrequentWords
-from syllabParser import SyllabParser
-from syllabTools import SyllabTools
-from trigramHmmUtils import TrigramHmmUtils

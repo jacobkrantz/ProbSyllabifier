@@ -6,7 +6,7 @@ from celex import Celex
 class TestCelex(unittest.TestCase):
     def setUp(self):
         self.celex = Celex()
-        self.celex.load_sets(500, 25)
+        self.celex.load_sets(1000, 25)
         self.transcription_scheme = [
             ['b', 'h', 'z', 'm', '0', 'x', 'Z'],
             ['p', 'C', 'T', '_', 'v'],
@@ -25,14 +25,6 @@ class TestCelex(unittest.TestCase):
     def tearDown(self):
         self.celex = None
         self.transcriptionScheme = None
-
-    def test_hmmbo(self):
-        hmmbo = self.celex.train_hmm(self.transcription_scheme)
-        self.assertGreater(len(hmmbo.observation_lookup), 0)
-        self.assertGreater(len(hmmbo.hidden_lookup), 0)
-        self.assertGreater(len(hmmbo.transcription_scheme), 0)
-        self.assertIsNotNone(hmmbo.matrix_a)
-        self.assertIsNotNone(hmmbo.matrix_b)
 
     def test_with_transcription(self):
         hmmbo = self.celex.train_hmm(self.transcription_scheme)

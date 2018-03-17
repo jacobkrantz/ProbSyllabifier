@@ -22,6 +22,10 @@ Standard output log verbosity:
 `info`: Shows results and warnings.  
 `warning`: Shows issues with what is going in the program, such as word's being skipped.  
 
+### Model parameters:
+use_start_tags: insert `<` as a start tag and `>` as an end tag to all words. `true` or `false`  
+k_smoothing: Add a smoothing value to all HMM probabilities. Float greater than or equal to `0.0`  
+
 ### Database configuration files:
 databaseContext: The database that is being used for the system.  
 write_results_to_DB: Write to the database or not in the program. `true` or `false`  

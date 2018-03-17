@@ -1,1 +1,1 @@
-from probSyllabifier_new import ProbSyllabifier as ProbSyllabifierNew
+from probSyllabifier import ProbSyllabifier, Utils
