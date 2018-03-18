@@ -82,11 +82,13 @@ class Celex(AbstractSyllabRunner):
         )
         return percent_same, test_results_list
 
-    def cross_validate(self):
+    def cross_validate(self, validation_list=None):
         """
         Using k-fold cross-validation, determine the predicted
         practical syllabification accuracy of the current system.
         Outputs each run to logs. Outputs final accuracy to logs.
+        Args:
+            validation_list. optional, default to None.
         Returns:
             float: cross validated ProbSyllabifier accuracy
         """
@@ -95,9 +97,9 @@ class Celex(AbstractSyllabRunner):
         subset_size = n_value / k_value
         results_list = []
 
-        validation_list = list(self._to_ascii(
-            self.SQLQueryService.get_word_subset(n_value)
-        ))
+        if validation_list == None:
+            validation_list = self._get_validation_list()
+
         for i in range(k_value):
             lower_bound = i * subset_size
             upper_bound = (i + 1) * subset_size
@@ -110,6 +112,38 @@ class Celex(AbstractSyllabRunner):
         accuracy = round(sum(results_list) / float(len(results_list)), 2)
         log.info("Cross-validated accuracy: " + str(accuracy) + "%")
         return accuracy
+
+    def optimize_smoothing(self):
+        """
+        Overrides the k_smoothing parameter in the config to determine
+        the smoothing value that maximizes syllabification accuracy. Prints
+        results to logs without updating the config file. To be ran after a
+        syllabification scheme has been found by optimize.py and before
+        finalizing publishable results.
+        Returns:
+            list<float> all smoothing values that produce a maximized
+                syllabification accuracy. Length 1 or greater.
+        """
+        results = dict()
+        prev_smoothing = config["model"]["k_smoothing"]
+        for smoothing_param in [float(x)/10 for x in range(11)]:
+            log.info("Testing k_smoothing at: " + str(smoothing_param))
+            config["model"]["k_smoothing"] = smoothing_param
+            validation_list = self._get_validation_list()
+            results[smoothing_param] = self.cross_validate(validation_list)
+
+        config["model"]["k_smoothing"] = prev_smoothing
+        log.info("smoothing results:")
+        for tup in results.items():
+            print(str(tup[0]) + " -> " + str(tup[1]))
+        max_accuracy = max(results.values())
+        return [k for k in results.keys() if results[k] == max_accuracy]
+
+    def _get_validation_list(self):
+        """ returns a list of words to be used in cross-validation"""
+        return list(self._to_ascii(
+            self.SQLQueryService.get_word_subset(config["cross_validation"]["n_value"])
+        ))
 
     def get_incorrect_results(self):
         """

@@ -95,7 +95,8 @@ def main():
             3. Test Results
             4. Phone Optimization
             5. Cross Validate on CELEX
-            6. Quit\n"""
+            6. Optimize smoothing on CELEX
+            7. Quit\n"""
         )
 
         try:
@@ -133,6 +134,9 @@ def main():
 
         elif choice == 5:
             celex.cross_validate()
+
+        elif choice == 6:
+            celex.optimize_smoothing()
 
 
 if __name__ == '__main__':
