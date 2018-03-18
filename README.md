@@ -14,6 +14,12 @@ To work with this syllabification software in Celex, you need a have a copy of t
 `wordforms.db` contains part of the Celex linguistics dataset refactored to integrate more easily into this python project.  
 To work with the NIST source, you need to have [NIST syllabification Software](https://www.nist.gov/file/65961) installed.  
 Other data sources are possible but not implemented, such as Miriam Webster.  
+This project further has certain dependencies. For now, you must install these using the `requirements.txt` file. For `pypy`:   
+`>>> pypy -m pip install -r requirements.txt`  
+For `Python 2 or 3`:  
+`>>> pip install -r requirements.txt`  
+If these attempts fail, try running commands with `sudo`.
+
 ### Running the Syllabifier  
 A typical run of the syllabifier will involve training the HMM, running the syllabifier, and obtaining an output accuracy. To run the syllabifier, call:  
 `$ python run.py`  
@@ -49,15 +55,15 @@ from celex import Celex
 c = Celex()
 c.load_sets(10000, 1500) # training_size, testing_size
 
-# train the A and B matrices of the Hidden Markov Model.
+# train the Hidden Markov Model using the Simple-HOHMM library.
 # pass in a transcriptionScheme that contains all phone categories (see test/test_celex.py)
 # or default to specification in config.json.
-hmmbo = c.train_hmm()
+ps_model = c.train_hmm()
 
 # accuracy is the percentage of whole words syllabified correctly.
 # test_results is a detailed look at the test run: list<tuple(generated_result, celex_result, isSame)>
-# Pass in the provided HMMBO trained data object to test the syllabifier.
-accuracy, test_results = c.test_hmm(hmmbo)
+# Pass in the trained model to test the syllabifier.
+accuracy, test_results = c.test_hmm(ps_model)
 ```
 
 ## Tests
@@ -71,7 +77,7 @@ $ python -m unittest discover -s test
 `test_celex.py` ensures that Celex training and testing work with both a given transcription scheme and without.  
 `test_mutate.py` ensures the mutation factor generation is accurate and mutates the proper chromosomes of the population.  
 `test_sql_query_service.py` ensures the database queries all act as expected.  
-`test_syllab_parser.py` ensures the tuples are extracted correctly from the CELEX training data.  
+`test_syllab_parser.py` ensures the observation and hidden state sequences are correctly synthesized from the word inputs.  
 
 ## Contributors
 Suggestions, issues, and pull requests are welcomed!  
