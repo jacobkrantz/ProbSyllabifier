@@ -84,7 +84,7 @@ def main():
     trained_comparator = config["comparator"]
     choice = 0
     hmmbo = None
-    while choice != 6:
+    while choice != 7:
         print("\n" + Color.BOLD + "Main Menu" + Color.END)
         print("Comparator: " + Color.YELLOW + comparator + Color.END)
         option_select = textwrap.dedent(
