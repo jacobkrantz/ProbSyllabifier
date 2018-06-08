@@ -5,13 +5,13 @@ Create an automatic, probabilistic syllabifier that can achieve the highest poss
 Words are represented as a sequence of sounds using the phonetic alphabet DISC, a digital version of IPA. Data source: Celex.  
 Also trains and tests against NIST with Arpabet. Word sets for NIST are generated using the Brown Corpus with custom tokenization.  
 #### Background  
-This is a research project sponsored by Gonzaga University Department of Computer Science. Director of research is Dr. Paul De Palma. Presentation of this work was done at the Spokane Intercollegiate Research Conference (SIRC) in Spokane, WA, earning the Top Oral Presentation award. Also presented at Gonzaga's Research Showcase Poster Session.
+This is a research project sponsored by Gonzaga University Department of Computer Science. Director of research is Dr. Paul De Palma. Presentation of this work was done at the Spokane Intercollegiate Research Conference (SIRC) in Spokane, WA, earning the Top Oral Presentation award. Also presented at Gonzaga's Research Showcase Poster Session. A paper detailing the work done in this project will be published in the companion proceedings at the [GECCO](http://gecco-2018.sigevo.org/) conference in Kyoto, Japan in July 2018.  
 
 ---
 ## Syllabification
 ### Getting Started
 To work with this syllabification software in Celex, you need a have a copy of the dataset.  
-`wordforms.db` contains part of the Celex linguistics dataset refactored to integrate more easily into this python project.  
+`wordforms.db` contains part of the [Celex linguistics dataset](http://celex.mpi.nl/) refactored to integrate more easily into this python project.  
 To work with the NIST source, you need to have [NIST syllabification Software](https://www.nist.gov/file/65961) installed.  
 Other data sources are possible but not implemented, such as Miriam Webster.  
 This project further has certain dependencies. For now, you must install these using the `requirements.txt` file. For `pypy`:   
