@@ -142,7 +142,7 @@ class Mating:
         Args:
             range_list(list): a list of the areas that the population owns.
         Returns:
-
+            keep_list(list): a list of the chromosomes to keep.
         """
         amount = config["population_size"]/4
         interval = int(1/(float(amount))*10000)

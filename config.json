@@ -29,10 +29,10 @@
     "n_value": 60000
   },
   "genetic_algorithm": {
-    "max_thread_count": 4,
-    "initial_population_size": 4,
-    "population_size": 4,
-    "num_mating_pairs": 1,
+    "max_thread_count": 8,
+    "initial_population_size": 16,
+    "population_size": 16,
+    "num_mating_pairs": 4,
     "num_chroms_not_to_mutate": 1,
     "base_mutation_factor": 0.040,
     "desired_deviation": 1.50,
@@ -41,8 +41,8 @@
     "num_categories": 15,
     "category_restriction": "True",
     "category_restriction_count": 3,
-    "training_size_hmm": 10000,
-    "testing_size_hmm": 1000,
+    "training_size_hmm": 1000,
+    "testing_size_hmm": 300,
     "gene_list": [ "m", "F", "n", "N", "C",
                   "H", "p", "b", "t", "d",
                   "k", "g", "J", "_", "f",
@@ -59,8 +59,8 @@
   "phone_optimize": {
     "phone_list": ["s"],
     "transcription_file": "test.txt",
-    "evo_frequency": 10,
-    "evo_at_least": 200
+    "evo_frequency": 2,
+    "evo_at_least": 0
   },
   "email": {
     "from_address": "cps.research.krantz@gmail.com",

@@ -47,7 +47,9 @@ class PhoneOptimize:
         self._insert_phones()
         self.population = self.compute_fitness.compute(self.population)
         self._sort()
-        scheme[spot] = self.population[0]
+
+        ## replaces the worst scheme with the best scheme. 
+        scheme[-1] = self.population[0]
         return scheme
 
     def make_population(self):
