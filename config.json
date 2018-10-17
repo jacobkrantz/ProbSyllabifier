@@ -15,7 +15,7 @@
   "write_results_to_db": false,
   "wordforms_db": {
     "default_alphabet": "DISC",
-    "path": "../wordforms.db",
+    "path": "wordforms.db",
     "protected_tables": [
       "words",
       "pronunciations",
