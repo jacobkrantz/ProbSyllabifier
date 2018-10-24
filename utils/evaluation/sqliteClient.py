@@ -20,7 +20,6 @@ class SQLiteClient:
             not protected against SQL injection
         :return: None
         """
-        self._check_permissions("write_permissions")
         column_inserts = ""
         for column_and_type_tuple in columns_and_types.items():
             column_inserts += (column_and_type_tuple[0] + " "
@@ -38,8 +37,6 @@ class SQLiteClient:
         :param table_name: string, Table must exist
         :return: None
         """
-        self._check_permissions("write_permissions")
-        self._check_protected(table_name)
         sql = """ DELETE FROM %s """ % self._scrub_parameter(table_name)
         with closing(self.connection.cursor()) as cursor:
             cursor.execute(sql)
@@ -50,9 +47,6 @@ class SQLiteClient:
         :param table_name: Table must exist
         :return: None
         """
-
-        self._check_permissions("write_permissions")
-        self._check_protected(table_name)
         sql = (""" DROP TABLE IF EXISTS %s """
                % self._scrub_parameter(table_name))
         with closing(self.connection.cursor()) as cursor:
@@ -66,7 +60,6 @@ class SQLiteClient:
             defined table columns
         :return: None
         """
-        self._check_permissions("write_permissions")
         places = ','.join(['?'] * len(data_dict))
         keys = ','.join(data_dict.iterkeys())
         values = tuple(data_dict.itervalues())
@@ -88,23 +81,6 @@ class SQLiteClient:
         """
 
         return ''.join(char for char in sql_parameter if char.isalnum())
-
-    def _check_permissions(self, which_permission):
-        """
-        :param which_permission: string, can be:
-            "read_permissions" OR "write_permissions"
-        :raises PermissionsException
-        :return: True
-        """
-        return
-
-    def _check_protected(self, table_name):
-        """
-        :param table_name: string
-        :raises PermissionsException
-        :return: True
-        """
-        return
 
 
 class PermissionsException(Exception):

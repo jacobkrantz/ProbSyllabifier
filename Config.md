@@ -29,11 +29,10 @@ k_smoothing: Add a smoothing value to all HMM probabilities. Float greater than 
 ### Database configuration files:
 database_context: The database that is being used for the system.  
 write_results_to_db: Write to the database or not in the program. `true` or `false`  
+language: Which language to use the syllabifier with. Currently supports `English`.  
 default_alphabet: The phonetic alphabet in usage, which is in database. (Currently only using `DISC`)  
 path: Where the database is stored at locally.  
-protected_tables: A list of tables that cannot be wrote over.  
-read_permissions: Whether the database can be read by the user.  
-write_permissions: Whether the database can be written into by the user.  
+protected_tables: A list of tables that cannot be wrote over.   
 
 ## Accuracy Testing  
 cross_validation: k-fold cross-validation used for testing publishable syllabification accuracy.  

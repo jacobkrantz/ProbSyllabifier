@@ -68,6 +68,7 @@ accuracy, test_results = c.test_hmm(ps_model)
 
 ## Tests
 Tests should be ran before any pull requests.  
+Warning! Tests currently only work when config `'language'='English'`.
 Unit tests are implemented in Python's `unittest` module and accessed through:  
 ```
 $ cd ProbSyllabifier

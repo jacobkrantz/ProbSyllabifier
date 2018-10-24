@@ -14,15 +14,16 @@
   },
   "write_results_to_db": false,
   "wordforms_db": {
+    "language": "English",
     "default_alphabet": "DISC",
     "path": "wordforms.db",
     "protected_tables": [
       "words",
       "pronunciations",
-      "syllabifications"
-    ],
-    "read_permissions": true,
-    "write_permissions": true
+      "syllabifications",
+      "Dutch",
+      "CleanDutch"
+    ]
   },
   "cross_validation": {
     "k_value": 10,

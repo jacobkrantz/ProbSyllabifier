@@ -11,8 +11,6 @@ class SQLQueryService(SQLiteClient):
         :param word: string
         :return: string, "" if word is not in the database
         """
-        self._check_permissions("read_permissions")
-
         query = """
             SELECT %s
             FROM pronunciations
@@ -31,7 +29,6 @@ class SQLQueryService(SQLiteClient):
             if the word does not exist in the database, entry is not
             returned
         """
-        self._check_permissions("read_permissions")
         batch_size = 100
         batch_lst = []
         many_pros = []
@@ -48,8 +45,6 @@ class SQLQueryService(SQLiteClient):
         :param word: string
         :return: string, "" if word is not in the database
         """
-        self._check_permissions("read_permissions")
-
         query = """
             SELECT %s
             FROM syllabifications
@@ -68,7 +63,6 @@ class SQLQueryService(SQLiteClient):
             if the word does not exist in the database, entry is not
             returned
         """
-        self._check_permissions("read_permissions")
         batch_size = 100
         batch_lst = []
         many_syls = []
@@ -85,7 +79,6 @@ class SQLQueryService(SQLiteClient):
         :param table_name: string
         :return: integer, total number of words in a given table
         """
-        self._check_permissions("read_permissions")
         query = """
             SELECT COUNT(Word)
             FROM %s
@@ -94,23 +87,7 @@ class SQLQueryService(SQLiteClient):
             cursor.execute(query)
             return cursor.fetchone()[0]
 
-    def get_is_same_syllabification_count(self, ignore_skipped=False):
-        self._check_permissions("read_permissions")
-        if ignore_skipped:
-            where_prob_syl_not_empty = 'AND ProbSyl != ""'
-        else:
-            where_prob_syl_not_empty = ""
-        query = """
-            SELECT COUNT(Word)
-            FROM workingresults
-            WHERE Same = 1
-            """
-        with closing(self.connection.cursor()) as cursor:
-            cursor.execute(query)
-            return cursor.fetchone()[0]
-
     def get_skipped_prob_syl_count(self):
-        self._check_permissions("read_permissions")
         query = """
             SELECT COUNT(Word)
             FROM workingresults
@@ -127,7 +104,6 @@ class SQLQueryService(SQLiteClient):
             selects all rows that are incorrect.
             returns a unicode 4-tuple (word, probSyl, celexSylab, isSame)
         """
-        self._check_permissions("read_permissions")
         query = """
             SELECT *
             FROM workingresults
@@ -142,7 +118,6 @@ class SQLQueryService(SQLiteClient):
             selects all rows that are correct.
             returns a unicode 4-tuple (word, probSyl, celexSylab, isSame)
         """
-        self._check_permissions("read_permissions")
         query = """
             SELECT CSyl
             FROM workingresults
@@ -158,7 +133,6 @@ class SQLQueryService(SQLiteClient):
         :return: set of words in ASCII encoding
         """
         # this implementation makes me sad, but it works.
-        self._check_permissions("read_permissions")
         if (number_of_words + len(word_blacklist)
                 > self._get_count_of_word_entries):
             raise IndexException(

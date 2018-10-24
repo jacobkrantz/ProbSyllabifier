@@ -10,6 +10,7 @@ class SQLiteClient:
 
     def __init__(self):
         self._database_context = config["data_loader"]["database_context"]
+        self._language = config[self._database_context]["language"]
         self.connection = sqlite3.connect(
             config[self._database_context]["path"]
         )
@@ -21,7 +22,6 @@ class SQLiteClient:
             not protected against SQL injection
         :return: None
         """
-        self._check_permissions("write_permissions")
         column_inserts = ""
         for column_and_type_tuple in columns_and_types.items():
             column_inserts += (column_and_type_tuple[0] + " "
@@ -39,7 +39,6 @@ class SQLiteClient:
         :param table_name: string, Table must exist
         :return: None
         """
-        self._check_permissions("write_permissions")
         self._check_protected(table_name)
         sql = """ DELETE FROM %s """ % self._scrub_parameter(table_name)
         with closing(self.connection.cursor()) as cursor:
@@ -51,8 +50,6 @@ class SQLiteClient:
         :param table_name: Table must exist
         :return: None
         """
-
-        self._check_permissions("write_permissions")
         self._check_protected(table_name)
         sql = (""" DROP TABLE IF EXISTS %s """
                % self._scrub_parameter(table_name))
@@ -67,8 +64,6 @@ class SQLiteClient:
             defined table columns
         :return: None
         """
-        self._check_permissions("write_permissions")
-        places = ','.join(['?'] * len(data_dict))
         keys = ','.join(data_dict.iterkeys())
         values = tuple(data_dict.itervalues())
         sql = (""" INSERT INTO %s (%s) VALUES %s """
@@ -80,20 +75,6 @@ class SQLiteClient:
     # ---------------- #
     #    "Private"     #
     # ---------------- #
-
-    def _check_permissions(self, which_permission):
-        """
-        :param which_permission: string, can be:
-            "read_permissions" OR "write_permissions"
-        :raises PermissionsException
-        :return: True
-        """
-        if not config[self._database_context][which_permission]:
-            raise PermissionsException(
-                "User does not have permission: " + which_permission
-            )
-        else:
-            return True
 
     def _check_protected(self, table_name):
         """

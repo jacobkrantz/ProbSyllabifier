@@ -1,4 +1,5 @@
 import multiprocessing
+import Queue
 import time
 
 from activePool import ActivePool
@@ -54,7 +55,7 @@ class ComputeFitness:
                     population[index].set_results(results_list)
                     pulled_results += 1
 
-            except Queue.empty:
+            except Queue.Empty:
                 pass
             time.sleep(1)
 

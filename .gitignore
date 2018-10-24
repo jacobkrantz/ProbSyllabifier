@@ -90,3 +90,6 @@ ENV/
 
 # Python modules
 .pyc
+
+# VSCode
+.vscode
