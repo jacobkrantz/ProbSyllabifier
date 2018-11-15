@@ -14,15 +14,16 @@
   },
   "write_results_to_db": false,
   "wordforms_db": {
-    "language": "English",
-    "default_alphabet": "DISC",
+    "language": "Italian",
+    "default_alphabet": "SAMPA",
     "path": "wordforms.db",
     "protected_tables": [
       "words",
       "pronunciations",
       "syllabifications",
       "Dutch",
-      "CleanDutch"
+      "CleanDutch",
+      "Italian"
     ]
   },
   "cross_validation": {
@@ -30,37 +31,27 @@
     "n_value": 60000
   },
   "genetic_algorithm": {
-    "max_thread_count": 8,
-    "initial_population_size": 16,
-    "population_size": 16,
-    "num_mating_pairs": 4,
+    "max_thread_count": 3,
+    "initial_population_size": 4,
+    "population_size": 4,
+    "num_mating_pairs": 1,
     "num_chroms_not_to_mutate": 1,
     "base_mutation_factor": 0.040,
     "desired_deviation": 1.50,
     "num_chroms_in_deviation": 8,
     "num_evolutions": 10,
     "num_categories": 15,
-    "category_restriction": "True",
+    "category_restriction": "False",
     "category_restriction_count": 3,
     "training_size_hmm": 1000,
     "testing_size_hmm": 300,
-    "gene_list": [ "m", "F", "n", "N", "C",
-                  "H", "p", "b", "t", "d",
-                  "k", "g", "J", "_", "f",
-                  "v", "T", "D", "s", "z",
-                  "S", "Z", "x", "h", "j",
-                  "w", "r", "R", "l", "P",
-                  "6", "7", "i", "u", "I",
-                  "U", "1", "5", "@", "E",
-                  "3", "V", "$", "9", "4",
-                  "8", "{", "c", "#", "Q",
-                  "2", "q", "0", "~"],
+    "gene_file" : "HMMFiles/SAMPA/SAMPA_phones.txt",
     "log_file_location": "GeneticAlgorithm/EvolutionLogs/"
   },
   "phone_optimize": {
     "phone_list": ["s"],
     "transcription_file": "test.txt",
-    "evo_frequency": 2,
+    "evo_frequency": 1,
     "evo_at_least": 0
   },
   "email": {

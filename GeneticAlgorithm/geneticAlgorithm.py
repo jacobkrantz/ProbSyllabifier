@@ -22,6 +22,7 @@ class GeneticAlgorithm:
         self.population = []
         self.mating = Mating()
         self.computeFitness = ComputeFitness()
+        self.phones = []
         self.phone_opt = PhoneOptimize()
 
     def display_parameters(self):
@@ -32,7 +33,7 @@ class GeneticAlgorithm:
         mf = GAConfig["base_mutation_factor"]
         ne = GAConfig["num_evolutions"]
         noc = GAConfig["num_categories"]
-        nog = len(GAConfig["gene_list"])
+        nog = len(self.phones)
 
         display_string = """
     Genetic Algorithm Parameters
@@ -56,7 +57,7 @@ class GeneticAlgorithm:
         """
         for i in range(GAConfig["initial_population_size"]):
             new_chromosome = Chromosome(GAConfig["num_categories"])
-            for gene in GAConfig["gene_list"]:
+            for gene in self.phones:
                 random_category = randint(0, GAConfig["num_categories"] - 1)
                 new_chromosome.insert_into_category(random_category, gene)
                 #need to make sure that the chromosome has all categories fixed here.
@@ -99,6 +100,16 @@ class GeneticAlgorithm:
 
         return chrom
 
+    def import_phones(self):
+        """
+        Pulls in the genes (phones) used for the particular language.
+        Sets the class variables phones to have all of the phones
+        """
+        phones_file = GAConfig["gene_file"]
+        with open(phones_file, 'r') as in_file:
+            for line in in_file:
+                line = line.replace("\n","")
+                self.phones.append(line)
 
     def import_population(self, resume_from):
         """
@@ -111,7 +122,7 @@ class GeneticAlgorithm:
 
         with open(file_name, 'r') as in_file:
             for line in in_file:
-                if len(line) < len(GAConfig["gene_list"]):
+                if len(line) < len(self.phones):
                     self.population[-1].set_fitness(float(line))
                     continue
 
@@ -277,3 +288,6 @@ class GeneticAlgorithm:
         Returns a random number between 0 and the number of categories
         """
         return randint(0,GAConfig["num_categories"]-1)
+
+if __name__ == "__main__":
+    GA = GeneticAlgorithm()

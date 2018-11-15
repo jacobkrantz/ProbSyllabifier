@@ -55,7 +55,7 @@ category_restriction: Do categories have a minimum occupancy? True or False.
 category_restriction_count: If category_restriction is on, what's the minimum amount per category allowed.
 training_size_hmm: The amount of words to train the HMM on.  
 testing_size_hmm: The amount of words to test the accuracy of the scheme on.  
-gene_list: The list of phonetic characters in the language being used.  
+gene_file: The file for which the phones being stored are held.
 log_file_location: The location to store the output of the genetic algorithm.  
 
 ## phone_optimize  

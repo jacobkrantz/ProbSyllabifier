@@ -21,13 +21,13 @@ Date Modified:  9/10/17
 # evolutionNumber represents the evolution log file to continue from
 def optimize():
     ga = GeneticAlgorithm()
+    ga.import_phones()
     ga.display_parameters()
-
     assert(GAConfig["population_size"]/4 == GAConfig["num_mating_pairs"])
-
+    
     #Can not have more genes per category than genes available
     if(GAConfig["category_restriction"] == "True"):
-        assert(int(GAConfig["category_restriction_count"])* int(GAConfig["num_categories"])<= len(GAConfig["gene_list"]))
+        assert(int(GAConfig["category_restriction_count"])* int(GAConfig["num_categories"])<= len(ga.phones))
     #configure constraints for amount of genes vs amount of categories
     evolution_number = 0
     if len(sys.argv) > 1:
@@ -49,7 +49,6 @@ def optimize():
 
 def test():
     ga = GeneticAlgorithm()
-    ga.initialize_population()
-    ga.evolve(1,1)
+    ga.import_phones()
+
 optimize()
-#test()

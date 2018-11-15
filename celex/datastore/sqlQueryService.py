@@ -1,5 +1,5 @@
-from contextlib import closing
 
+from contextlib import closing
 from config import settings as config
 from sqliteClient import SQLiteClient
 
@@ -22,6 +22,12 @@ class SQLQueryService(SQLiteClient):
             query = """
                     SELECT %s
                     FROM CleanDutch
+                    WHERE Word = ?
+                    """ % self._get_alphabet_column("Phon")
+        elif self._language == "Italian":
+            query = """
+                    SELECT %s
+                    FROM Italian
                     WHERE Word = ?
                     """ % self._get_alphabet_column("Phon")
         else:
@@ -65,6 +71,12 @@ class SQLQueryService(SQLiteClient):
             query = """
                     SELECT %s
                     FROM CleanDutch
+                    WHERE Word = ?
+                    """ % self._get_alphabet_column("PhonSyl")
+        elif self._language == "Italian":
+            query = """
+                    SELECT %s
+                    FROM Italian
                     WHERE Word = ?
                     """ % self._get_alphabet_column("PhonSyl")
         else:
@@ -171,6 +183,13 @@ class SQLQueryService(SQLiteClient):
                     WHERE Word NOT LIKE '% %'
                     ORDER BY Random()
                     """
+        elif self._language == 'Italian':
+            query = """
+                    SELECT Word
+                    FROM Italian
+                    WHERE Word NOT LIKE '% %'
+                    ORDER BY Random()
+                    """
         else:
             raise ValueError('illegal language parameter in config.json.')
 
@@ -205,6 +224,12 @@ class SQLQueryService(SQLiteClient):
                         FROM CleanDutch
                         WHERE Word NOT LIKE '% %'
                         """
+            elif self._language == 'Italian':
+                query = """
+                        SELECT COUNT (*)
+                        FROM Italian
+                        WHERE Word NOT LIKE '% %'
+                        """
             else:
                 raise ValueError('illegal language parameter in config.json.')
 
@@ -230,6 +255,14 @@ class SQLQueryService(SQLiteClient):
                         Word,
                         %s
                     FROM CleanDutch
+                    WHERE Word IN ({})
+                    """ % self._get_alphabet_column("Phon")
+        elif self._language == 'Italian':
+            query = """
+                    SELECT
+                        Word,
+                        %s
+                    FROM Italian
                     WHERE Word IN ({})
                     """ % self._get_alphabet_column("Phon")
         else:
@@ -260,6 +293,14 @@ class SQLQueryService(SQLiteClient):
                         Word,
                         %s
                     FROM CleanDutch
+                    WHERE Word IN ({})
+                    """ % self._get_alphabet_column("PhonSyl")
+        elif self._language == 'Italian':
+            query = """
+                    SELECT
+                        Word,
+                        %s
+                    FROM Italian
                     WHERE Word IN ({})
                     """ % self._get_alphabet_column("PhonSyl")
         else:

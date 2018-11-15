@@ -48,7 +48,7 @@ class PhoneOptimize:
         self.population = self.compute_fitness.compute(self.population)
         self._sort()
 
-        ## replaces the worst scheme with the best scheme. 
+        ## replaces the worst scheme with the best scheme.
         scheme[-1] = self.population[0]
         return scheme
 
@@ -196,7 +196,19 @@ class PhoneOptimize:
                     spot_lst.append([spot,spot2])
         return spot_lst
 
-
+    def _import_phones(self):
+        """
+        Pulls in the genes (phones) used for the particular language.
+        Returns:
+            List(strings): Each string represents a phone
+        """
+        gene_list = []
+        phones_file = GAConfig["gene_file"]
+        with open(phones_file, 'r') as in_file:
+            for line in in_file:
+                line = line.replace("\n","")
+                gene_list.append(line)
+        return gene_list
 
     def _chrom_copy(self, chrom):
         """
@@ -205,8 +217,8 @@ class PhoneOptimize:
             A non references identical chromosome
         """
         new_chromosome = Chromosome(GAConfig["num_categories"])
-
-        for phone in GAConfig["gene_list"]:
+        gene_list = self._import_phones()
+        for phone in gene_list:
             spot = chrom.get_category(phone)
             if(spot != None):
                 new_chromosome.insert_into_category(spot,phone)

@@ -14,7 +14,8 @@ class SQLiteClient:
         self.connection = sqlite3.connect(
             config[self._database_context]["path"]
         )
-
+        self.connection.text_factory = lambda x: unicode(x, 'utf-8', 'ignore')
+        
     def create_table(self, table_name, columns_and_types):
         """
         :param table_name: string

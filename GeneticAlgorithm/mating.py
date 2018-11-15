@@ -30,6 +30,7 @@ class Mating:
         """
 
         self.newPopulation = []
+        self.phones = self.import_phones()
         self.newPopulation = self._SUS(population)
         #self._selection_random(population)
 
@@ -39,6 +40,19 @@ class Mating:
     #############
     ##Private ###
     #############
+    def import_phones(self):
+        """
+        Pulls in the genes (phones) used for the particular language.
+        Sets the class variables phones to have all of the phones
+        """
+        phone_list = []
+        phones_file = config["gene_file"]
+
+        with open(phones_file, 'r') as in_file:
+            for line in in_file:
+                line = line.replace("\n","")
+                phone_list.append(line)
+        return phone_list
 
     def _SUS(self, population):
         """
@@ -203,7 +217,7 @@ class Mating:
             A vector of 0's and 1's.
         """
         vector = list()
-        amount = len(config["gene_list"])
+        amount = len(self.phones)
         for count in range(amount):
             rand_num = randint(0,1)
             vector.append(rand_num)
@@ -225,7 +239,7 @@ class Mating:
         child1.set_fitness(0)
         child2 = Chromosome(config["num_categories"])
         child2.set_fitness(0)
-        gene_list = config["gene_list"]
+        gene_list = self.phones
 
         # exchanging the phones into their new, mated categories
         for index in range(len(gene_list)):
@@ -258,7 +272,7 @@ class Mating:
         child1.set_fitness(0)
 
         # exchanging the phones into their new, mated categories
-        for phone in config["gene_list"]:
+        for phone in self.phones:
             rand_num = randint(0, 100)
             # father
             if 0 <= rand_num <= father_range:
